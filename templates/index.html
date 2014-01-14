@@ -1,0 +1,13 @@
+<html>
+<head></head>
+<body>
+<h1>List of users</h1>
+	<ul>
+	{% for user in data.users %}
+	  <li{% if loop.first %} class="first"{% endif %}>
+	    {{ user.name }}
+	  </li>
+	{% endfor %}
+	</ul>
+</body>
+</html>
