@@ -25,6 +25,7 @@ module.exports = function(grunt) {
     var data = root.child("gamesFinder").on('value', function(dataSnapshot) {
 
       grunt.log.write('Finding Templates \n');
+
       dir.files('templates', function(err, files) {
 
         grunt.log.write('Rendering Templates \n');
@@ -37,10 +38,10 @@ module.exports = function(grunt) {
 
           var newFile = file.replace('templates', './out/');
 
-          mkdirp(path.dirname(newFile), function (err) {
-            fs.writeFile(newFile, output)
-          });
-
+          mkdirp.sync(path.dirname(newFile));
+          
+          fs.writeFile(newFile, output)
+          
         });
 
         done(true);
