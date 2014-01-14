@@ -3,7 +3,35 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    firebase: 'ltsquigs'
+    firebase: 'ltsquigs',
+
+    open : {
+      dev: {
+        path: 'http://localhost:2002'
+      }
+    },
+
+    clean: {
+      build: ["build"]
+    },
+
+    connect: {
+      server: {
+        options: {
+          port: 2002,
+          base: 'build',
+          livereload: true
+        }
+      }
+    },
+
+    watch: {
+      files: ['templates/**/*.html'],
+      tasks: ['build'],
+      options: {
+        livereload: true,
+      }
+    }
   });
 
   var Firebase = require('firebase');
@@ -11,18 +39,16 @@ module.exports = function(grunt) {
   var path = require('path');
   var swig  = require('swig');
   var fs = require('fs');
-  var dir = require('node-dir')
+  var dir = require('node-dir');
 
-  // Default task(s).
-  grunt.registerTask('default', function() {
-
+  var renderTemplates = function (done) {
     grunt.log.write('Connecting to firebase \n');
     var root = new Firebase('https://' + grunt.config.get('firebase') +  '.firebaseio.com/');
 
-    var done = this.async();
 
     grunt.log.write('Loading Data \n');
-    var data = root.child("gamesFinder").on('value', function(dataSnapshot) {
+
+    root.child("gamesFinder").on('value', function(data) {
 
       grunt.log.write('Finding Templates \n');
 
@@ -33,13 +59,13 @@ module.exports = function(grunt) {
         // TODO FILTER ONLY HTML FILES
         files.forEach(function(file) {
           var output = swig.renderFile(file, {
-            data: dataSnapshot.val()
+            data: data.val()
           });
 
-          var newFile = file.replace('templates', './out/');
+          var newFile = file.replace('templates', './build/');
 
           mkdirp.sync(path.dirname(newFile));
-          
+
           fs.writeFile(newFile, output)
           
         });
@@ -47,6 +73,19 @@ module.exports = function(grunt) {
         done(true);
       });
     });
+  };
+
+  // Build Task.
+  grunt.registerTask('build', function() {
+    var done = this.async();
+    renderTemplates(done);
   });
 
+  grunt.registerTask('default', ['clean', 'build', 'connect', 'open', 'watch'])
+
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-open');
 };
