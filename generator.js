@@ -72,7 +72,7 @@ module.exports.generator = function (firebaseUrl, logger) {
 
         var fixedFiles = [];
         files.forEach(function(file) {
-          if(path.extname(file) === '.html')
+          if(path.extname(file) === '.html' && file.indexOf('templates/partials') !== 0)
           {
             var baseName = path.basename(file, '.html');
             var newPath = path.dirname(file).replace('templates', './build');
