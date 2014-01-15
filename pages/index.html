@@ -2,4 +2,11 @@
 
 {% block body %}
   <a href="/users/">Users</a>
+
+  {% set users = get('users', 4, 2) %}
+
+  {% for user in users %}
+    {{ user.name }}
+  {% endfor %}
+
 {% endblock %}
