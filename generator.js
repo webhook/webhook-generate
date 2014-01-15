@@ -1,5 +1,5 @@
 // Requires
-var Firebase = require('firebase');
+var firebase = require('firebase');
 var request = require('request');
 var mkdirp = require('mkdirp');
 var path = require('path');
@@ -17,10 +17,10 @@ console.log = function () {};
 module.exports.generator = function (firebaseUrl, logger) {
 
   var self = this;
-  logger = logger || { ok: function() {}, error: function() {}, write: function() {} };
+  logger = logger || { ok: function() {}, error: function() {}, write: function() {}, writeln: function() {} };
   firebaseUrl = firebaseUrl || '';
 
-  this.root = new Firebase('https://' + firebaseUrl +  '.firebaseio.com/');
+  this.root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
 
   var getData = function(callback) {
     self.root.child("gamesFinder").once('value', function(data) {
@@ -53,6 +53,7 @@ module.exports.generator = function (firebaseUrl, logger) {
             var newFile = file.replace('pages', './build');
             fixedFiles.push(writeTemplate(file, newFile, { data: data }));
           }
+
         });
 
         logger.ok('Finished Rendering Pages\n');
@@ -180,6 +181,7 @@ module.exports.generator = function (firebaseUrl, logger) {
       }
 
       initial = false;
+
     }, function(error) {
       logger.error(error);
     });
