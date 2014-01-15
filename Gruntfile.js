@@ -42,7 +42,7 @@ module.exports = function(grunt) {
 
   });
 
-  var generator = require('./generator').generator(grunt.config.get('firebase'), grunt.log);
+  var generator = require('./libs/generator').generator(grunt.config.get('firebase'), grunt.log);
 
   grunt.registerTask('buildTemplates', 'Generate static files from templates directory', function() {
     var done = this.async();

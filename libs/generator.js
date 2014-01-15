@@ -159,8 +159,11 @@ module.exports.generator = function (firebaseUrl, logger) {
     // TODO use a real pluralize, not just tak s on
     var list = directory +  'individual.html';
 
-    fs.writeFile(individual, '');
-    fs.writeFile(list, '');
+    var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
+    var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
+
+    fs.writeFile(individual, individualTemplate);
+    fs.writeFile(list, listTemplate);
   };
 
   this.reloadFiles = function(files, done) {
