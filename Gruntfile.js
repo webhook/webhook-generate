@@ -25,11 +25,11 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      files: ['pages/**/*.html', 'templates/**/*.html'],
-      tasks: ['build'],
-      options: {
+      options : {
         livereload: true,
-      }
+        files: ['pages/**/*.html', 'templates/**/*.html'],
+        tasks: ['build']
+      },
     },
 
     concurrent: {
@@ -50,6 +50,7 @@ module.exports = function(grunt) {
   var swig  = require('swig');
   var fs = require('fs');
   var dir = require('node-dir');
+  var tinylr = require('tiny-lr');
 
   var root = new Firebase('https://' + grunt.config.get('firebase') +  '.firebaseio.com/');
 
@@ -78,7 +79,7 @@ module.exports = function(grunt) {
 
           mkdirp.sync(path.dirname(newFile));
 
-          fs.writeFile(newFile, output)
+          fs.writeFileSync(newFile, output);
           
         });
 
@@ -107,7 +108,7 @@ module.exports = function(grunt) {
 
           mkdirp.sync(path.dirname(newFile));
 
-          fs.writeFile(newFile, output)
+          fs.writeFileSync(newFile, output);
           
         });
 
@@ -155,20 +156,30 @@ module.exports = function(grunt) {
     fs.writeFile(list, '');
   };
 
+  var reloadFiles = function(files) {
+    request({ url : 'http://localhost:35729/changed?files=' + files.join(',')  }, function(error, response, body) {
+      grunt.log.write(error + '\n');
+    });
+  };
 
   grunt.registerTask('buildTemplates', function() {
     var done = this.async();
-    renderTemplates(done);
+    renderTemplates(done, reloadFiles);
   });
 
   grunt.registerTask('buildPages', function() {
     var done = this.async();
-    renderPages(done);
+    renderPages(done, reloadFiles);
   });
 
   grunt.registerTask('scaffolding', function(name) {
     makeScaffolding(name);
   });
+
+  grunt.registerTask('watch', function() {
+    tinylr().listen(35729);
+    grunt.task.run('simple-watch');
+  })
 
   grunt.registerTask('watchFirebase', function(name) {
     var done = this.async();
@@ -176,17 +187,10 @@ module.exports = function(grunt) {
     var initial = true;
     root.child("gamesFinder").on('value', function(data) {
 
-      //if(!initial)
+      if(!initial)
       {
-        buildBoth(function(files) {
-          request({ url : 'http://localhost:35729/changed?files=' + files.join(',')  }, function(error, response, body) {
-            grunt.log.write(error);
-            grunt.log.write('\n');
-          });
-        });
-
-       // grunt.log.write('\n');
-    //  } else {
+        buildBoth(reloadFiles);
+      } else {
         grunt.log.write('Watching \n');
       }
 
@@ -199,11 +203,10 @@ module.exports = function(grunt) {
   // Build Task.
   grunt.registerTask('build', ['clean', 'buildTemplates', 'buildPages']);
 
-  grunt.registerTask('default', ['build', 'connect', 'open', 'concurrent'])
+  grunt.registerTask('default', ['build', 'connect', 'open', 'concurrent']);
 
-  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-simple-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-concurrent');
