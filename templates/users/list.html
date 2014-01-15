@@ -1,9 +1,0 @@
-{% extends "../partials/base.html" %}
-
-{% block body %}
-<ul>
-  {% for user in items %}
-    <a href="/users/{{ user.name }}/">{{ user.name }}</a>
-  {% endfor %}
-</ul>
-{% endblock %}
