@@ -28,7 +28,10 @@ module.exports = function(grunt) {
       options : {
         livereload: true,
         files: ['pages/**/*.html', 'templates/**/*.html'],
-        tasks: ['build']
+        tasks: ['build'],
+        dateFormat: function(time) {
+          grunt.log.write('here');
+        }
       },
     },
 
@@ -48,119 +51,176 @@ module.exports = function(grunt) {
   var mkdirp = require('mkdirp');
   var path = require('path');
   var swig  = require('swig');
+
+  swig.setDefaults({ cache: false });
+
   var fs = require('fs');
-  var dir = require('node-dir');
+  var glob = require('glob');
   var tinylr = require('tiny-lr');
 
   var root = new Firebase('https://' + grunt.config.get('firebase') +  '.firebaseio.com/');
 
   var getData = function(callback) {
     root.child("gamesFinder").once('value', function(data) {
-      callback(data);
+      callback(data.val());
+    }, function(error) {
+      grunt.log.error(error);
     });
   }
 
+  var writeTemplate = function(inFile, outFile, params) {
+    var output = swig.renderFile(inFile, params);
+
+    mkdirp.sync(path.dirname(outFile));
+
+    fs.writeFileSync(outFile, output);
+
+    return outFile.replace('./build', '');
+  }
 
   var renderPages = function (done, cb)  {
-    grunt.log.write('Rendering Pages\n');
+    grunt.log.ok('Rendering Pages\n');
     getData(function(data) {
 
-      dir.files('pages', function(err, files) {
-
-        // TODO FILTER ONLY HTML FILES
+      glob('pages/**/*.html', function(err, files) {
         var fixedFiles = [];
         files.forEach(function(file) {
-          var output = swig.renderFile(file, {
-            data: data.val()
-          });
 
-          fixedFiles.push(file.replace('pages', ''));
-          var newFile = file.replace('pages', './build/');
-
-          mkdirp.sync(path.dirname(newFile));
-
-          fs.writeFileSync(newFile, output);
-          
+          if(path.extname(file) === '.html')
+          {
+            var newFile = file.replace('pages', './build');
+            fixedFiles.push(writeTemplate(file, newFile, { data: data }));
+          }
         });
 
-        if(cb) cb(fixedFiles);
-        if(done) done(true);
+        grunt.log.ok('Finished Rendering Pages\n');
+
+        if(cb) cb(fixedFiles, done);
       });
+
     });
   };
 
   var renderTemplates = function(done, cb) {
-    grunt.log.write('Rendering Templates\n');
+    grunt.log.ok('Rendering Templates');
+
     getData(function(data) {
 
-      dir.files('templates', function(err, files) {
+      glob('templates/**/*.html', function(err, files) {
 
-        // TODO FILTER ONLY HTML FILES
         var fixedFiles = [];
         files.forEach(function(file) {
-          var output = swig.renderFile(file, {
-            data: data.val()
-          });
+          if(path.extname(file) === '.html')
+          {
+            var baseName = path.basename(file, '.html');
+            var newPath = path.dirname(file).replace('templates', './build');
+            var pathParths = path.dirname(file).split(path.sep);
+            var objectName = pathParths[pathParths.length - 1];
+            var items = data[objectName];
 
-          // Special Handling goes here
-          fixedFiles.push(file.replace('templates', ''));
-          var newFile = file.replace('templates', './build/');
+            if(baseName === 'list')
+            {
+              // Output should be path + '/index.html'
+              // Should pass in object as 'items'
+              newPath = newPath + '/index.html';
+              fixedFiles.push(writeTemplate(file, newPath, { items: items }));
 
-          mkdirp.sync(path.dirname(newFile));
+            } else if (baseName === 'individual') {
+              // Output should be path + id + '/index.html'
+              // Should pass in object as 'item'
 
-          fs.writeFileSync(newFile, output);
-          
+              var baseNewPath = newPath;
+              for(var key in items)
+              {
+                var val = items[key];
+                var id = val.id || val.name;
+
+                newPath = baseNewPath + '/' + id + '/index.html';
+                fixedFiles.push(writeTemplate(file, newPath, { item: val }));
+              }
+            }
+          }
         });
 
-        if(cb) cb(fixedFiles);
-        if(done) done(true);
+        grunt.log.ok('Finished Rendering Templates');
+
+        if(cb) cb(fixedFiles, done);
+
       });
     });
   }
 
   var cleanFiles = function(callback) {
-      dir.paths('build', function(err, paths) {
-        grunt.log.write('Cleaning Files \n');
 
-        paths.files.forEach(function(file) {
-          fs.unlinkSync(file)
+      glob('build/**', function(err, files) {
+        var directories = [];
+        var realFiles = [];
+
+        files.forEach(function(file) {
+          if(path.extname(file))
+          {
+            fs.unlinkSync(file);
+          } else if (file) {
+            directories.push(file);
+          }
         });
-        paths.dirs.forEach(function(file) {
-          fs.rmdir(file)
+
+        directories.sort().reverse().forEach(function(file) {
+          fs.rmdirSync(file);
         });
 
         callback();
       });
+
   };
 
-  var buildBoth = function(cb) {
+  var buildBoth = function(cb, done) {
     // clean files
     cleanFiles(function() {
-      renderTemplates(null, cb);
-      renderPages(null, cb);
+      renderTemplates(null, function() {
+        renderPages(done, cb);
+      });
     });
 
   };
 
   var makeScaffolding = function(name) {
+    grunt.log.ok('Creating Scaffolding\n');
     var directory = 'templates/' + name + '/';
     mkdirp.sync(directory);
 
     // TODO make sure name is not plural
-    var individual = directory + name + '.html';
+    var individual = directory + 'list.html';
 
     // TODO use a real pluralize, not just tak s on
-    var list = directory + name + 's.html';
+    var list = directory +  'individual.html';
 
     fs.writeFile(individual, '');
     fs.writeFile(list, '');
   };
 
-  var reloadFiles = function(files) {
-    request({ url : 'http://localhost:35729/changed?files=' + files.join(',')  }, function(error, response, body) {
-      grunt.log.write(error + '\n');
+  var reloadFiles = function(files, done) {
+    request({ url : 'http://localhost:35729/changed?files=' + files.join(','), timeout: 10  }, function(error, response, body) {
+      if(done) done(true);
     });
   };
+
+  var watchFirebase = function() {
+    var initial = true;
+    root.child("gamesFinder").on('value', function(data) {
+
+      if(!initial)
+      {
+        buildBoth(reloadFiles);
+      } else {
+        grunt.log.ok('Watching');
+      }
+
+      initial = false;
+    }, function(error) {
+      grunt.log.error(error);
+    });
+  }
 
   grunt.registerTask('buildTemplates', function() {
     var done = this.async();
@@ -181,27 +241,17 @@ module.exports = function(grunt) {
     grunt.task.run('simple-watch');
   })
 
-  grunt.registerTask('watchFirebase', function(name) {
+  grunt.registerTask('watchFirebase', function() {
     var done = this.async();
-
-    var initial = true;
-    root.child("gamesFinder").on('value', function(data) {
-
-      if(!initial)
-      {
-        buildBoth(reloadFiles);
-      } else {
-        grunt.log.write('Watching \n');
-      }
-
-      initial = false;
-    });
-
+    watchFirebase();
   });
 
-
   // Build Task.
-  grunt.registerTask('build', ['clean', 'buildTemplates', 'buildPages']);
+  grunt.registerTask('build', function() {
+    var done = this.async();
+
+    buildBoth(reloadFiles, done);
+  });
 
   grunt.registerTask('default', ['build', 'connect', 'open', 'concurrent']);
 
