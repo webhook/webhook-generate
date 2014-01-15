@@ -41,7 +41,6 @@ module.exports.swigFunctions = function(swig) {
       slicedDict[key] = dict[key];
     });
 
-
     return slicedDict;
   };
 
