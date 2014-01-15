@@ -18,7 +18,7 @@ swigTags.init(swig);
 swig.setDefaults({ cache: false });
 
 // Disable console log in various things
-//console.log = function () {};
+console.log = function () {};
 
 module.exports.generator = function (firebaseUrl, logger) {
 
