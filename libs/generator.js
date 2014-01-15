@@ -37,7 +37,7 @@ module.exports.generator = function (firebaseUrl, logger) {
 
     fs.writeFileSync(outFile, output);
 
-    return outFile.replace('./build', '');
+    return outFile.replace('./.build', '');
   };
 
   this.renderPages = function (done, cb)  {
@@ -50,7 +50,7 @@ module.exports.generator = function (firebaseUrl, logger) {
 
           if(path.extname(file) === '.html')
           {
-            var newFile = file.replace('pages', './build');
+            var newFile = file.replace('pages', './.build');
             fixedFiles.push(writeTemplate(file, newFile, { data: data }));
           }
 
@@ -76,7 +76,7 @@ module.exports.generator = function (firebaseUrl, logger) {
           if(path.extname(file) === '.html' && file.indexOf('templates/partials') !== 0)
           {
             var baseName = path.basename(file, '.html');
-            var newPath = path.dirname(file).replace('templates', './build');
+            var newPath = path.dirname(file).replace('templates', './.build');
             var pathParths = path.dirname(file).split(path.sep);
             var objectName = pathParths[pathParths.length - 1];
             var items = data[objectName];
@@ -115,7 +115,7 @@ module.exports.generator = function (firebaseUrl, logger) {
 
   this.cleanFiles = function(callback, done) {
       logger.ok('Cleaning files');
-      glob('build/**', function(err, files) {
+      glob('.build/**', function(err, files) {
         var directories = [];
         var realFiles = [];
 
@@ -154,16 +154,16 @@ module.exports.generator = function (firebaseUrl, logger) {
     mkdirp.sync(directory);
 
     // TODO make sure name is not plural
-    var individual = directory + 'list.html';
+    var list = directory + 'list.html';
 
     // TODO use a real pluralize, not just tak s on
-    var list = directory +  'individual.html';
+    var individual = directory +  'individual.html';
 
     var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
     var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
 
-    fs.writeFile(individual, individualTemplate);
-    fs.writeFile(list, listTemplate);
+    fs.writeFileSync(individual, individualTemplate);
+    fs.writeFileSync(list, listTemplate);
   };
 
   this.reloadFiles = function(files, done) {
