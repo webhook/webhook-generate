@@ -25,6 +25,7 @@
     "grunt-contrib-connect": "~0.6.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-open": "~0.2.2",
-    "grunt-concurrent": "~0.4.2"
+    "grunt-concurrent": "~0.4.2",
+    "request": "~2.31.0"
   }
 }

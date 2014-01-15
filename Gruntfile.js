@@ -44,6 +44,7 @@ module.exports = function(grunt) {
   });
 
   var Firebase = require('firebase');
+  var request = require('request');
   var mkdirp = require('mkdirp');
   var path = require('path');
   var swig  = require('swig');
@@ -59,18 +60,20 @@ module.exports = function(grunt) {
   }
 
 
-  var renderPages = function (done)  {
+  var renderPages = function (done, cb)  {
     grunt.log.write('Rendering Pages\n');
     getData(function(data) {
 
       dir.files('pages', function(err, files) {
 
         // TODO FILTER ONLY HTML FILES
+        var fixedFiles = [];
         files.forEach(function(file) {
           var output = swig.renderFile(file, {
             data: data.val()
           });
 
+          fixedFiles.push(file.replace('pages', ''));
           var newFile = file.replace('pages', './build/');
 
           mkdirp.sync(path.dirname(newFile));
@@ -79,24 +82,27 @@ module.exports = function(grunt) {
           
         });
 
+        if(cb) cb(fixedFiles);
         if(done) done(true);
       });
     });
   };
 
-  var renderTemplates = function(done) {
+  var renderTemplates = function(done, cb) {
     grunt.log.write('Rendering Templates\n');
     getData(function(data) {
 
       dir.files('templates', function(err, files) {
 
         // TODO FILTER ONLY HTML FILES
+        var fixedFiles = [];
         files.forEach(function(file) {
           var output = swig.renderFile(file, {
             data: data.val()
           });
 
           // Special Handling goes here
+          fixedFiles.push(file.replace('templates', ''));
           var newFile = file.replace('templates', './build/');
 
           mkdirp.sync(path.dirname(newFile));
@@ -105,6 +111,7 @@ module.exports = function(grunt) {
           
         });
 
+        if(cb) cb(fixedFiles);
         if(done) done(true);
       });
     });
@@ -125,11 +132,11 @@ module.exports = function(grunt) {
       });
   };
 
-  var buildBoth = function(done) {
+  var buildBoth = function(cb) {
     // clean files
     cleanFiles(function() {
-      renderTemplates();
-      renderPages();
+      renderTemplates(null, cb);
+      renderPages(null, cb);
     });
 
   };
@@ -169,11 +176,17 @@ module.exports = function(grunt) {
     var initial = true;
     root.child("gamesFinder").on('value', function(data) {
 
-      if(!initial)
+      //if(!initial)
       {
-        buildBoth();
-        grunt.log.write('\n');
-      } else {
+        buildBoth(function(files) {
+          request({ url : 'http://localhost:35729/changed?files=' + files.join(',')  }, function(error, response, body) {
+            grunt.log.write(error);
+            grunt.log.write('\n');
+          });
+        });
+
+       // grunt.log.write('\n');
+    //  } else {
         grunt.log.write('Watching \n');
       }
 
