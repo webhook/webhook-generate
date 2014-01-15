@@ -8,11 +8,17 @@ var fs = require('fs');
 var glob = require('glob');
 var tinylr = require('tiny-lr');
 
+var swigFunctions = require('./swig_functions').swigFunctions();
+var swigFilters = require('./swig_filters');
+var swigTags = require('./swig_tags');
+
 // Config requires
+swigFilters.init(swig);
+swigTags.init(swig);
 swig.setDefaults({ cache: false });
 
 // Disable console log in various things
-console.log = function () {};
+//console.log = function () {};
 
 module.exports.generator = function (firebaseUrl, logger) {
 
@@ -22,15 +28,30 @@ module.exports.generator = function (firebaseUrl, logger) {
 
   this.root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
 
+  var extend = function(target) {
+      var sources = [].slice.call(arguments, 1);
+      sources.forEach(function (source) {
+          for (var prop in source) {
+              target[prop] = source[prop];
+          }
+      });
+      return target;
+  };
+
   var getData = function(callback) {
     self.root.child("gamesFinder").once('value', function(data) {
-      callback(data.val());
+      var data = data.val();
+
+      swigFunctions.setData(data);
+      callback(data);
     }, function(error) {
       logger.error(error);
     });
   };
 
   var writeTemplate = function(inFile, outFile, params) {
+    params = params || {};
+    params = extend(params, swigFunctions.getFunctions());
     var output = swig.renderFile(inFile, params);
 
     mkdirp.sync(path.dirname(outFile));
@@ -51,7 +72,7 @@ module.exports.generator = function (firebaseUrl, logger) {
           if(path.extname(file) === '.html')
           {
             var newFile = file.replace('pages', './.build');
-            fixedFiles.push(writeTemplate(file, newFile, { data: data }));
+            fixedFiles.push(writeTemplate(file, newFile));
           }
 
         });
