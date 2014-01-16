@@ -215,7 +215,11 @@ module.exports.generator = function (config, logger) {
   this.cleanFiles = function(done, cb) {
       logger.ok('Cleaning files');
 
-      wrench.rmdirSyncRecursive('.build');
+      if(fs.existsSync('.build'))
+      {
+        wrench.rmdirSyncRecursive('.build');
+      }
+
       if (cb) cb();
       if (done) done(true);
   };
