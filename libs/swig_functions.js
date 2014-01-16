@@ -34,7 +34,7 @@ module.exports.swigFunctions = function(swig) {
     } else if (limit !== -1) {
       keys = keys.slice(0, offset + limit);
     } else if (offset !== -1) {
-      keys = keys.slice(offset)
+      keys = keys.slice(offset);
     } 
 
     var slicedDict = {};

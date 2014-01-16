@@ -81,13 +81,13 @@ module.exports.generator = function (config, logger) {
     }
 
     getBucket().once('value', function(data) {
-      var data = data.val();
+      data = data.val();
 
       // Get the data portion of bucket, other things are not needed for templates
-      if(!data['data']) {
+      if(!data.data) {
         data = {};
       } else {
-        data = data['data'];
+        data = data.data;
       }
 
       // Sets the context for swig functions
@@ -296,7 +296,7 @@ module.exports.generator = function (config, logger) {
    */
   this.startLiveReload = function() {
     tinylr().listen(liveReloadPort);
-  }
+  };
 
   /** 
    * Inintializes firebase configuration for a new site

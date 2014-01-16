@@ -69,7 +69,7 @@ module.exports = function(grunt) {
   grunt.registerTask('watch', 'Watch for changes in templates and regenerate site', function() {
     generator.startLiveReload();
     grunt.task.run('simple-watch');
-  })
+  });
 
   grunt.registerTask('watchFirebase', 'Watch for changes in firebase and regenerate site', function() {
     var done = this.async();
@@ -104,6 +104,7 @@ module.exports = function(grunt) {
 
     if(conf === {})
     {
+      // Eventually this should prompt instead of hard code site
       grunt.task.run('init:site');
     }
 
