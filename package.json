@@ -26,6 +26,7 @@
     "request": "~2.31.0",
     "grunt-simple-watch": "~0.1.2",
     "lodash": "~2.4.1",
-    "glob": "~3.2.8"
+    "glob": "~3.2.8",
+    "tiny-lr": "0.0.5"
   }
 }
