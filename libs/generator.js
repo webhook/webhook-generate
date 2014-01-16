@@ -242,6 +242,8 @@ module.exports.generator = function (config, logger) {
     var templated = _.template(confFile, { bucket: sitename });
 
     fs.writeFileSync('./.firebase.conf', templated);
+
+    done(true);
   };
 
   return this;
