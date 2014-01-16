@@ -1,21 +1,18 @@
 {
   "name": "webhook-generate",
   "version": "0.0.1",
-  "description": "Grunt generator for webhook",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "Grunt site generator for webhook",
   "repository": {
     "type": "git",
     "url": "git://github.com/webhook/webhook-generate.git"
   },
-  "author": "",
+  "author": "Webhook",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/webhook/webhook-generate/issues"
   },
   "homepage": "https://github.com/webhook/webhook-generate",
-  "devDependencies": {
+  "dependencies": {
     "grunt": "~0.4.2",
     "firebase": "~1.0.2",
     "swig": "~1.2.2",
@@ -27,6 +24,7 @@
     "grunt-simple-watch": "~0.1.2",
     "lodash": "~2.4.1",
     "glob": "~3.2.8",
-    "tiny-lr": "0.0.5"
+    "tiny-lr": "0.0.5",
+    "wrench": "~1.5.4"
   }
 }

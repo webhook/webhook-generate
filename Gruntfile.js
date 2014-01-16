@@ -1,20 +1,17 @@
+'use strict';
 module.exports = function(grunt) {
 
-  function loadConf() {
-    var conf = {};
+  var conf = {};
 
-    try {
-      conf = grunt.file.readJSON('./.firebase.conf');
-    } catch (err) {
-      conf = {};
-    }
-
-    return conf;
+  try {
+    conf = grunt.file.readJSON('./.firebase.conf');
+  } catch (err) {
+    conf = {};
   }
 
   // Project configuration.
   grunt.initConfig({
-    conf: loadConf(),
+    webhook: conf,
 
     open : {
       dev: {
@@ -27,14 +24,13 @@ module.exports = function(grunt) {
         options: {
           port: 2002,
           base: '.build',
-          livereload: true
+          livereload: 35729
         }
       }
     },
 
     watch: {
       options : {
-        livereload: true,
         files: ['pages/**/*.html', 'templates/**/*.html'],
         tasks: ['build'],
         dateFormat: function(time) {
@@ -54,7 +50,7 @@ module.exports = function(grunt) {
 
   });
 
-  var generator = require('./libs/generator').generator(grunt.config.get('conf'), grunt.log);
+  var generator = require('./libs/generator').generator(grunt.config, grunt.log);
 
   grunt.registerTask('buildTemplates', 'Generate static files from templates directory', function() {
     var done = this.async();
@@ -82,15 +78,16 @@ module.exports = function(grunt) {
 
   grunt.registerTask('clean', 'Clean build files', function() {
     var done = this.async();
-    generator.cleanFiles(null, done);
+    generator.cleanFiles(done);
   });
 
   // Build Task.
   grunt.registerTask('build', 'Clean files and then generate static site into build', function() {
     var done = this.async();
-    generator.buildBoth(generator.reloadFiles, done);
+    generator.buildBoth(done, generator.reloadFiles);
   });
 
+  // Change this to optionally prompt instead of requiring a sitename
   grunt.registerTask('init', 'Initialize the firebase configuration file (installer should do this as well)', function(sitename) {
     var done = this.async();
 
@@ -102,7 +99,19 @@ module.exports = function(grunt) {
     generator.init(sitename, done);
   });
 
-  grunt.registerTask('default',  'Clean, Build, Start Local Server, and Watch', ['build', 'connect', 'open', 'concurrent']);
+  // Check if initialized properly before running all these tasks
+  grunt.registerTask('default',  'Clean, Build, Start Local Server, and Watch', function() {
+
+    if(conf === {})
+    {
+      grunt.task.run('init:site');
+    }
+
+    grunt.task.run('build');
+    grunt.task.run('connect');
+    grunt.task.run('open');
+    grunt.task.run('concurrent');
+  });
 
   grunt.loadNpmTasks('grunt-simple-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');

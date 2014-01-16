@@ -3,30 +3,44 @@ var firebase = require('firebase');
 var request = require('request');
 var mkdirp = require('mkdirp');
 var path = require('path');
-var swig = require('swig');
 var fs = require('fs');
 var glob = require('glob');
 var tinylr = require('tiny-lr');
 var _ = require('lodash');
+var wrench = require('wrench');
 
+// Template requires
+// TODO: Abstract these later to make it simpler to change
+var swig = require('swig');
 var swigFunctions = require('./swig_functions').swigFunctions();
 var swigFilters = require('./swig_filters');
 var swigTags = require('./swig_tags');
-
-// Config requires
 swigFilters.init(swig);
 swigTags.init(swig);
 swig.setDefaults({ cache: false });
 
 // Disable console log in various things
-//console.log = function () {};
+console.log = function () {};
 
+/**
+ * Generator that handles various commands
+ * @param  {Object}   config     Configuration options from .firebase.conf
+ * @param  {Object}   logger     Object to use for logging, defaults to no-ops
+ */
 module.exports.generator = function (config, logger) {
 
   var self = this;
-  logger = logger || { ok: function() {}, error: function() {}, write: function() {}, writeln: function() {} };
-  var firebaseUrl = config.firebase || '';
+  var firebaseUrl = config.get('webhook').firebase || '';
+  var liveReloadPort = config.get('connect').server.options.livereload;
 
+  if(liveReloadPort === true)
+  {
+    liveReloadPort = 35729;
+  }
+
+  logger = logger || { ok: function() {}, error: function() {}, write: function() {}, writeln: function() {} };
+
+  // We dont error out here so init can still be run
   if (firebaseUrl)
   {
     this.root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
@@ -34,6 +48,11 @@ module.exports.generator = function (config, logger) {
     this.root = null;
   }
 
+  /**
+   * Extends an object from multiple objects
+   * @param {Object}    target   The target object to be extended to
+   * @param {Objects}   sources  A variable argument list of source objects to extend from
+   */
   var extend = function(target) {
       var sources = [].slice.call(arguments, 1);
       sources.forEach(function (source) {
@@ -44,10 +63,17 @@ module.exports.generator = function (config, logger) {
       return target;
   };
 
+  /**
+   * Used to get the bucket were using (combinaton of config and environment)
+   */
   var getBucket = function() {
-    return self.root.child(config.bucket).child('dev');
+    return self.root.child(config.get('webhook').bucket).child('dev');
   };
 
+  /**
+   * Retrieves snapshot of data from Firebase
+   * @param  {Function}   callback   Callback function to run after data is retrieved, is sent the snapshot
+   */
   var getData = function(callback) {
     if(!self.root)
     {
@@ -57,27 +83,48 @@ module.exports.generator = function (config, logger) {
     getBucket().once('value', function(data) {
       var data = data.val();
 
+      // Get the data portion of bucket, other things are not needed for templates
+      if(!data['data']) {
+        data = {};
+      } else {
+        data = data['data'];
+      }
+
+      // Sets the context for swig functions
       swigFunctions.setData(data);
       callback(data);
     }, function(error) {
-      logger.error(error);
+      throw new Error(error);
     });
   };
 
+  /**
+   * Writes an instance of a template to the build directory
+   * @param  {string}   inFile     Template to read
+   * @param  {string}   outFile    Destination in build directory
+   * @param  {Object}   params     The parameters to pass to the template
+   */
   var writeTemplate = function(inFile, outFile, params) {
     params = params || {};
+
+    // Merge functions in
     params = extend(params, swigFunctions.getFunctions());
     var output = swig.renderFile(inFile, params);
 
     mkdirp.sync(path.dirname(outFile));
-
     fs.writeFileSync(outFile, output);
 
     return outFile.replace('./.build', '');
   };
 
+  /**
+   * Renders all templates in the /pages directory to the build directory
+   * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
+   * @param  {Function}   cb       Callback called after finished, passed list of files changed and done function
+   */
   this.renderPages = function (done, cb)  {
     logger.ok('Rendering Pages\n');
+
     getData(function(data) {
 
       glob('pages/**/*.html', function(err, files) {
@@ -100,6 +147,11 @@ module.exports.generator = function (config, logger) {
     });
   };
 
+  /**
+   * Renders all templates in the /templates directory to the build directory
+   * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
+   * @param  {Function}   cb       Callback called after finished, passed list of files changed and done function
+   */
   this.renderTemplates = function(done, cb) {
     logger.ok('Rendering Templates');
 
@@ -109,13 +161,19 @@ module.exports.generator = function (config, logger) {
 
         var fixedFiles = [];
         files.forEach(function(file) {
+          // We ignore partials, special directory to allow making of partial includes
           if(path.extname(file) === '.html' && file.indexOf('templates/partials') !== 0)
           {
+            // Here we try and abstract out the content type name from directory structure
             var baseName = path.basename(file, '.html');
             var newPath = path.dirname(file).replace('templates', './.build');
-            var pathParths = path.dirname(file).split(path.sep);
-            var objectName = pathParths[pathParths.length - 1];
-            var items = data['data'][objectName];
+            var pathParts = path.dirname(file).split(path.sep);
+            var objectName = pathParths[pathParts.length - 1];
+            var items = data[objectName];
+
+            if(!items) {
+              logger.error('Missing content type for ' + objectName);
+            }
 
             if(baseName === 'list')
             {
@@ -127,7 +185,6 @@ module.exports.generator = function (config, logger) {
             } else if (baseName === 'individual') {
               // Output should be path + id + '/index.html'
               // Should pass in object as 'item'
-
               var baseNewPath = newPath;
               for(var key in items)
               {
@@ -148,34 +205,27 @@ module.exports.generator = function (config, logger) {
     });
   };
 
-  this.cleanFiles = function(callback, done) {
+  /**
+   * Cleans the build directory
+   * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
+   * @param  {Function}   cb       Callback called after finished, passed list of files changed and done function
+   */
+  this.cleanFiles = function(done, cb) {
       logger.ok('Cleaning files');
-      glob('.build/**', function(err, files) {
-        var directories = [];
-        var realFiles = [];
 
-        files.forEach(function(file) {
-          if(path.extname(file))
-          {
-            fs.unlinkSync(file);
-          } else if (file) {
-            directories.push(file);
-          }
-        });
-
-        directories.sort().reverse().forEach(function(file) {
-          fs.rmdirSync(file);
-        });
-
-        if (callback) callback();
-        if (done) done(true);
-      });
-
+      wrench.rmdirSyncRecursive('.build');
+      if (cb) cb();
+      if (done) done(true);
   };
 
-  this.buildBoth = function(cb, done) {
+  /**
+   * Builds templates from both /pages and /templates to the build directory
+   * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
+   * @param  {Function}   cb       Callback called after finished, passed list of files changed and done function
+   */
+  this.buildBoth = function(done, cb) {
     // clean files
-    self.cleanFiles(function() {
+    self.cleanFiles(null, function() {
       self.renderTemplates(null, function() {
         self.renderPages(done, cb);
       });
@@ -183,15 +233,16 @@ module.exports.generator = function (config, logger) {
 
   };
 
+  /**
+   * Generates scaffolding for content type with name
+   * @param  {String}   name     Name of content type to generate scaffolding for
+   */
   this.makeScaffolding = function(name) {
     logger.ok('Creating Scaffolding\n');
     var directory = 'templates/' + name + '/';
     mkdirp.sync(directory);
 
-    // TODO make sure name is not plural
     var list = directory + 'list.html';
-
-    // TODO use a real pluralize, not just tak s on
     var individual = directory +  'individual.html';
 
     var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
@@ -201,12 +252,20 @@ module.exports.generator = function (config, logger) {
     fs.writeFileSync(list, listTemplate);
   };
 
+  /**
+   * Send signal to local livereload server to reload files
+   * @param  {Array}      files     List of files to reload
+   * @param  {Function}   done      Callback passed either a true value to indicate its done, or an error 
+   */
   this.reloadFiles = function(files, done) {
-    request({ url : 'http://localhost:35729/changed?files=' + files.join(','), timeout: 10  }, function(error, response, body) {
+    request({ url : 'http://localhost:' + liveReloadPort + '/changed?files=' + files.join(','), timeout: 10  }, function(error, response, body) {
       if(done) done(true);
     });
   };
 
+  /**
+   * Runs forever, rebuilding the whole project when data is changed in firebase
+   */
   this.watchFirebase = function() {
 
     if(!self.root)
@@ -217,9 +276,10 @@ module.exports.generator = function (config, logger) {
     var initial = true;
     getBucket().on('value', function(data) {
 
+      // We ignore the initial run (in the default path its already built)
       if(!initial)
       {
-        self.buildBoth(self.reloadFiles);
+        self.buildBoth(null, self.reloadFiles);
       } else {
         logger.ok('Watching');
       }
@@ -227,18 +287,26 @@ module.exports.generator = function (config, logger) {
       initial = false;
 
     }, function(error) {
-      logger.error(error);
+      throw new Error(error);
     });
   };
 
+  /**
+   * Starts a live reload server to detect changes
+   */
   this.startLiveReload = function() {
-    tinylr().listen(35729);
+    tinylr().listen(liveReloadPort);
   }
 
+  /** 
+   * Inintializes firebase configuration for a new site
+   * @param  {String}    sitename  Name of site to generate config for
+   * @param  {Function}  done      Callback to call when operation is done
+   */
   this.init = function(sitename, done) {
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
     
-    // Grab bucket information from server eventually, for now just use the site name
+    // TODO: Grab bucket information from server eventually, for now just use the site name
     var templated = _.template(confFile, { bucket: sitename });
 
     fs.writeFileSync('./.firebase.conf', templated);

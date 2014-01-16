@@ -1,6 +1,8 @@
 
-
-// Set of twig filters we expose to users in the templates
+/**
+ * Defines a set of filters available in swig templates
+ * @param  {Object}   swig        Swig engine to add filters to
+ */
 module.exports.init = function (swig) {
 
   var upper = function(input) {

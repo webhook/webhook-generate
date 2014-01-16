@@ -1,6 +1,8 @@
 
-// Defines a list of all the swig functions we allow in templates by default
-// Is merged into the full list of functions on render
+/**
+ * Defines a set of functions usable in all swig templates, are merged into context on render
+ * @param  {Object}   swig        Swig engine
+ */
 module.exports.swigFunctions = function(swig) {
 
   var self = this;
@@ -46,7 +48,7 @@ module.exports.swigFunctions = function(swig) {
 
   var getData = function(name, limit, offset) {
 
-    var data = self.data['data'][name];
+    var data = self.data[name];
 
     return sliceDictionary(data, limit, offset);
   };
