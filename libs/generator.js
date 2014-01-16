@@ -1,3 +1,5 @@
+'use strict';
+
 // Requires
 var firebase = require('firebase');
 var request = require('request');
@@ -168,7 +170,7 @@ module.exports.generator = function (config, logger) {
             var baseName = path.basename(file, '.html');
             var newPath = path.dirname(file).replace('templates', './.build');
             var pathParts = path.dirname(file).split(path.sep);
-            var objectName = pathParths[pathParts.length - 1];
+            var objectName = pathParts[pathParts.length - 1];
             var items = data[objectName];
 
             if(!items) {

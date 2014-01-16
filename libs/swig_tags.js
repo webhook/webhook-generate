@@ -1,3 +1,4 @@
+'use strict';
 
 /**
  * Defines swig tags for templates

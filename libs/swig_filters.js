@@ -1,3 +1,4 @@
+'use strict';
 
 /**
  * Defines a set of filters available in swig templates
