@@ -25,6 +25,7 @@
     "grunt-open": "~0.2.2",
     "grunt-concurrent": "~0.4.2",
     "request": "~2.31.0",
-    "grunt-simple-watch": "~0.1.2"
+    "grunt-simple-watch": "~0.1.2",
+    "lodash": "~2.4.1"
   }
 }

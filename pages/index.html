@@ -1,12 +1,12 @@
 {% extends "../templates/partials/base.html" %}
 
 {% block body %}
-  <a href="/users/">Users</a>
+  <a href="/users/">Articles</a>
 
-  {% set users = get('users', 4, 2) %}
+  {% set article = get('Article') %}
 
-  {% for user in users %}
-    {{ user.name }}
+  {% for article in article %}
+    {{ article.Thing1 }}
   {% endfor %}
 
 {% endblock %}

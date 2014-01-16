@@ -46,7 +46,7 @@ module.exports.swigFunctions = function(swig) {
 
   var getData = function(name, limit, offset) {
 
-    var data = self.data[name];
+    var data = self.data['data'][name];
 
     return sliceDictionary(data, limit, offset);
   };

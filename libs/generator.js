@@ -7,6 +7,7 @@ var swig = require('swig');
 var fs = require('fs');
 var glob = require('glob');
 var tinylr = require('tiny-lr');
+var _ = require('lodash');
 
 var swigFunctions = require('./swig_functions').swigFunctions();
 var swigFilters = require('./swig_filters');
@@ -18,15 +19,20 @@ swigTags.init(swig);
 swig.setDefaults({ cache: false });
 
 // Disable console log in various things
-console.log = function () {};
+//console.log = function () {};
 
-module.exports.generator = function (firebaseUrl, logger) {
+module.exports.generator = function (config, logger) {
 
   var self = this;
   logger = logger || { ok: function() {}, error: function() {}, write: function() {}, writeln: function() {} };
-  firebaseUrl = firebaseUrl || '';
+  var firebaseUrl = config.firebase || '';
 
-  this.root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
+  if (firebaseUrl)
+  {
+    this.root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
+  } else {
+    this.root = null;
+  }
 
   var extend = function(target) {
       var sources = [].slice.call(arguments, 1);
@@ -38,8 +44,17 @@ module.exports.generator = function (firebaseUrl, logger) {
       return target;
   };
 
+  var getBucket = function() {
+    return self.root.child(config.bucket).child('dev');
+  };
+
   var getData = function(callback) {
-    self.root.child("gamesFinder").once('value', function(data) {
+    if(!self.root)
+    {
+      throw new Error('Missing firebase reference, may need to run init');
+    }
+
+    getBucket().once('value', function(data) {
       var data = data.val();
 
       swigFunctions.setData(data);
@@ -100,7 +115,7 @@ module.exports.generator = function (firebaseUrl, logger) {
             var newPath = path.dirname(file).replace('templates', './.build');
             var pathParths = path.dirname(file).split(path.sep);
             var objectName = pathParths[pathParths.length - 1];
-            var items = data[objectName];
+            var items = data['data'][objectName];
 
             if(baseName === 'list')
             {
@@ -117,9 +132,8 @@ module.exports.generator = function (firebaseUrl, logger) {
               for(var key in items)
               {
                 var val = items[key];
-                var id = val.id || val.name;
 
-                newPath = baseNewPath + '/' + id + '/index.html';
+                newPath = baseNewPath + '/' + key + '/index.html';
                 fixedFiles.push(writeTemplate(file, newPath, { item: val }));
               }
             }
@@ -194,8 +208,14 @@ module.exports.generator = function (firebaseUrl, logger) {
   };
 
   this.watchFirebase = function() {
+
+    if(!self.root)
+    {
+      throw new Error('Missing firebase reference, may need to run init');
+    }
+
     var initial = true;
-    self.root.child("gamesFinder").on('value', function(data) {
+    getBucket().on('value', function(data) {
 
       if(!initial)
       {
@@ -214,6 +234,15 @@ module.exports.generator = function (firebaseUrl, logger) {
   this.startLiveReload = function() {
     tinylr().listen(35729);
   }
+
+  this.init = function(sitename, done) {
+    var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
+    
+    // Grab bucket information from server eventually, for now just use the site name
+    var templated = _.template(confFile, { bucket: sitename });
+
+    fs.writeFileSync('./.firebase.conf', templated);
+  };
 
   return this;
 };

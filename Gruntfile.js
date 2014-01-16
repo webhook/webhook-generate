@@ -1,8 +1,21 @@
 module.exports = function(grunt) {
 
+  function loadConf() {
+    var conf = {};
+
+    try {
+      conf = grunt.file.readJSON('./.firebase.conf');
+    } catch (err) {
+      console.log(err);
+      conf = {};
+    }
+
+    return conf;
+  }
+
   // Project configuration.
   grunt.initConfig({
-    firebase: 'ltsquigs-new',
+    conf: loadConf(),
 
     open : {
       dev: {
@@ -42,7 +55,7 @@ module.exports = function(grunt) {
 
   });
 
-  var generator = require('./libs/generator').generator(grunt.config.get('firebase'), grunt.log);
+  var generator = require('./libs/generator').generator(grunt.config.get('conf'), grunt.log);
 
   grunt.registerTask('buildTemplates', 'Generate static files from templates directory', function() {
     var done = this.async();
@@ -77,6 +90,17 @@ module.exports = function(grunt) {
   grunt.registerTask('build', 'Clean files and then generate static site into build', function() {
     var done = this.async();
     generator.buildBoth(generator.reloadFiles, done);
+  });
+
+  grunt.registerTask('init', 'Initialize the firebase configuration file (installer should do this as well)', function(sitename) {
+    var done = this.async();
+
+    if(!sitename)
+    {
+      throw new Error('Must define a Site Name');
+    }
+
+    generator.init(sitename, done);
   });
 
   grunt.registerTask('default',  'Clean, Build, Start Local Server, and Watch', ['build', 'connect', 'open', 'concurrent']);
