@@ -2,7 +2,7 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    firebase: 'ltsquigs',
+    firebase: 'ltsquigs-new',
 
     open : {
       dev: {
