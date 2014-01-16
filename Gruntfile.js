@@ -6,7 +6,6 @@ module.exports = function(grunt) {
     try {
       conf = grunt.file.readJSON('./.firebase.conf');
     } catch (err) {
-      console.log(err);
       conf = {};
     }
 
