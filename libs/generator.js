@@ -10,6 +10,7 @@ var glob = require('glob');
 var tinylr = require('tiny-lr');
 var _ = require('lodash');
 var wrench = require('wrench');
+var utils = require('./utils.js');
 
 // Template requires
 // TODO: Abstract these later to make it simpler to change
@@ -22,7 +23,7 @@ swigTags.init(swig);
 swig.setDefaults({ cache: false });
 
 // Disable console log in various things
-console.log = function () {};
+//console.log = function () {};
 
 /**
  * Generator that handles various commands
@@ -51,21 +52,6 @@ module.exports.generator = function (config, logger) {
   }
 
   /**
-   * Extends an object from multiple objects
-   * @param {Object}    target   The target object to be extended to
-   * @param {Objects}   sources  A variable argument list of source objects to extend from
-   */
-  var extend = function(target) {
-      var sources = [].slice.call(arguments, 1);
-      sources.forEach(function (source) {
-          for (var prop in source) {
-              target[prop] = source[prop];
-          }
-      });
-      return target;
-  };
-
-  /**
    * Used to get the bucket were using (combinaton of config and environment)
    */
   var getBucket = function() {
@@ -84,6 +70,14 @@ module.exports.generator = function (config, logger) {
 
     getBucket().once('value', function(data) {
       data = data.val();
+      var typeInfo = {};
+
+      if(!data.content_types)
+      {
+        typeInfo = {};
+      } else {
+        typeInfo = data.content_types;
+      }
 
       // Get the data portion of bucket, other things are not needed for templates
       if(!data.data) {
@@ -94,7 +88,7 @@ module.exports.generator = function (config, logger) {
 
       // Sets the context for swig functions
       swigFunctions.setData(data);
-      callback(data);
+      callback(data, typeInfo);
     }, function(error) {
       throw new Error(error);
     });
@@ -110,7 +104,7 @@ module.exports.generator = function (config, logger) {
     params = params || {};
 
     // Merge functions in
-    params = extend(params, swigFunctions.getFunctions());
+    params = utils.extend(params, swigFunctions.getFunctions());
     var output = swig.renderFile(inFile, params);
 
     mkdirp.sync(path.dirname(outFile));
@@ -157,7 +151,7 @@ module.exports.generator = function (config, logger) {
   this.renderTemplates = function(done, cb) {
     logger.ok('Rendering Templates');
 
-    getData(function(data) {
+    getData(function(data, typeInfo) {
 
       glob('templates/**/*.html', function(err, files) {
 
@@ -172,6 +166,9 @@ module.exports.generator = function (config, logger) {
             var pathParts = path.dirname(file).split(path.sep);
             var objectName = pathParts[pathParts.length - 1];
             var items = data[objectName];
+            var info = typeInfo[objectName];
+
+            var perPage = 1; // Read from info later
 
             if(!items) {
               logger.error('Missing content type for ' + objectName);
@@ -181,8 +178,32 @@ module.exports.generator = function (config, logger) {
             {
               // Output should be path + '/index.html'
               // Should pass in object as 'items'
-              newPath = newPath + '/index.html';
-              fixedFiles.push(writeTemplate(file, newPath, { items: items }));
+              var remaining = items;
+
+              if(remaining._type)
+              {
+                delete remaining['_type'];
+              }
+
+              var baseNewPath = newPath;
+              var page = 0;
+
+              while(_(remaining).size() !== 0)
+              {
+                var sliceOfItems = utils.sliceDictionary(remaining, perPage);
+                remaining = utils.sliceDictionary(remaining, null, perPage);
+
+                if(page === 0)
+                {
+                  newPath = baseNewPath + '/index.html';
+                } else {
+                  newPath = baseNewPath + '/page-' + page + '/index.html';
+                }
+
+                fixedFiles.push(writeTemplate(file, newPath, { items: sliceOfItems }));
+
+                page = page + 1;
+              }
 
             } else if (baseName === 'individual') {
               // Output should be path + id + '/index.html'
@@ -190,6 +211,10 @@ module.exports.generator = function (config, logger) {
               var baseNewPath = newPath;
               for(var key in items)
               {
+                if(key.indexOf('_') === 0)
+                {
+                  continue;
+                }
                 var val = items[key];
 
                 newPath = baseNewPath + '/' + key + '/index.html';
