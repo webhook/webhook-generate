@@ -1,8 +1,10 @@
 'use strict';
 
 /**
- * Defines a set of functions usable in all swig templates, are merged into context on render
- * @param  {Object}   swig        Swig engine
+ * Extends source dictionaries into the target dictionary
+ * @param  {Object}   target        Target to extend into
+ * @param  {Objects}  sources       Sources to extend from
+ * @return {Object}   Returns the target
  */
 module.exports.extend = function(target) {
   var sources = [].slice.call(arguments, 1);
@@ -14,6 +16,13 @@ module.exports.extend = function(target) {
   return target;
 };
 
+/**
+ * Slices a dictionary
+ * @param  {Object}   dict        Object to slice
+ * @param  {Integer}  limit       Number of items to return
+ * @param  {Integer}  offset      Offset to slice to (From limit)
+ * @return {Object}   Sliced dictionary
+ */
 module.exports.sliceDictionary = function(dict, limit, offset) {
   var keys = [];
 
