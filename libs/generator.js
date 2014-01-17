@@ -168,7 +168,7 @@ module.exports.generator = function (config, logger) {
             var items = data[objectName];
             var info = typeInfo[objectName];
 
-            var perPage = 1; // Read from info later
+            var perPage = 20; // Read from info later
 
             if(!items) {
               logger.error('Missing content type for ' + objectName);
