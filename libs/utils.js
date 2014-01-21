@@ -54,3 +54,12 @@ module.exports.sliceDictionary = function(dict, limit, offset) {
 
   return slicedDict;
 };
+
+module.exports.slice = function(data, limit, offset) {
+  if(Array.isArray(data))
+  {
+    return data.slice(offset, limit + offset);
+  } else {
+    return this.sliceDictionary(data, limit, offset);
+  }
+};

@@ -105,10 +105,28 @@ module.exports.generator = function (config, logger) {
 
     // Merge functions in
     params = utils.extend(params, swigFunctions.getFunctions());
-    var output = swig.renderFile(inFile, params);
 
+    swigFunctions.init();
+
+    var output = swig.renderFile(inFile, params);
     mkdirp.sync(path.dirname(outFile));
     fs.writeFileSync(outFile, output);
+
+    var originalOutFile = outFile;
+
+    while(swigFunctions.shouldPaginate && !swigFunctions.endPagination)
+    {
+      swigFunctions.increasePage();
+
+      outFile = originalOutFile.replace('/index.html', '/' + swigFunctions.pageUrl + swigFunctions.curPage + '/index.html');
+
+      var output = swig.renderFile(inFile, params);
+      if(!swigFunctions.endPagination)
+      {
+        mkdirp.sync(path.dirname(outFile));
+        fs.writeFileSync(outFile, output);
+      }
+    }
 
     return outFile.replace('./.build', '');
   };
@@ -168,42 +186,15 @@ module.exports.generator = function (config, logger) {
             var items = data[objectName];
             var info = typeInfo[objectName];
 
-            var perPage = 20; // Read from info later
-
             if(!items) {
               logger.error('Missing content type for ' + objectName);
             }
 
             if(baseName === 'list')
             {
-              // Output should be path + '/index.html'
-              // Should pass in object as 'items'
-              var remaining = items;
 
-              if(remaining._type)
-              {
-                delete remaining['_type'];
-              }
-
-              var baseNewPath = newPath;
-              var page = 0;
-
-              while(_(remaining).size() !== 0)
-              {
-                var sliceOfItems = utils.sliceDictionary(remaining, perPage);
-                remaining = utils.sliceDictionary(remaining, null, perPage);
-
-                if(page === 0)
-                {
-                  newPath = baseNewPath + '/index.html';
-                } else {
-                  newPath = baseNewPath + '/page-' + page + '/index.html';
-                }
-
-                fixedFiles.push(writeTemplate(file, newPath, { items: sliceOfItems }));
-
-                page = page + 1;
-              }
+              newPath = newPath + '/index.html';
+              fixedFiles.push(writeTemplate(file, newPath));
 
             } else if (baseName === 'individual') {
               // Output should be path + id + '/index.html'
@@ -215,6 +206,7 @@ module.exports.generator = function (config, logger) {
                 {
                   continue;
                 }
+
                 var val = items[key];
 
                 newPath = baseNewPath + '/' + key + '/index.html';
@@ -280,7 +272,7 @@ module.exports.generator = function (config, logger) {
     var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
 
     fs.writeFileSync(individual, individualTemplate);
-    fs.writeFileSync(list, listTemplate);
+    fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
   };
 
   /**

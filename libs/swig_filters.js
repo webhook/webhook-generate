@@ -32,4 +32,6 @@ module.exports.init = function (swig) {
 
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
+  swig.setFilter('sort', sort);
+  swig.setFilter('reverse', reverse);
 };

@@ -1,9 +1,14 @@
 {% extends "../partials/base.html" %}
 
 {% block body %}
+
+{% set data = get('<%= typeName %>') %}
+{% set data = paginate(data, 1) %}
+
 <ul>
-  {% for user in items %}
-    <a href="/users/{{ user.name }}/">{{ user.name }}</a>
+  {% for d in data %}
+    {{ d }}
   {% endfor %}
 </ul>
+
 {% endblock %}
