@@ -16,10 +16,10 @@ module.exports.init = function (swig) {
   var slice = function(input, offset, limit) {
     if(Array.isArray(input))
     {
-      return input.slice(offset || 0, limit)
+      return input.slice(offset || 0, offset + limit)
     }
 
-    return utils.sliceDictionary(input, offset, limit);
+    return utils.sliceDictionary(input, limit, offset);
   };
 
   var sort = function(input, property) {
