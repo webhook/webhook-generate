@@ -14,9 +14,9 @@ module.exports.swigFunctions = function(swig) {
   this.context = {};
   this.data = {};
 
-  this.shouldPaginate = false;
+  this.paginate = false;
   this.curPage = 1;
-  this.endPagination = false;
+  this.maxPage = -1;
   this.pageUrl = 'page-';
 
   this.setData = function(data) {
@@ -36,30 +36,39 @@ module.exports.swigFunctions = function(swig) {
   };
 
   var paginate = function(data, perPage, pageName) {
-    if(self.curPage === 1 && self.shouldPaginate === true)
+    if(self.curPage === 1 && self.paginate === true)
     {
       throw new Error('Can only paginate one set of data in a template.');
     }
 
     var items = utils.slice(data, perPage, perPage * (self.curPage-1));
-    self.shouldPaginate = true;
+    self.paginate = true;
 
     self.pageUrl = pageName || self.pageUrl;
-
-    if(self.curPage > 1 && _(items).size() === 0)
-    {
-      self.endPagination = true;
-    }
+    self.maxPage = _(data).size() / perPage;
 
     return items;
   };
 
+  var currentPage = function() {
+    return self.curPage;
+  };
+
+  var maxPage = function() {
+    return self.maxPage;
+  };
+
+  // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
+  this.shouldPaginate = function() {
+    return self.curPage <= self.maxPage;
+  };
+
   // Reset initial data
   this.init = function() {
-    self.shouldPaginate = false;
+    self.paginate = false;
     self.curPage = 1;
-    self.endPagination = false;
     self.pageUrl = 'page-'
+    self.maxPage = -1;
   };
 
   this.increasePage = function() {
@@ -69,7 +78,9 @@ module.exports.swigFunctions = function(swig) {
   this.getFunctions = function() {
     return {
       get: getCombined,
-      paginate: paginate
+      paginate: paginate,
+      currentPage: currentPage,
+      maxPage: maxPage
     };
   };
 

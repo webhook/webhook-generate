@@ -114,18 +114,15 @@ module.exports.generator = function (config, logger) {
 
     var originalOutFile = outFile;
 
-    while(swigFunctions.shouldPaginate && !swigFunctions.endPagination)
+    swigFunctions.increasePage();
+    while(swigFunctions.shouldPaginate())
     {
-      swigFunctions.increasePage();
-
       outFile = originalOutFile.replace('/index.html', '/' + swigFunctions.pageUrl + swigFunctions.curPage + '/index.html');
-
       var output = swig.renderFile(inFile, params);
-      if(!swigFunctions.endPagination)
-      {
-        mkdirp.sync(path.dirname(outFile));
-        fs.writeFileSync(outFile, output);
-      }
+      mkdirp.sync(path.dirname(outFile));
+      fs.writeFileSync(outFile, output);
+      
+      swigFunctions.increasePage();
     }
 
     return outFile.replace('./.build', '');
