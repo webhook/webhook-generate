@@ -338,7 +338,7 @@ module.exports.generator = function (config, logger) {
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
     
     // TODO: Grab bucket information from server eventually, for now just use the site name
-    var templated = _.template(confFile, { bucket: sitename });
+    var templated = _.template(confFile, { bucket: sitename, siteName: sitename });
 
     fs.writeFileSync('./.firebase.conf', templated);
 
