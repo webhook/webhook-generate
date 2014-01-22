@@ -88,13 +88,11 @@ module.exports = function(grunt) {
   });
 
   // Change this to optionally prompt instead of requiring a sitename
-  grunt.registerTask('init', 'Initialize the firebase configuration file (installer should do this as well)', function(sitename) {
+  grunt.registerTask('init', 'Initialize the firebase configuration file (installer should do this as well)', function() {
     var done = this.async();
 
-    if(!sitename)
-    {
-      throw new Error('Must define a Site Name');
-    }
+    var sitename = grunt.option('sitename');
+    var secretkey = grunt.option('secretkey');
 
     generator.init(sitename, done);
   });
@@ -105,7 +103,7 @@ module.exports = function(grunt) {
     if(conf === {})
     {
       // Eventually this should prompt instead of hard code site
-      grunt.task.run('init:site');
+      grunt.task.run('init');
     }
 
     grunt.task.run('build');
