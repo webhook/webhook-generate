@@ -94,7 +94,7 @@ module.exports = function(grunt) {
     var sitename = grunt.option('sitename');
     var secretkey = grunt.option('secretkey');
 
-    generator.init(sitename, done);
+    generator.init(sitename, secretkey, done);
   });
 
   // Check if initialized properly before running all these tasks

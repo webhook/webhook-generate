@@ -325,11 +325,11 @@ module.exports.generator = function (config, logger) {
    * @param  {String}    sitename  Name of site to generate config for
    * @param  {Function}  done      Callback to call when operation is done
    */
-  this.init = function(sitename, done) {
+  this.init = function(sitename, secretkey, done) {
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
     
     // TODO: Grab bucket information from server eventually, for now just use the site name
-    var templated = _.template(confFile, { bucket: sitename, siteName: sitename });
+    var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename });
 
     fs.writeFileSync('./.firebase.conf', templated);
 
