@@ -57,7 +57,7 @@ module.exports.generator = function (config, logger) {
    * Used to get the bucket were using (combinaton of config and environment)
    */
   var getBucket = function() {
-    return self.root.child(config.get('webhook').bucket).child('dev');
+    return self.root.child('buckets/' + config.get('webhook').siteName + '/' + config.get('webhook').secretKey + '/dev');
   };
 
   /**
@@ -74,7 +74,7 @@ module.exports.generator = function (config, logger) {
       data = data.val();
       var typeInfo = {};
 
-      if(!data.content_types)
+      if(!data || !data.content_types)
       {
         typeInfo = {};
       } else {
@@ -82,7 +82,7 @@ module.exports.generator = function (config, logger) {
       }
 
       // Get the data portion of bucket, other things are not needed for templates
-      if(!data.data) {
+      if(!data || data.data) {
         data = {};
       } else {
         data = data.data;
