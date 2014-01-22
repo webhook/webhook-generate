@@ -15,6 +15,8 @@ var utils = require('./utils.js');
 // Template requires
 // TODO: Abstract these later to make it simpler to change
 var swig = require('swig');
+swig.setDefaults({ loader: swig.loaders.fs(__dirname + '/..') });
+
 var swigFunctions = require('./swig_functions').swigFunctions();
 var swigFilters = require('./swig_filters');
 var swigTags = require('./swig_tags');
