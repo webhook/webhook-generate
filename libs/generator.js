@@ -38,6 +38,8 @@ module.exports.generator = function (config, logger) {
   var firebaseUrl = config.get('webhook').firebase || '';
   var liveReloadPort = config.get('connect').server.options.livereload;
 
+  this.versionString = null;
+
   if(liveReloadPort === true)
   {
     liveReloadPort = 35729;
@@ -104,6 +106,7 @@ module.exports.generator = function (config, logger) {
    */
   var writeTemplate = function(inFile, outFile, params) {
     params = params || {};
+    var originalOutFile = outFile;
 
     // Merge functions in
     params = utils.extend(params, swigFunctions.getFunctions());
@@ -111,15 +114,25 @@ module.exports.generator = function (config, logger) {
     swigFunctions.init();
 
     var output = swig.renderFile(inFile, params);
+
+    if(self.versionString)
+    {
+      outFile = outFile.replace('/index.html', '/index_' + self.versionString + '.html');
+    }
+
     mkdirp.sync(path.dirname(outFile));
     fs.writeFileSync(outFile, output);
-
-    var originalOutFile = outFile;
 
     swigFunctions.increasePage();
     while(swigFunctions.shouldPaginate())
     {
       outFile = originalOutFile.replace('/index.html', '/' + swigFunctions.pageUrl + swigFunctions.curPage + '/index.html');
+
+      if(self.versionString)
+      {
+        outFile = outFile.replace('/index.html', '/index_' + self.versionString + '.html');
+      }
+
       var output = swig.renderFile(inFile, params);
       mkdirp.sync(path.dirname(outFile));
       fs.writeFileSync(outFile, output);
@@ -147,6 +160,17 @@ module.exports.generator = function (config, logger) {
           if(path.extname(file) === '.html')
           {
             var newFile = file.replace('pages', './.build');
+
+            var dir = path.dirname(newFile);
+            var filename = path.basename(newFile, '.html');
+
+            if(filename !== 'index') {
+              dir = dir + '/' + filename;
+              filename = 'index';
+            }
+
+            newFile = dir + '/' + filename + '.html';
+
             fixedFiles.push(writeTemplate(file, newFile));
           }
 
@@ -238,6 +262,10 @@ module.exports.generator = function (config, logger) {
 
       if (cb) cb();
       if (done) done(true);
+  };
+
+  this.setBuildVersion = function(versionString) {
+    self.versionString = versionString;
   };
 
   /**

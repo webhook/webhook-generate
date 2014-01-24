@@ -84,6 +84,14 @@ module.exports = function(grunt) {
   // Build Task.
   grunt.registerTask('build', 'Clean files and then generate static site into build', function() {
     var done = this.async();
+
+    var versionString = grunt.option('build-version');
+
+    if(versionString)
+    {
+      generator.setBuildVersion(versionString);
+    }
+
     generator.buildBoth(done, generator.reloadFiles);
   });
 
