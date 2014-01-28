@@ -1,5 +1,12 @@
-{% extends "../partials/base.html" %}
+{% extends "templates/partials/base.html" %}
 
 {% block body %}
-  {{ item.title }}
+  <table>
+   <% _.forEach(typeInfo.fields || [], function(field) { %>
+    <tr>
+    <td><%- field.name %></li>
+    <td>{{ item.<%- field.name %> }}</td>
+    </tr>
+  <% }); %>
+  </table>
 {% endblock %}

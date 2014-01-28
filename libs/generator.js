@@ -11,6 +11,7 @@ var tinylr = require('tiny-lr');
 var _ = require('lodash');
 var wrench = require('wrench');
 var utils = require('./utils.js');
+var ws = require('ws').Server;
 
 // Template requires
 // TODO: Abstract these later to make it simpler to change
@@ -84,7 +85,7 @@ module.exports.generator = function (config, logger) {
       }
 
       // Get the data portion of bucket, other things are not needed for templates
-      if(!data || data.data) {
+      if(!data || !data.data) {
         data = {};
       } else {
         data = data.data;
@@ -292,7 +293,7 @@ module.exports.generator = function (config, logger) {
    * Generates scaffolding for content type with name
    * @param  {String}   name     Name of content type to generate scaffolding for
    */
-  this.makeScaffolding = function(name) {
+  this.makeScaffolding = function(name, done) {
     logger.ok('Creating Scaffolding\n');
     var directory = 'templates/' + name + '/';
     mkdirp.sync(directory);
@@ -303,8 +304,12 @@ module.exports.generator = function (config, logger) {
     var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
     var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
 
-    fs.writeFileSync(individual, individualTemplate);
-    fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
+    getData(function(data, typeInfo) {
+      fs.writeFileSync(individual,  _.template(individualTemplate, { typeInfo: typeInfo[name] || {} }));
+      fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
+
+      if(done) done();
+    });
   };
 
   /**
@@ -351,6 +356,22 @@ module.exports.generator = function (config, logger) {
    */
   this.startLiveReload = function() {
     tinylr().listen(liveReloadPort);
+  };
+
+  this.webListener = function() {
+    var server = new ws({ host: '127.0.0.1', port: 6557 });
+
+    server.on('connection', function(sock) {
+      console.log('client connected');
+
+      sock.on('message', function(message) {
+        if(message.indexOf('scaffolding:') === 0)
+        {
+          var name = message.replace('scaffolding:', '');
+          self.makeScaffolding(name);
+        }
+      });
+    });
   };
 
   /** 

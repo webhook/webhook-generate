@@ -1,4 +1,4 @@
-{% extends "../partials/base.html" %}
+{% extends "templates/partials/base.html" %}
 
 {% block body %}
 
@@ -6,8 +6,8 @@
 {% set data = paginate(data, 1) %}
 
 <ul>
-  {% for d in data %}
-    {{ d }}
+  {% for id, object in data %}
+    <a href="{{ id }}">{{ object.title }}</a>
   {% endfor %}
 </ul>
 

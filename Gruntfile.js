@@ -63,7 +63,8 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('scaffolding', 'Generate scaffolding for a new object', function(name) {
-    generator.makeScaffolding(name);
+    var done = this.async();
+    generator.makeScaffolding(name, done);
   });
 
   grunt.registerTask('watch', 'Watch for changes in templates and regenerate site', function() {
@@ -74,6 +75,11 @@ module.exports = function(grunt) {
   grunt.registerTask('watchFirebase', 'Watch for changes in firebase and regenerate site', function() {
     var done = this.async();
     generator.watchFirebase();
+  });
+
+  grunt.registerTask('webListener', 'Listens for commands from CMS through websocket', function() {
+    var done = this.async();
+    generator.webListener(done);
   });
 
   grunt.registerTask('clean', 'Clean build files', function() {
