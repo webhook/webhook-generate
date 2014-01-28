@@ -164,7 +164,7 @@ module.exports.generator = function (config, logger) {
             var dir = path.dirname(newFile);
             var filename = path.basename(newFile, '.html');
 
-            if(filename !== 'index') {
+            if(filename !== 'index' && path.basename(newFile) !== '404.html') {
               dir = dir + '/' + filename;
               filename = 'index';
             }
@@ -175,6 +175,11 @@ module.exports.generator = function (config, logger) {
           }
 
         });
+
+        if(fs.existsSync('pages/robots.txt'))
+        {
+          fs.writeFileSync('./.build/robots.txt', fs.readFileSync('pages/robots.txt'));
+        }
 
         logger.ok('Finished Rendering Pages\n');
 
