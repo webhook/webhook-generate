@@ -44,7 +44,7 @@ module.exports = function(grunt) {
         logConcurrentOutput: true
       },
       watch: {
-        tasks: ["watch", "watchFirebase"]
+        tasks: ["watch", "watchFirebase", "webListener"]
       }
     }
 
