@@ -2,10 +2,10 @@
 
 {% block body %}
   <table>
-   <% _.forEach(typeInfo.fields || [], function(field) { %>
+   <% _.forEach(typeInfo.fields || [], function(fieldId) { %>
     <tr>
-    <td><%- field.name %></li>
-    <td>{{ item.<%- field.name %> }}</td>
+    <td><%- fieldInfo[fieldId].name %></li>
+    <td>{{ item.<%- fieldInfo[fieldId].name %> }}</td>
     </tr>
   <% }); %>
   </table>

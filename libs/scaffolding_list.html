@@ -3,7 +3,7 @@
 {% block body %}
 
 {% set data = get('<%= typeName %>') %}
-{% set data = paginate(data, 1) %}
+{% set data = paginate(data, 5) %}
 
 <ul>
   {% for id, object in data %}

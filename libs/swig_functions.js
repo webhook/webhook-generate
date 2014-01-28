@@ -18,6 +18,7 @@ module.exports.swigFunctions = function(swig) {
   this.curPage = 1;
   this.maxPage = -1;
   this.pageUrl = 'page-';
+  this.cachedData = {};
 
   this.setData = function(data) {
     self.data = data;
@@ -26,11 +27,19 @@ module.exports.swigFunctions = function(swig) {
   var getCombined = function() {
     var names = [].slice.call(arguments, 0);
 
+    if(self.cachedData[names.join(',')])
+    {
+      return self.cachedData[names.join(',')];
+    }
+
     var data = {};
     names.forEach(function(name) {
-      data = utils.extend(data, self.data[name] || {});
+      var tempData = self.data[name] || {};
+      data = utils.extend(data, _.mapValues(tempData || {}, function(val) { return val.data || {}; } ));
       data = _.omit(data, function(value, key) { return key.indexOf('_') === 0; });
     });
+
+    self.cachedData[names.join(',')] = data;
 
     return data;
   };

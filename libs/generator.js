@@ -40,6 +40,7 @@ module.exports.generator = function (config, logger) {
   var liveReloadPort = config.get('connect').server.options.livereload;
 
   this.versionString = null;
+  this.cachedData = null;
 
   if(liveReloadPort === true)
   {
@@ -68,6 +69,13 @@ module.exports.generator = function (config, logger) {
    * @param  {Function}   callback   Callback function to run after data is retrieved, is sent the snapshot
    */
   var getData = function(callback) {
+
+    if(self.cachedData)
+    {
+      swigFunctions.setData(self.cachedData.data);
+      callback(self.cachedData.data, self.cachedData.typeInfo, self.cachedData.fieldInfo);
+    }
+
     if(!self.root)
     {
       throw new Error('Missing firebase reference, may need to run init');
@@ -75,13 +83,21 @@ module.exports.generator = function (config, logger) {
 
     getBucket().once('value', function(data) {
       data = data.val();
+      var fieldInfo = {};
       var typeInfo = {};
 
-      if(!data || !data.content_types)
+      if(!data || !data['content-type'])
       {
         typeInfo = {};
       } else {
-        typeInfo = data.content_types;
+        typeInfo = data['content-type'];
+      }
+
+      if(!data || !data.field)
+      {
+        fieldInfo = {};
+      } else {
+        fieldInfo = data.field;
       }
 
       // Get the data portion of bucket, other things are not needed for templates
@@ -91,9 +107,14 @@ module.exports.generator = function (config, logger) {
         data = data.data;
       }
 
+      self.cachedData = {
+        data: data,
+        typeInfo: typeInfo,
+        fieldInfo: fieldInfo
+      };
       // Sets the context for swig functions
       swigFunctions.setData(data);
-      callback(data, typeInfo);
+      callback(data, typeInfo, fieldInfo);
     }, function(error) {
       throw new Error(error);
     });
@@ -236,7 +257,7 @@ module.exports.generator = function (config, logger) {
                   continue;
                 }
 
-                var val = items[key];
+                var val = items[key].data;
 
                 newPath = baseNewPath + '/' + key + '/index.html';
                 fixedFiles.push(writeTemplate(file, newPath, { item: val }));
@@ -281,6 +302,8 @@ module.exports.generator = function (config, logger) {
    */
   this.buildBoth = function(done, cb) {
     // clean files
+
+    self.cachedData = null;
     self.cleanFiles(null, function() {
       self.renderTemplates(null, function() {
         self.renderPages(done, cb);
@@ -304,8 +327,8 @@ module.exports.generator = function (config, logger) {
     var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
     var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
 
-    getData(function(data, typeInfo) {
-      fs.writeFileSync(individual,  _.template(individualTemplate, { typeInfo: typeInfo[name] || {} }));
+    getData(function(data, typeInfo, fieldInfo) {
+      fs.writeFileSync(individual,  _.template(individualTemplate, { typeInfo: typeInfo[name] || {}, fieldInfo: fieldInfo }));
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();
