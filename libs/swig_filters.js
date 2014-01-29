@@ -30,8 +30,20 @@ module.exports.init = function (swig) {
     return _(input).reverse();
   };
 
+  this.imageSize = function(input, width, height) {
+    if(width && !height)
+    {
+      return input + '?width=' + width;
+    } else if (height && !width) {
+      return input + '?height=' + height;
+    }
+    
+    return input + '?width=' + width + '&height=' + height;
+  };
+
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
   swig.setFilter('sort', sort);
   swig.setFilter('reverse', reverse);
+  swig.setFilter('imageSize', reverse);
 };

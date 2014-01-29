@@ -83,7 +83,7 @@ module.exports.swigFunctions = function(swig) {
   this.increasePage = function() {
     self.curPage = self.curPage + 1;
   };
-
+  
   this.getFunctions = function() {
     return {
       get: getCombined,
