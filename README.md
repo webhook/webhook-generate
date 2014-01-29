@@ -42,8 +42,8 @@ Template Functions:
   
   * `get(contentType1, contentType2, contentType3, ...)` - Gets data for a content type (or multiple mixed content types)
   * `paginate(data, perPage, urlPrefix)` - Tells the templating system that this data needs to be paginated, and will cause the engine to render this page into several pages. perPage is the number of items per page. urlPrefix is the prefix you want to use for the page url (default is /page-<pageNum>/). ONLY ONE SET OF DATA CAN BE PAGINATED PER TEMPLATE.
-  * `currentPage` - Returns the current page in a paginated template.
-  * `maxPage` - Returns the max number of pages in a paginated template, only works after paginate.
+  * `getCurrentPage` - Returns the current page in a paginated template.
+  * `getMaxPage` - Returns the max number of pages in a paginated template, only works after paginate.
 
 Template Filters:
 
@@ -51,6 +51,7 @@ Template Filters:
   * `slice(offset, limit)` - Slices the array/object returning a set of data from offset up to limit items
   * `sort(property)` - Sorts an array by the given property
   * `reverse` - Reverses an array or object of keys
+  * `imageSize(width, height)` - Takes an image url, returns url of image with resize information on it
 
 
 Examples
