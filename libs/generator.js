@@ -87,11 +87,11 @@ module.exports.generator = function (config, logger) {
       var fieldInfo = {};
       var typeInfo = {};
 
-      if(!data || !data['content-type'])
+      if(!data || !data['contentTypes'])
       {
         typeInfo = {};
       } else {
-        typeInfo = data['content-type'];
+        typeInfo = data['contentTypes'];
       }
 
       if(!data || !data.field)
@@ -258,7 +258,7 @@ module.exports.generator = function (config, logger) {
                   continue;
                 }
 
-                var val = items[key].data;
+                var val = items[key];
 
                 newPath = baseNewPath + '/' + key + '/index.html';
                 fixedFiles.push(writeTemplate(file, newPath, { item: val }));
