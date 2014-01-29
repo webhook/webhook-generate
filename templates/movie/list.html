@@ -2,7 +2,7 @@
 
 {% block body %}
 
-{% set data = get('<%= typeName %>') %}
+{% set data = get('movie') %}
 {% set data = paginate(data, 5) %}
 
 <ul>

@@ -1,0 +1,27 @@
+{% set curPage = getCurPage() %}
+{% set maxPage = getMaxPage() %}
+
+{% if !pageUrl %}
+  {% set pageUrl = 'page-' %}
+{% endif %}
+
+{% set prefix = '' %}
+{% if curPage > 1 %}
+  {% set prefix = '../' %}
+{% endif %}
+
+{% if maxPage > 1 %}
+
+<ul>
+
+  {% if curPage > 1 %}
+  <li><a href="../">First</a></li>
+  {% endif %}
+
+  {% if curPage < maxPage %}
+  <li><a href="{{prefix}}{{ pageUrl }}{{ maxPage }}/">Last</a></li>
+  {% endif %}
+
+</ul>
+
+{% endif %}

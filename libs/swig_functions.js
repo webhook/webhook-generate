@@ -54,16 +54,16 @@ module.exports.swigFunctions = function(swig) {
     self.paginate = true;
 
     self.pageUrl = pageName || self.pageUrl;
-    self.maxPage = _(data).size() / perPage;
+    self.maxPage = Math.floor(_(data).size() / perPage);
 
     return items;
   };
 
-  var currentPage = function() {
+  var getCurPage = function() {
     return self.curPage;
   };
 
-  var maxPage = function() {
+  var getMaxPage = function() {
     return self.maxPage;
   };
 
@@ -88,8 +88,8 @@ module.exports.swigFunctions = function(swig) {
     return {
       get: getCombined,
       paginate: paginate,
-      currentPage: currentPage,
-      maxPage: maxPage
+      getCurPage: getCurPage,
+      getMaxPage: getMaxPage
     };
   };
 

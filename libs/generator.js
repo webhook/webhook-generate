@@ -74,6 +74,7 @@ module.exports.generator = function (config, logger) {
     {
       swigFunctions.setData(self.cachedData.data);
       callback(self.cachedData.data, self.cachedData.typeInfo, self.cachedData.fieldInfo);
+      return;
     }
 
     if(!self.root)
