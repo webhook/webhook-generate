@@ -229,7 +229,7 @@ module.exports.generator = function (config, logger) {
             var info = typeInfo[objectName];
 
             if(!items) {
-              logger.error('Missing content type for ' + objectName);
+              logger.error('Missing data for content type ' + objectName);
             }
 
             if(baseName === 'list')
@@ -308,9 +308,15 @@ module.exports.generator = function (config, logger) {
    * Generates scaffolding for content type with name
    * @param  {String}   name     Name of content type to generate scaffolding for
    */
-  this.makeScaffolding = function(name, done) {
+  this.makeScaffolding = function(name, done, force) {
     logger.ok('Creating Scaffolding\n');
     var directory = 'templates/' + name + '/';
+
+    if(!force && fs.existsSync(directory)) {
+      if(done) done();
+      return false;
+    }
+
     mkdirp.sync(directory);
 
     var list = directory + 'list.html';
@@ -325,6 +331,8 @@ module.exports.generator = function (config, logger) {
 
       if(done) done();
     });
+
+    return true;
   };
 
   /**
@@ -383,6 +391,7 @@ module.exports.generator = function (config, logger) {
         if(message.indexOf('scaffolding:') === 0)
         {
           var name = message.replace('scaffolding:', '');
+          console.log('scaffolding for ' + name);
           self.makeScaffolding(name);
         } else if (message === 'build') {
           self.buildBoth(null, self.reloadFiles);

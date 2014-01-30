@@ -64,14 +64,22 @@ module.exports = function(grunt) {
 
   grunt.registerTask('scaffolding', 'Generate scaffolding for a new object', function(name) {
     var done = this.async();
-    generator.makeScaffolding(name, done);
+
+    var force = grunt.option('force');
+
+
+    var result = generator.makeScaffolding(name, done, force);
+
+    if(!result) {
+      grunt.log.error('Scaffolding for ' + name + ' already exists, use --force to overwrite');
+    }
   });
 
   grunt.registerTask('watch', 'Watch for changes in templates and regenerate site', function() {
     generator.startLiveReload();
     grunt.task.run('simple-watch');
   });
-  
+
   grunt.registerTask('webListener', 'Listens for commands from CMS through websocket', function() {
     var done = this.async();
     generator.webListener(done);
