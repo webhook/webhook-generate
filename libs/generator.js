@@ -384,6 +384,8 @@ module.exports.generator = function (config, logger) {
         {
           var name = message.replace('scaffolding:', '');
           self.makeScaffolding(name);
+        } else if (message === 'build') {
+          self.buildBoth(null, self.reloadFiles);
         }
       });
     });

@@ -44,7 +44,7 @@ module.exports = function(grunt) {
         logConcurrentOutput: true
       },
       watch: {
-        tasks: ["watch", "watchFirebase", "webListener"]
+        tasks: ["watch", "webListener"]
       }
     }
 
@@ -71,12 +71,7 @@ module.exports = function(grunt) {
     generator.startLiveReload();
     grunt.task.run('simple-watch');
   });
-
-  grunt.registerTask('watchFirebase', 'Watch for changes in firebase and regenerate site', function() {
-    var done = this.async();
-    generator.watchFirebase();
-  });
-
+  
   grunt.registerTask('webListener', 'Listens for commands from CMS through websocket', function() {
     var done = this.async();
     generator.webListener(done);
