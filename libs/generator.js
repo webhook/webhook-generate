@@ -73,7 +73,7 @@ module.exports.generator = function (config, logger) {
     if(self.cachedData)
     {
       swigFunctions.setData(self.cachedData.data);
-      callback(self.cachedData.data, self.cachedData.typeInfo, self.cachedData.fieldInfo);
+      callback(self.cachedData.data, self.cachedData.typeInfo);
       return;
     }
 
@@ -84,7 +84,6 @@ module.exports.generator = function (config, logger) {
 
     getBucket().once('value', function(data) {
       data = data.val();
-      var fieldInfo = {};
       var typeInfo = {};
 
       if(!data || !data['contentTypes'])
@@ -92,13 +91,6 @@ module.exports.generator = function (config, logger) {
         typeInfo = {};
       } else {
         typeInfo = data['contentTypes'];
-      }
-
-      if(!data || !data.field)
-      {
-        fieldInfo = {};
-      } else {
-        fieldInfo = data.field;
       }
 
       // Get the data portion of bucket, other things are not needed for templates
@@ -110,12 +102,11 @@ module.exports.generator = function (config, logger) {
 
       self.cachedData = {
         data: data,
-        typeInfo: typeInfo,
-        fieldInfo: fieldInfo
+        typeInfo: typeInfo
       };
       // Sets the context for swig functions
       swigFunctions.setData(data);
-      callback(data, typeInfo, fieldInfo);
+      callback(data, typeInfo);
     }, function(error) {
       throw new Error(error);
     });
@@ -328,8 +319,8 @@ module.exports.generator = function (config, logger) {
     var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
     var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
 
-    getData(function(data, typeInfo, fieldInfo) {
-      fs.writeFileSync(individual,  _.template(individualTemplate, { typeInfo: typeInfo[name] || {}, fieldInfo: fieldInfo }));
+    getData(function(data, typeInfo) {
+      fs.writeFileSync(individual,  _.template(individualTemplate, { typeInfo: typeInfo[name] || {} }));
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();
