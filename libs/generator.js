@@ -445,10 +445,13 @@ module.exports.generator = function (config, logger, fileParser) {
         if(message.indexOf('scaffolding:') === 0)
         {
           var name = message.replace('scaffolding:', '');
-          console.log('scaffolding for ' + name);
-          self.makeScaffolding(name);
+          self.makeScaffolding(name, function() { 
+            sock.send('done');
+          });
         } else if (message === 'build') {
-          self.buildBoth(null, self.reloadFiles);
+          self.buildBoth(function() {
+            sock.send('done');
+          }, self.reloadFiles);
         }
       });
     });
