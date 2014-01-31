@@ -2,7 +2,7 @@
 
 {% block body %}
   <table>
-   <% _.forEach(typeInfo.fields || [], function(fieldInfo) { %>
+   <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
     <tr>
     <td><%- fieldInfo.label %></li>
     <td>{{ item.<%- fieldInfo.name %> }}</td>

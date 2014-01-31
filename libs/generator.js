@@ -12,6 +12,7 @@ var _ = require('lodash');
 var wrench = require('wrench');
 var utils = require('./utils.js');
 var ws = require('ws').Server;
+var Zip   = require('adm-zip');
 
 // Template requires
 // TODO: Abstract these later to make it simpler to change
@@ -33,7 +34,7 @@ swig.setDefaults({ cache: false });
  * @param  {Object}   config     Configuration options from .firebase.conf
  * @param  {Object}   logger     Object to use for logging, defaults to no-ops
  */
-module.exports.generator = function (config, logger) {
+module.exports.generator = function (config, logger, fileParser) {
 
   var self = this;
   var firebaseUrl = config.get('webhook').firebase || '';
@@ -155,6 +156,60 @@ module.exports.generator = function (config, logger) {
     }
 
     return outFile.replace('./.build', '');
+  };
+
+
+  var downloadRepo = function(zipUrl, callback) {
+    console.log('Downloading preset...'.magenta);
+
+    // Keep track if the request fails to prevent the continuation of the install
+    var requestFailed = false;
+
+    // TODO: have this hit different templating repos
+    var repoRequest = request(zipUrl);
+
+    repoRequest
+    .on('response', function (response) {
+      // If we fail, set it as failing and remove zip file
+      if (response.statusCode !== 200) {
+        requestFailed = true;
+        fs.unlinkSync('.preset.zip');
+        callback(true);
+      }
+    })
+    .pipe(fs.createWriteStream('.preset.zip'))
+    .on('close', function () {
+      if (requestFailed) return;
+
+      // Unzip into temporary file
+      var zip = new Zip('.preset.zip');
+
+      var entries = zip.getEntries();
+
+      entries.forEach(function(entry) {
+        var newName = entry.entryName.split(path.sep).slice(1).join(path.sep);
+        entry.entryName = newName;
+      });
+      zip.extractAllTo('.');
+      fs.unlinkSync('.preset.zip');
+      callback();
+    });
+  };
+
+  var downloadPreset = function(zipUrl, callback) {
+    downloadRepo(zipUrl, function() {
+      if(fs.existsSync('.preset-data.json')) {
+        var presetData = fileParser.readJSON('.preset-data.json');
+
+        getBucket().child('contentTypes').set(presetData, function(err) {
+          fs.unlinkSync('.preset-data.json');
+          callback();
+        });
+
+      } else {
+        callback();
+      }
+    });
   };
 
   /**
@@ -294,7 +349,6 @@ module.exports.generator = function (config, logger) {
    */
   this.buildBoth = function(done, cb) {
     // clean files
-
     self.cachedData = null;
     self.cleanFiles(null, function() {
       self.renderTemplates(null, function() {

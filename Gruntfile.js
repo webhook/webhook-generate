@@ -50,7 +50,7 @@ module.exports = function(grunt) {
 
   });
 
-  var generator = require('./libs/generator').generator(grunt.config, grunt.log);
+  var generator = require('./libs/generator').generator(grunt.config, grunt.log, grunt.file);
 
   grunt.registerTask('buildTemplates', 'Generate static files from templates directory', function() {
     var done = this.async();
