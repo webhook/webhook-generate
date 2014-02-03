@@ -15,7 +15,7 @@ module.exports = function(grunt) {
 
     open : {
       dev: {
-        path: 'http://localhost:2002'
+        path: 'http://localhost:2002/cms/'
       }
     },
 
