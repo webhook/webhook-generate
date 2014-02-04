@@ -13,6 +13,7 @@ var wrench = require('wrench');
 var utils = require('./utils.js');
 var ws = require('ws').Server;
 var Zip   = require('adm-zip');
+var slug = require('slug');
 
 // Template requires
 // TODO: Abstract these later to make it simpler to change
@@ -297,6 +298,7 @@ module.exports.generator = function (config, logger, fileParser) {
               // Output should be path + id + '/index.html'
               // Should pass in object as 'item'
               var baseNewPath = newPath;
+              var number = 1;
               for(var key in items)
               {
                 if(key.indexOf('_') === 0)
@@ -306,8 +308,10 @@ module.exports.generator = function (config, logger, fileParser) {
 
                 var val = items[key];
 
-                newPath = baseNewPath + '/' + key + '/index.html';
+                newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '-' + number + '/index.html';
                 fixedFiles.push(writeTemplate(file, newPath, { item: val }));
+
+                number = number + 1;
               }
             }
           }
