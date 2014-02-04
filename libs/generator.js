@@ -470,6 +470,11 @@ module.exports.generator = function (config, logger, fileParser) {
 
     fs.writeFileSync('./.firebase.conf', templated);
 
+    var cmsFile = fs.readFileSync('./libs/cms.html');
+
+    var cmsTemplated = _.template(cmsFile, { siteName: sitename });
+
+    fs.writeFileSync('./pages/cms.html', cmsTemplated);
     done(true);
   };
 
