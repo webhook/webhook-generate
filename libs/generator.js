@@ -233,6 +233,11 @@ module.exports.generator = function (config, logger, fileParser) {
 
             var dir = path.dirname(newFile);
             var filename = path.basename(newFile, '.html');
+            var dontRefresh = false;
+
+            if(filename === 'cms') {
+               dontRefresh = true;
+            }
 
             if(filename !== 'index' && path.basename(newFile) !== '404.html') {
               dir = dir + '/' + filename;
@@ -241,7 +246,11 @@ module.exports.generator = function (config, logger, fileParser) {
 
             newFile = dir + '/' + filename + '.html';
 
-            fixedFiles.push(writeTemplate(file, newFile));
+            var destFile = writeTemplate(file, newFile);
+
+            if(!dontRefresh) {
+              fixedFiles.push(destFile);
+            }
           }
 
         });
