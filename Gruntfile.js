@@ -44,7 +44,7 @@ module.exports = function(grunt) {
         logConcurrentOutput: true
       },
       watch: {
-        tasks: ["watch", "webListener"]
+        tasks: ["watch", "webListener-open"]
       }
     }
 
@@ -83,6 +83,22 @@ module.exports = function(grunt) {
   grunt.registerTask('webListener', 'Listens for commands from CMS through websocket', function() {
     var done = this.async();
     generator.webListener(done);
+  });
+
+  grunt.registerTask('webListener-open', 'Listens for commands from CMS through websocket', function() {
+    var done = this.async();
+    generator.webListener(done);
+
+    grunt.util.spawn({
+      grunt: true,
+      args: ['open'].concat(grunt.option.flags()),
+      opts: { stdio: 'inherit' }
+    }, function (err, result, code) {
+      if (err || code > 0) {
+        grunt.warn(result.stderr || result.stdout);
+      }
+      grunt.log.writeln('\n' + result.stdout);
+    });
   });
 
   grunt.registerTask('clean', 'Clean build files', function() {
@@ -125,7 +141,7 @@ module.exports = function(grunt) {
 
     grunt.task.run('build');
     grunt.task.run('connect');
-    grunt.task.run('open');
+   // grunt.task.run('open');
     grunt.task.run('concurrent');
   });
 

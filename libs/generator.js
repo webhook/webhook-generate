@@ -224,7 +224,6 @@ module.exports.generator = function (config, logger, fileParser) {
     getData(function(data) {
 
       glob('pages/**/*.html', function(err, files) {
-        var fixedFiles = [];
         files.forEach(function(file) {
 
           if(path.extname(file) === '.html')
@@ -247,10 +246,6 @@ module.exports.generator = function (config, logger, fileParser) {
             newFile = dir + '/' + filename + '.html';
 
             var destFile = writeTemplate(file, newFile);
-
-            if(!dontRefresh) {
-              fixedFiles.push(destFile);
-            }
           }
 
         });
@@ -262,7 +257,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
         logger.ok('Finished Rendering Pages\n');
 
-        if(cb) cb(fixedFiles, done);
+        if(cb) cb(done);
       });
 
     });
@@ -280,7 +275,6 @@ module.exports.generator = function (config, logger, fileParser) {
 
       glob('templates/**/*.html', function(err, files) {
 
-        var fixedFiles = [];
         files.forEach(function(file) {
           // We ignore partials, special directory to allow making of partial includes
           if(path.extname(file) === '.html' && file.indexOf('templates/partials') !== 0)
@@ -301,7 +295,7 @@ module.exports.generator = function (config, logger, fileParser) {
             {
 
               newPath = newPath + '/index.html';
-              fixedFiles.push(writeTemplate(file, newPath));
+              writeTemplate(file, newPath);
 
             } else if (baseName === 'individual') {
               // Output should be path + id + '/index.html'
@@ -318,7 +312,7 @@ module.exports.generator = function (config, logger, fileParser) {
                 var val = items[key];
 
                 newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '-' + number + '/index.html';
-                fixedFiles.push(writeTemplate(file, newPath, { item: val }));
+                writeTemplate(file, newPath, { item: val });
 
                 number = number + 1;
               }
@@ -328,7 +322,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
         logger.ok('Finished Rendering Templates');
 
-        if(cb) cb(fixedFiles, done);
+        if(cb) cb(done);
 
       });
     });
@@ -407,8 +401,8 @@ module.exports.generator = function (config, logger, fileParser) {
    * @param  {Array}      files     List of files to reload
    * @param  {Function}   done      Callback passed either a true value to indicate its done, or an error 
    */
-  this.reloadFiles = function(files, done) {
-    request({ url : 'http://localhost:' + liveReloadPort + '/changed?files=' + files.join(','), timeout: 10  }, function(error, response, body) {
+  this.reloadFiles = function(done) {
+    request({ url : 'http://localhost:' + liveReloadPort + '/changed?files=true', timeout: 10  }, function(error, response, body) {
       if(done) done(true);
     });
   };
