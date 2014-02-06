@@ -88,11 +88,11 @@ module.exports.generator = function (config, logger, fileParser) {
       data = data.val();
       var typeInfo = {};
 
-      if(!data || !data['contentTypes'])
+      if(!data || !data['contentType'])
       {
         typeInfo = {};
       } else {
-        typeInfo = data['contentTypes'];
+        typeInfo = data['contentType'];
       }
 
       // Get the data portion of bucket, other things are not needed for templates
@@ -202,7 +202,7 @@ module.exports.generator = function (config, logger, fileParser) {
       if(fs.existsSync('.preset-data.json')) {
         var presetData = fileParser.readJSON('.preset-data.json');
 
-        getBucket().child('contentTypes').set(presetData, function(err) {
+        getBucket().child('contentType').set(presetData, function(err) {
           fs.unlinkSync('.preset-data.json');
           callback();
         });
