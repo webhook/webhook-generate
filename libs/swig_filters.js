@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var utils = require('./utils.js');
+var slug = require('slug');
 
 /**
  * Defines a set of filters available in swig templates
@@ -29,6 +30,10 @@ module.exports.init = function (swig) {
   var reverse = function(input, reverse) {
     return _(input).reverse();
   };
+
+  var slug = function(input) {
+    return slug(input).toLowerCase();
+  }
 
   this.imageSize = function(input, width, height) {
     if(width && !height)

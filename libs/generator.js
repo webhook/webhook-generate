@@ -311,7 +311,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
                 var val = items[key];
 
-                newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '-' + number + '/index.html';
+                newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/index.html';
                 writeTemplate(file, newPath, { item: val });
 
                 number = number + 1;
