@@ -51,4 +51,5 @@ module.exports.init = function (swig) {
   swig.setFilter('sort', sort);
   swig.setFilter('reverse', reverse);
   swig.setFilter('imageSize', reverse);
+  swig.setFilter('slug', slug);
 };
