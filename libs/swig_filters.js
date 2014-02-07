@@ -31,7 +31,7 @@ module.exports.init = function (swig) {
     return _(input).reverse();
   };
 
-  var slug = function(input) {
+  var makeSlug = function(input) {
     return slug(input).toLowerCase();
   }
 
@@ -51,5 +51,5 @@ module.exports.init = function (swig) {
   swig.setFilter('sort', sort);
   swig.setFilter('reverse', reverse);
   swig.setFilter('imageSize', reverse);
-  swig.setFilter('slug', slug);
+  swig.setFilter('slug', makeSlug);
 };
