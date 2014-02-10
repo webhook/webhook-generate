@@ -386,8 +386,20 @@ module.exports.generator = function (config, logger, fileParser) {
     var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
     var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
 
+    var widgetFilesRaw = [];
+
+    if(fs.existsSync('./templates/partials/widgets')) {
+      widgetFilesRaw = wrench.readdirSyncRecursive('./templates/partials/widgets');
+    }
+
+    var widgetFiles = [];
+
+    widgetFilesRaw.forEach(function(item) {
+      widgetFiles[(path.dirname(item) + path.sep + path.basename(item, '.html')).replace('./', '')] = true;
+    });
+
     getData(function(data, typeInfo) {
-      fs.writeFileSync(individual,  _.template(individualTemplate, { typeInfo: typeInfo[name] || {} }));
+      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeInfo: typeInfo[name] || {} }));
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();

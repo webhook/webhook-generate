@@ -5,7 +5,11 @@
    <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
     <tr>
     <td><%- fieldInfo.label %></li>
+    <% if(widgetFiles[fieldInfo.controlType]) { %>
+    <td>{% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item } %}</td>
+    <% } else { %>
     <td>{{ item.<%- fieldInfo.name %> }}</td>
+    <% } %>
     </tr>
   <% }); %>
   </table>
