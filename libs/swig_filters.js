@@ -35,15 +35,26 @@ module.exports.init = function (swig) {
     return slug(input).toLowerCase();
   }
 
-  this.imageSize = function(input, width, height) {
-    if(width && !height)
-    {
-      return input + '?width=' + width;
-    } else if (height && !width) {
-      return input + '?height=' + height;
+  this.imageSize = function(input, width, height, grow) {
+
+    params = [];
+    if(width) {
+      params.push('width=' + width);
     }
+
+    if(height) {
+      params.push('height=' + height);
+    }
+
+    if(grow) {
+      params.push('grow=' + grow);
+    }
+
+    params.push('url=' + encodeURIComponent(inputy));
+    params.push('key=13dde81b8137446e89c7933edca679eb');
+    var imageSource = 'http://i.embed.ly/1/display/resize?' + params.join('&');
     
-    return input + '?width=' + width + '&height=' + height;
+    return imageSource
   };
 
   swig.setFilter('upper', upper);
