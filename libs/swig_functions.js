@@ -53,8 +53,9 @@ module.exports.swigFunctions = function(swig) {
     var items = utils.slice(data, perPage, perPage * (self.curPage-1));
     self.paginate = true;
 
+
     self.pageUrl = pageName || self.pageUrl;
-    self.maxPage = Math.floor(_(data).size() / perPage);
+    self.maxPage = Math.ceil(_(data).size() / perPage);
 
     return items;
   };
