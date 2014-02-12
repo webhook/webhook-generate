@@ -6,7 +6,7 @@
     <tr>
     <td><%- fieldInfo.label %></li>
     <% if(widgetFiles[fieldInfo.controlType]) { %>
-    <td>{% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item } %}</td>
+    <td>{% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item, value: item.<%- fieldInfo.name %> } %}</td>
     <% } else { %>
     <td>{{ item.<%- fieldInfo.name %> }}</td>
     <% } %>
