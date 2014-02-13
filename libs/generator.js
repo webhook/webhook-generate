@@ -328,6 +328,15 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   };
 
+  this.copyStatic = function(callback) {
+    logger.ok('Copying static');
+    if(fs.existsSync('static')) {
+      mkdirp.sync('.build/static');
+      wrench.copyDirSyncRecursive('static', '.build/static', { forceDelete: true });
+    }
+    callback();
+  };
+
   /**
    * Cleans the build directory
    * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
@@ -359,7 +368,9 @@ module.exports.generator = function (config, logger, fileParser) {
     self.cachedData = null;
     self.cleanFiles(null, function() {
       self.renderTemplates(null, function() {
-        self.renderPages(done, cb);
+        self.copyStatic(function() {
+          self.renderPages(done, cb);
+        });
       });
     });
 
