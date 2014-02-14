@@ -16,11 +16,21 @@
 
 <ul>
 
-  {% if curPage > 1 %}
+  {% if curPage > 1  && maxPage > 2%}
   <li><a href="../">First</a></li>
   {% endif %}
 
+  {% if curPage > 1 %}
+  <li><a href="{{prefix}}{{pageUrl}}{{curPage}}">{{curPage - 1}}</a></li>
+  {% endif %}
+
+  <li><a href="{{prefix}}{{pageUrl}}{{curPage}}">{{curPage}}</a></li>
+
   {% if curPage < maxPage %}
+  <li><a href="{{prefix}}{{pageUrl}}{{curPage}}">{{curPage + 1}}</a></li>
+  {% endif %}
+
+  {% if curPage < maxPage && maxPage > 2 %}
   <li><a href="{{prefix}}{{ pageUrl }}{{ maxPage }}/">Last</a></li>
   {% endif %}
 
