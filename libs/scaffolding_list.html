@@ -7,7 +7,7 @@
 
 <ul>
   {% for id, object in data %}
-    <a href="{{ object.name|slug }}">{{ object.name }}</a>
+    <a href="{{ getPagintedPrefix() }}{{ object.name|slug }}">{{ object.name }}</a>
   {% endfor %}
 </ul>
 

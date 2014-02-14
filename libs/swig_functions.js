@@ -74,6 +74,36 @@ module.exports.swigFunctions = function(swig) {
     return self.maxPage;
   };
 
+  var getPaginatedPrefix = function() {
+    var prefix = './';
+
+    if(self.curPage > 1) {
+      prefix = '../';
+    }
+
+    return prefix;
+  };
+
+  var getPageUrl = function(pageNum) {
+
+    if(pageNum === 1)
+    {
+      if(self.curPage === 1) {
+        return '.';
+      } else {
+        return '../';
+      }
+    }
+
+    var prefix = self.pageUrl + '/';
+
+    if(self.curPage > 1) {
+      prefix = '../' + self.pageUrl + '/';
+    }
+
+    return prefix + pageNum;
+  };
+
   // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
   this.shouldPaginate = function() {
     return self.curPage <= self.maxPage;
@@ -96,7 +126,9 @@ module.exports.swigFunctions = function(swig) {
       get: getCombined,
       paginate: paginate,
       getCurPage: getCurPage,
-      getMaxPage: getMaxPage
+      getMaxPage: getMaxPage,
+      getPageUrl: getPageUrl,
+      getPaginatedPrefix: getPaginatedPrefix
     };
   };
 
