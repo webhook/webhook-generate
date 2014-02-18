@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 'use strict';
 module.exports = function(grunt) {
 
@@ -24,7 +26,19 @@ module.exports = function(grunt) {
         options: {
           port: 2002,
           base: '.build',
-          livereload: 35730
+          livereload: 35730,
+          middleware: function(connect, options) {
+            // Return array of whatever middlewares you want
+            return [
+              connect.static(options.base),
+              function(req, res, next) {
+                if ('GET' != req.method && 'HEAD' != req.method) return next();
+
+                var contents = fs.readFileSync('./libs/debug404.html');
+                res.end(contents);
+              }
+            ];
+          }
         }
       }
     },
