@@ -469,8 +469,6 @@ module.exports.generator = function (config, logger, fileParser) {
     var server = new ws({ host: '127.0.0.1', port: 6557 });
 
     server.on('connection', function(sock) {
-      console.log('client connected');
-
       sock.on('message', function(message) {
         if(message.indexOf('scaffolding:') === 0)
         {
