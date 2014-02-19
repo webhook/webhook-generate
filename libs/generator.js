@@ -161,7 +161,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
 
   var downloadRepo = function(zipUrl, callback) {
-    console.log('Downloading preset...'.magenta);
+    logger.ok('Downloading preset...');
 
     // Keep track if the request fails to prevent the continuation of the install
     var requestFailed = false;
@@ -202,10 +202,9 @@ module.exports.generator = function (config, logger, fileParser) {
       if(fs.existsSync('.preset-data.json')) {
         var presetData = fileParser.readJSON('.preset-data.json');
 
-        getBucket().child('contentType').set(presetData, function(err) {
-          fs.unlinkSync('.preset-data.json');
-          callback();
-        });
+        fs.unlinkSync('.preset-data.json');
+        logger.ok('Done downloading.');
+        callback(presetData);
 
       } else {
         callback();
@@ -486,8 +485,8 @@ module.exports.generator = function (config, logger, fileParser) {
             sock.send('done');
             return;
           }
-          downloadPreset(url, function() {
-            sock.send('done');
+          downloadPreset(url, function(data) {
+            sock.send('done:' + JSON.stringify(data));
           });
         }
       });
