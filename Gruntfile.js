@@ -2,6 +2,9 @@
 module.exports = function(grunt) {
 
   // Put your own grunt config here
+  grunt.initConfig({
+
+  });
 
   // NEVER REMOVE THESE LINES, OR ELSE YOUR PROJECT MAY NOT WORK
   require('./options/generatorOptions.js')(grunt);
