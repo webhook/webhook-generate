@@ -46,10 +46,7 @@ module.exports = function(grunt) {
     watch: {
       'wh-watch': {
         files: ['pages/**/*.html', 'templates/**/*.html'],
-        tasks: ['build'],
-        dateFormat: function(time) {
-          grunt.log.write('here');
-        }
+        tasks: ['build']
       }
     },
 
@@ -58,7 +55,7 @@ module.exports = function(grunt) {
         logConcurrentOutput: true
       },
       "wh-concurrent": {
-        tasks: ["wh-watch", "webListener-open"]
+        tasks: ["watch", "webListener-open"]
       }
     }
 

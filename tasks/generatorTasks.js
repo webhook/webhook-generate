@@ -25,9 +25,9 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('wh-watch', 'Watch for changes in templates and regenerate site', function() {
+  grunt.registerTask('watch', 'Watch for changes in templates and regenerate site', function() {
     generator.startLiveReload();
-    grunt.task.run('simple-watch:wh-watch');
+    grunt.task.run('simple-watch');
   });
 
   grunt.registerTask('webListener', 'Listens for commands from CMS through websocket', function() {
@@ -82,13 +82,6 @@ module.exports = function(grunt) {
 
   // Check if initialized properly before running all these tasks
   grunt.registerTask('default',  'Clean, Build, Start Local Server, and Watch', function() {
-
-    if(grunt.config.webhook === {})
-    {
-      // Eventually this should prompt instead of hard code site
-      grunt.task.run('init');
-    }
-
     grunt.task.run('connect:wh-server');
     grunt.task.run('build');
     grunt.task.run('concurrent:wh-concurrent');
