@@ -39,7 +39,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
   var self = this;
   var firebaseUrl = config.get('webhook').firebase || '';
-  var liveReloadPort = config.get('connect').server.options.livereload;
+  var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
 
   this.versionString = null;
   this.cachedData = null;
