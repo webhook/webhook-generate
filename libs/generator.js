@@ -480,6 +480,15 @@ module.exports.generator = function (config, logger, fileParser) {
           self.buildBoth(function() {
             sock.send('done');
           }, self.reloadFiles);
+        } else if (message.indexOf('preset:') === 0) {
+          var url = message.replace('preset:', '');
+          if(!url) {
+            sock.send('done');
+            return;
+          }
+          downloadPreset(url, function() {
+            sock.send('done');
+          });
         }
       });
     });
