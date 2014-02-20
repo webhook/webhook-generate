@@ -30,11 +30,11 @@ module.exports.swigFunctions = function(swig) {
   };
 
   var getTypes = function() {
-    var types = {};
+    var types = [];
 
     for(var key in self.typeInfo) {
       if(!self.typeInfo[key].oneOff) {
-        types[key] = { key: key, name: self.typeInfo[key].name };
+        types.push({ slug: key, name: self.typeInfo[key].name });
       }
     }
 
