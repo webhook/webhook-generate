@@ -108,6 +108,7 @@ module.exports.generator = function (config, logger, fileParser) {
       };
       // Sets the context for swig functions
       swigFunctions.setData(data);
+      swigFunctions.setTypeInfo(typeInfo);
       callback(data, typeInfo);
     }, function(error) {
       throw new Error(error);

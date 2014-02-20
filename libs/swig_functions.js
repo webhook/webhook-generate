@@ -19,9 +19,26 @@ module.exports.swigFunctions = function(swig) {
   this.maxPage = -1;
   this.pageUrl = 'page-';
   this.cachedData = {};
+  this.typeInfo = {};
 
   this.setData = function(data) {
     self.data = data;
+  };
+
+  this.setTypeInfo = function(typeInfo) {
+    self.typeInfo = typeInfo;
+  };
+
+  var getTypes = function() {
+    var types = {};
+
+    for(var key in self.typeInfo) {
+      if(!self.typeInfo[key].oneOff) {
+        types[key] = { key: key, name: self.typeInfo[key].name };
+      }
+    }
+
+    return types;
   };
 
   var getCombined = function() {
@@ -124,6 +141,7 @@ module.exports.swigFunctions = function(swig) {
   this.getFunctions = function() {
     return {
       get: getCombined,
+      getTypes: getTypes,
       paginate: paginate,
       getCurPage: getCurPage,
       getMaxPage: getMaxPage,
