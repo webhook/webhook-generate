@@ -1,6 +1,7 @@
 {% extends "templates/partials/base.html" %}
 
 {% block body %}
+  <h1><a href="../"><%- typeName %></a></h1>
   <table>
    <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
     <tr>

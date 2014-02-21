@@ -400,7 +400,7 @@ module.exports.generator = function (config, logger, fileParser) {
     });
 
     getData(function(data, typeInfo) {
-      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeInfo: typeInfo[name] || {} }));
+      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {} }));
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();

@@ -5,6 +5,7 @@
 {% set data = get('<%= typeName %>') %}
 {% set data = paginate(data, 5) %}
 
+<h1><%= typeName %></h1>
 <ul>
   {% for id, object in data %}
     <a href="{{ getPagintedPrefix() }}{{ object.name|slug }}">{{ object.name }}</a>
