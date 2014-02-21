@@ -1,17 +1,25 @@
+{# INDIVIDUAL VIEW FOR EACH <%- typeName %> #}
+{# You can find a full list of variables to use on this page in your CMS. #}
+
 {% extends "templates/partials/base.html" %}
 
 {% block body %}
+
   <h1><a href="../"><%- typeName %></a></h1>
+
   <table>
-   <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
-    <tr>
-    <td><%- fieldInfo.label %></li>
-    <% if(widgetFiles[fieldInfo.controlType]) { %>
-    <td>{% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item, value: item.<%- fieldInfo.name %> } %}</td>
-    <% } else { %>
-    <td>{{ item.<%- fieldInfo.name %> }}</td>
-    <% } %>
-    </tr>
-  <% }); %>
+    <tbody>
+      <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
+        <tr>
+          <td><%- fieldInfo.label %></td>
+          <% if(widgetFiles[fieldInfo.controlType]) { %>
+            <td>{% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item, value: item.<%- fieldInfo.name %> } %}</td>
+          <% } else { %>
+            <td>{{ item.<%- fieldInfo.name %> }}</td>
+          <% } %>
+        </tr>
+      <% }); %>
+    </tbody>
   </table>
+
 {% endblock %}
