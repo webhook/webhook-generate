@@ -132,11 +132,6 @@ module.exports.generator = function (config, logger, fileParser) {
 
     var output = swig.renderFile(inFile, params);
 
-    if(self.versionString)
-    {
-      outFile = outFile.replace('/index.html', '/index_' + self.versionString + '.html');
-    }
-
     mkdirp.sync(path.dirname(outFile));
     fs.writeFileSync(outFile, output);
 
@@ -144,11 +139,6 @@ module.exports.generator = function (config, logger, fileParser) {
     while(swigFunctions.shouldPaginate())
     {
       outFile = originalOutFile.replace('/index.html', '/' + swigFunctions.pageUrl + swigFunctions.curPage + '/index.html');
-
-      if(self.versionString)
-      {
-        outFile = outFile.replace('/index.html', '/index_' + self.versionString + '.html');
-      }
 
       var output = swig.renderFile(inFile, params);
       mkdirp.sync(path.dirname(outFile));
