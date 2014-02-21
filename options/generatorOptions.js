@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 
     open : {
       'wh-open': {
-        path: 'http://localhost:2002/cms/'
+        path: 'http://localhost:2002/'
       }
     },
 

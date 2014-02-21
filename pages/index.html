@@ -12,16 +12,19 @@
 
     <p><a href="/cms/">Looking for the CMS?</a></p>
 
-
-    <p>Here are a list of content types you've created.</p>
-
     {% set types = getTypes() %}
 
-    <ul>
-    {% for type in types %}
-      <li><a href="{{ type.slug }}">{{ type.name }}</a></li>
-    {% endfor %}
-    </ul>
+    {% if types %}
+
+      <p>Here are a list of content types you've created.</p>
+
+      <ul>
+      {% for type in types %}
+        <li><a href="{{ type.slug }}">{{ type.name }}</a></li>
+      {% endfor %}
+      </ul>
+
+    {% endif %}
 
   </center>
 
