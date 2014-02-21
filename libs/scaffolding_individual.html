@@ -14,7 +14,7 @@
       <li>
         <strong><%- fieldInfo.label %>: </strong>
         <% if(widgetFiles[fieldInfo.controlType]) { %>
-          {% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item, value: item.<%- fieldInfo.name %> } %}
+          <% print(renderWidget(fieldInfo.controlType, fieldInfo.name)) %>
         <% } else { %>
           {{ item.<%- fieldInfo.name %> }}
         <% } %>

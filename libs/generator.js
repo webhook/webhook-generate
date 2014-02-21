@@ -389,8 +389,8 @@ module.exports.generator = function (config, logger, fileParser) {
 
     var widgetFilesRaw = [];
 
-    if(fs.existsSync('./templates/partials/widgets')) {
-      widgetFilesRaw = wrench.readdirSyncRecursive('./templates/partials/widgets');
+    if(fs.existsSync('./libs/widgets')) {
+      widgetFilesRaw = wrench.readdirSyncRecursive('./libs/widgets');
     }
 
     var widgetFiles = [];
@@ -399,8 +399,13 @@ module.exports.generator = function (config, logger, fileParser) {
       widgetFiles[(path.dirname(item) + path.sep + path.basename(item, '.html')).replace('./', '')] = true;
     });
 
+    var renderWidget = function(controlType, fieldName) {
+
+      return _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName });
+    };
+
     getData(function(data, typeInfo) {
-      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {} }));
+      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {} }, { 'imports': { 'renderWidget' : renderWidget}}));
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();
