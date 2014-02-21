@@ -22,6 +22,7 @@ module.exports.swigFunctions = function(swig) {
   this.typeInfo = {};
 
   this.setData = function(data) {
+    self.cachedData = {};
     self.data = data;
   };
 

@@ -35,7 +35,7 @@ module.exports.init = function (swig) {
     return slug(input).toLowerCase();
   }
 
-  this.imageSize = function(input, width, height, grow) {
+  var imageSize = function(input, width, height, grow) {
 
     params = [];
     if(width) {
@@ -56,11 +56,17 @@ module.exports.init = function (swig) {
     
     return imageSource
   };
+  
+
+  var size = function(input) {
+    return _(input).size();
+  };
 
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
   swig.setFilter('sort', sort);
   swig.setFilter('reverse', reverse);
-  swig.setFilter('imageSize', reverse);
+  swig.setFilter('imageSize', imageSize);
   swig.setFilter('slug', makeSlug);
+  swig.setFilter('size', size);
 };
