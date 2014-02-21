@@ -16,7 +16,7 @@
   {# Scaffolding only outputs the object.name, but feel to use any of the fields from your CMS form here. #}
   <ul>
     {% for id, object in data %}
-      <li><a href="{{ getPagintedPrefix() }}{{ object.name|slug }}">{{ object.name }}</a></li>
+      <li><a href="{{ getPagintedPrefix() }}{{ object.name|slug }}/">{{ object.name }}</a></li>
     {% endfor %}
   </ul>
 
