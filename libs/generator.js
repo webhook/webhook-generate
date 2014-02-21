@@ -39,7 +39,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
   var self = this;
   var firebaseUrl = config.get('webhook').firebase || '';
-  var liveReloadPort = config.get('connect').server.options.livereload;
+  var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
 
   this.versionString = null;
   this.cachedData = null;
@@ -108,6 +108,7 @@ module.exports.generator = function (config, logger, fileParser) {
       };
       // Sets the context for swig functions
       swigFunctions.setData(data);
+      swigFunctions.setTypeInfo(typeInfo);
       callback(data, typeInfo);
     }, function(error) {
       throw new Error(error);
@@ -161,7 +162,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
 
   var downloadRepo = function(zipUrl, callback) {
-    console.log('Downloading preset...'.magenta);
+    logger.ok('Downloading preset...');
 
     // Keep track if the request fails to prevent the continuation of the install
     var requestFailed = false;
@@ -202,10 +203,9 @@ module.exports.generator = function (config, logger, fileParser) {
       if(fs.existsSync('.preset-data.json')) {
         var presetData = fileParser.readJSON('.preset-data.json');
 
-        getBucket().child('contentType').set(presetData, function(err) {
-          fs.unlinkSync('.preset-data.json');
-          callback();
-        });
+        fs.unlinkSync('.preset-data.json');
+        logger.ok('Done downloading.');
+        callback(presetData);
 
       } else {
         callback();
@@ -469,8 +469,6 @@ module.exports.generator = function (config, logger, fileParser) {
     var server = new ws({ host: '127.0.0.1', port: 6557 });
 
     server.on('connection', function(sock) {
-      console.log('client connected');
-
       sock.on('message', function(message) {
         if(message.indexOf('scaffolding:') === 0)
         {
@@ -482,6 +480,15 @@ module.exports.generator = function (config, logger, fileParser) {
           self.buildBoth(function() {
             sock.send('done');
           }, self.reloadFiles);
+        } else if (message.indexOf('preset:') === 0) {
+          var url = message.replace('preset:', '');
+          if(!url) {
+            sock.send('done');
+            return;
+          }
+          downloadPreset(url, function(data) {
+            sock.send('done:' + JSON.stringify(data));
+          });
         }
       });
     });

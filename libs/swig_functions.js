@@ -19,9 +19,26 @@ module.exports.swigFunctions = function(swig) {
   this.maxPage = -1;
   this.pageUrl = 'page-';
   this.cachedData = {};
+  this.typeInfo = {};
 
   this.setData = function(data) {
     self.data = data;
+  };
+
+  this.setTypeInfo = function(typeInfo) {
+    self.typeInfo = typeInfo;
+  };
+
+  var getTypes = function() {
+    var types = [];
+
+    for(var key in self.typeInfo) {
+      if(!self.typeInfo[key].oneOff) {
+        types.push({ slug: key, name: self.typeInfo[key].name });
+      }
+    }
+
+    return types;
   };
 
   var getCombined = function() {
@@ -74,6 +91,36 @@ module.exports.swigFunctions = function(swig) {
     return self.maxPage;
   };
 
+  var getPaginatedPrefix = function() {
+    var prefix = './';
+
+    if(self.curPage > 1) {
+      prefix = '../';
+    }
+
+    return prefix;
+  };
+
+  var getPageUrl = function(pageNum) {
+
+    if(pageNum === 1)
+    {
+      if(self.curPage === 1) {
+        return '.';
+      } else {
+        return '../';
+      }
+    }
+
+    var prefix = self.pageUrl + '/';
+
+    if(self.curPage > 1) {
+      prefix = '../' + self.pageUrl + '/';
+    }
+
+    return prefix + pageNum;
+  };
+
   // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
   this.shouldPaginate = function() {
     return self.curPage <= self.maxPage;
@@ -94,9 +141,12 @@ module.exports.swigFunctions = function(swig) {
   this.getFunctions = function() {
     return {
       get: getCombined,
+      getTypes: getTypes,
       paginate: paginate,
       getCurPage: getCurPage,
-      getMaxPage: getMaxPage
+      getMaxPage: getMaxPage,
+      getPageUrl: getPageUrl,
+      getPaginatedPrefix: getPaginatedPrefix
     };
   };
 
