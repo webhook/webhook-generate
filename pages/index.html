@@ -14,7 +14,7 @@
 
     {% set types = getTypes() %}
 
-    {% if types %}
+    {% if types|size !== 0 %}
 
       <p>Here are a list of content types you've created.</p>
 
