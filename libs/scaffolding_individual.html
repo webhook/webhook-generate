@@ -5,21 +5,21 @@
 
 {% block body %}
 
-  <h1><a href="../"><%- typeName %></a></h1>
+  <h1>{{ item.name }}</h1>
 
-  <table>
-    <tbody>
-      <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
-        <tr>
-          <td><%- fieldInfo.label %></td>
-          <% if(widgetFiles[fieldInfo.controlType]) { %>
-            <td>{% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item, value: item.<%- fieldInfo.name %> } %}</td>
-          <% } else { %>
-            <td>{{ item.<%- fieldInfo.name %> }}</td>
-          <% } %>
-        </tr>
-      <% }); %>
-    </tbody>
-  </table>
+  <ul>
+    <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
+      <li>
+        <strong><%- fieldInfo.label %>: </strong>
+        <% if(widgetFiles[fieldInfo.controlType]) { %>
+          {% include "templates/partials/widgets/<%- fieldInfo.controlType %>.html" with { item: item, value: item.<%- fieldInfo.name %> } %}
+        <% } else { %>
+          {{ item.<%- fieldInfo.name %> }}
+        <% } %>
+      </li>
+    <% }); %>
+  </ul>
+
+  <p><a href="../">View a list of all <%- typeName %></a></p>
 
 {% endblock %}
