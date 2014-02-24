@@ -56,6 +56,25 @@ module.exports.init = function (swig) {
     
     return imageSource
   };
+
+  var imageCrop = function(input, width, height) {
+
+    var params = [];
+    if(width) {
+      params.push('width=' + width);
+    }
+
+    if(height) {
+      params.push('height=' + height);
+    }
+
+    params.push('url=' + encodeURIComponent(input));
+    params.push('key=13dde81b8137446e89c7933edca679eb');
+    var imageSource = 'http://i.embed.ly/1/display/crop?' + params.join('&');
+    
+    return imageSource
+  };
+  
   
 
   var size = function(input) {
@@ -67,6 +86,7 @@ module.exports.init = function (swig) {
   swig.setFilter('sort', sort);
   swig.setFilter('reverse', reverse);
   swig.setFilter('imageSize', imageSize);
+  swig.setFilter('imageCrop', imageCrop);
   swig.setFilter('slug', makeSlug);
   swig.setFilter('size', size);
 };
