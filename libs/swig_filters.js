@@ -50,7 +50,7 @@ module.exports.init = function (swig) {
       params.push('grow=' + grow);
     }
 
-    params.push('url=' + encodeURIComponent(inputy));
+    params.push('url=' + encodeURIComponent(input));
     params.push('key=13dde81b8137446e89c7933edca679eb');
     var imageSource = 'http://i.embed.ly/1/display/resize?' + params.join('&');
     
