@@ -37,7 +37,7 @@ module.exports.init = function (swig) {
 
   var imageSize = function(input, width, height, grow) {
 
-    params = [];
+    var params = [];
     if(width) {
       params.push('width=' + width);
     }
