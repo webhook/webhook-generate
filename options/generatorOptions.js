@@ -45,7 +45,7 @@ module.exports = function(grunt) {
 
     watch: {
       'wh-watch': {
-        files: ['pages/**/*.html', 'templates/**/*.html'],
+        files: ['pages/**/*.html', 'templates/**/*.html', 'static/**/*'],
         tasks: ['build']
       }
     },
