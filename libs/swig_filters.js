@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var utils = require('./utils.js');
-var slug = require('slug');
 
 /**
  * Defines a set of filters available in swig templates
@@ -30,10 +29,6 @@ module.exports.init = function (swig) {
   var reverse = function(input, reverse) {
     return _(input).reverse();
   };
-
-  var makeSlug = function(input) {
-    return slug(input).toLowerCase();
-  }
 
   var imageSize = function(input, width, height, grow) {
 
@@ -87,6 +82,5 @@ module.exports.init = function (swig) {
   swig.setFilter('reverse', reverse);
   swig.setFilter('imageSize', imageSize);
   swig.setFilter('imageCrop', imageCrop);
-  swig.setFilter('slug', makeSlug);
   swig.setFilter('size', size);
 };

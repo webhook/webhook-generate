@@ -74,7 +74,6 @@ module.exports.swigFunctions = function(swig) {
 
       if(typeof tempData !== 'object') {
         data = tempData;
-        data._type = name;
         return;
       }
 
