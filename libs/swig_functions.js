@@ -3,6 +3,8 @@
 var utils = require('./utils.js');
 var _ = require('lodash');
 
+var slugger = require('slug');
+
 /**
  * Defines a set of functions usable in all swig templates, are merged into context on render
  * @param  {Object}   swig        Swig engine
@@ -20,6 +22,22 @@ module.exports.swigFunctions = function(swig) {
   this.pageUrl = 'page-';
   this.cachedData = {};
   this.typeInfo = {};
+
+
+
+  var url = function(object) {
+    var slug = object.slug ? object.slug : (object.name ? slugger(object.name).toLowerCase() : null);
+    var prefix = object._type ? object._type : '';
+
+    var url = '';
+    if(prefix) {
+      url = '/' + prefix + '/' + slug + '/';
+    } else {
+      url = '/' + slug + '/';
+    }
+
+    return url;
+  };
 
   this.setData = function(data) {
     self.cachedData = {};
@@ -56,13 +74,17 @@ module.exports.swigFunctions = function(swig) {
 
       if(typeof tempData !== 'object') {
         data = tempData;
+        data._type = name;
         return;
       }
-      
+
+      tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
+      tempData = _.map(tempData, function(value) { value._type = name; return value; });
+
       data = utils.extend(data, tempData);
-      data = _.omit(data, function(value, key) { return key.indexOf('_') === 0; });
     });
 
+    console.log(data);
     self.cachedData[names.join(',')] = data;
 
     return data;
@@ -147,7 +169,8 @@ module.exports.swigFunctions = function(swig) {
       getCurPage: getCurPage,
       getMaxPage: getMaxPage,
       getPageUrl: getPageUrl,
-      getPaginatedPrefix: getPaginatedPrefix
+      getPaginatedPrefix: getPaginatedPrefix,
+      url: url
     };
   };
 
