@@ -114,16 +114,6 @@ module.exports.swigFunctions = function(swig) {
     return self.maxPage;
   };
 
-  var getPaginatedPrefix = function() {
-    var prefix = './';
-
-    if(self.curPage > 1) {
-      prefix = '../';
-    }
-
-    return prefix;
-  };
-
   var getPageUrl = function(pageNum) {
 
     if(pageNum === 1)
@@ -169,7 +159,6 @@ module.exports.swigFunctions = function(swig) {
       getCurPage: getCurPage,
       getMaxPage: getMaxPage,
       getPageUrl: getPageUrl,
-      getPaginatedPrefix: getPaginatedPrefix,
       url: url
     };
   };

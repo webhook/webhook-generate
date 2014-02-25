@@ -7,7 +7,7 @@
 
   <h1>{{ item.name }}</h1>
 
-  <p><a href="../">View a list of all <%- typeName %></a></p>
+  <p><a href="/<%- typeName %>/">View a list of all <%- typeName %></a></p>
 
   <ul>
     <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
