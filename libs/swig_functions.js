@@ -72,13 +72,16 @@ module.exports.swigFunctions = function(swig) {
     names.forEach(function(name) {
       var tempData = self.data[name] || {};
 
-      if(typeof tempData !== 'object') {
+      if(self.typeInfo[name].oneOff) {
         data = tempData;
         return;
       }
 
       tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
-      tempData = _.map(tempData, function(value) { value._type = name; return value; });
+
+      if(!self.typeInfo[name].oneOff) {
+        _.forIn(tempData, function(value) { value._type = name; });
+      }
 
       data = utils.extend(data, tempData);
     });
