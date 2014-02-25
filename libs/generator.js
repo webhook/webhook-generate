@@ -130,8 +130,10 @@ module.exports.generator = function (config, logger, fileParser) {
 
     swigFunctions.init();
 
-    var output = swig.renderFile(inFile, params);
+    var outputUrl = outFile.replace('index.html', '').replace('./.build', '');
+    swigFunctions.setParams({ CURRENT_URL: outputUrl });
 
+    var output = swig.renderFile(inFile, params);
     mkdirp.sync(path.dirname(outFile));
     fs.writeFileSync(outFile, output);
 
@@ -139,7 +141,9 @@ module.exports.generator = function (config, logger, fileParser) {
     while(swigFunctions.shouldPaginate())
     {
       outFile = originalOutFile.replace('/index.html', '/' + swigFunctions.pageUrl + swigFunctions.curPage + '/index.html');
+      outputUrl = outFile.replace('index.html', '').replace('./.build', '');
 
+      swigFunctions.setParams({ CURRENT_URL: outputUrl });
       var output = swig.renderFile(inFile, params);
       mkdirp.sync(path.dirname(outFile));
       fs.writeFileSync(outFile, output);

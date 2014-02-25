@@ -20,10 +20,10 @@ module.exports.swigFunctions = function(swig) {
   this.curPage = 1;
   this.maxPage = -1;
   this.pageUrl = 'page-';
+  this.paginationBaseUrl = null;
   this.cachedData = {};
   this.typeInfo = {};
-
-
+  this.CURRENT_URL = '/';
 
   var url = function(object) {
     var slug = object.slug ? object.slug : (object.name ? slugger(object.name).toLowerCase() : null);
@@ -84,7 +84,6 @@ module.exports.swigFunctions = function(swig) {
       data = utils.extend(data, tempData);
     });
 
-    console.log(data);
     self.cachedData[names.join(',')] = data;
 
     return data;
@@ -99,6 +98,9 @@ module.exports.swigFunctions = function(swig) {
     var items = utils.slice(data, perPage, perPage * (self.curPage-1));
     self.paginate = true;
 
+    if(self.paginationBaseUrl === null) {
+      self.paginationBaseUrl = self.CURRENT_URL;
+    }
 
     self.pageUrl = pageName || self.pageUrl;
     self.maxPage = Math.ceil(_(data).size() / perPage);
@@ -115,23 +117,7 @@ module.exports.swigFunctions = function(swig) {
   };
 
   var getPageUrl = function(pageNum) {
-
-    if(pageNum === 1)
-    {
-      if(self.curPage === 1) {
-        return '.';
-      } else {
-        return '../';
-      }
-    }
-
-    var prefix = self.pageUrl + '/';
-
-    if(self.curPage > 1) {
-      prefix = '../' + self.pageUrl + '/';
-    }
-
-    return prefix + pageNum;
+    return self.paginationBaseUrl + self.pageUrl + pageNum + '/';
   };
 
   // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
@@ -145,12 +131,19 @@ module.exports.swigFunctions = function(swig) {
     self.curPage = 1;
     self.pageUrl = 'page-'
     self.maxPage = -1;
+    self.paginationBaseUrl = null;
   };
 
   this.increasePage = function() {
     self.curPage = self.curPage + 1;
   };
   
+  this.setParams = function(params) {
+    for(var key in params) {
+      self[key] = params[key];
+    }
+  };
+
   this.getFunctions = function() {
     return {
       get: getCombined,
@@ -159,9 +152,11 @@ module.exports.swigFunctions = function(swig) {
       getCurPage: getCurPage,
       getMaxPage: getMaxPage,
       getPageUrl: getPageUrl,
-      url: url
+      url: url,
+      CURRENT_URL: self.CURRENT_URL,
     };
   };
+
 
   return this;
 };
