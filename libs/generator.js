@@ -14,6 +14,7 @@ var utils = require('./utils.js');
 var ws = require('ws').Server;
 var Zip   = require('adm-zip');
 var slug = require('slug');
+var async = require('async');
 
 // Template requires
 // TODO: Abstract these later to make it simpler to change
@@ -468,6 +469,14 @@ module.exports.generator = function (config, logger, fileParser) {
     var server = new ws({ host: '127.0.0.1', port: 6557 });
 
     server.on('connection', function(sock) {
+
+      var buildQueue = async.queue(function (task, callback) {
+          self.buildBoth(function() {
+            sock.send('done');
+            callback();
+          }, self.reloadFiles);
+      }, 1);
+
       sock.on('message', function(message) {
         if(message.indexOf('scaffolding:') === 0)
         {
@@ -476,9 +485,7 @@ module.exports.generator = function (config, logger, fileParser) {
             sock.send('done');
           });
         } else if (message === 'build') {
-          self.buildBoth(function() {
-            sock.send('done');
-          }, self.reloadFiles);
+          buildQueue.push({}, function(err) {});
         } else if (message.indexOf('preset:') === 0) {
           var url = message.replace('preset:', '');
           if(!url) {
