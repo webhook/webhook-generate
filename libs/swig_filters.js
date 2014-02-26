@@ -30,6 +30,32 @@ module.exports.init = function (swig) {
     return _(input).reverse();
   };
 
+  var groupBy = function (input, key) {
+    if (!_.isArray(input)) {
+      return input;
+    }
+
+    var out = {};
+
+    _.forEach(input, function (value) {
+      if (!value.hasOwnProperty(key)) {
+        return;
+      }
+
+      var keyname = value[key],
+        newVal = utils.extend({}, value);
+
+      if (!out[keyname]) {
+        out[keyname] = [];
+      }
+
+      out[keyname].push(value);
+    });
+
+    return out;
+  };
+
+
   var imageSize = function(input, width, height, grow) {
 
     var params = [];
@@ -83,4 +109,5 @@ module.exports.init = function (swig) {
   swig.setFilter('imageSize', imageSize);
   swig.setFilter('imageCrop', imageCrop);
   swig.setFilter('size', size);
+  swig.setFilter('groupBy', groupBy);
 };

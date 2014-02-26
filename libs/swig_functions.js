@@ -68,7 +68,7 @@ module.exports.swigFunctions = function(swig) {
       return self.cachedData[names.join(',')];
     }
 
-    var data = {};
+    var data = [];
     names.forEach(function(name) {
       var tempData = self.data[name] || {};
 
@@ -79,13 +79,11 @@ module.exports.swigFunctions = function(swig) {
 
       tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
 
-      if(!self.typeInfo[name].oneOff) {
-        _.forIn(tempData, function(value) { value._type = name; });
-      }
-
+      // convert it into an array
+      tempData = _.map(tempData, function(value, key) { value._id = key; value._type = name; return value });
       data = utils.extend(data, tempData);
     });
-
+    
     self.cachedData[names.join(',')] = data;
 
     return data;
@@ -122,6 +120,10 @@ module.exports.swigFunctions = function(swig) {
     return self.paginationBaseUrl + self.pageUrl + pageNum + '/';
   };
 
+  var getCurrentUrl = function() {
+    return self.CURRENT_URL;
+  };
+
   // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
   this.shouldPaginate = function() {
     return self.curPage <= self.maxPage;
@@ -155,7 +157,7 @@ module.exports.swigFunctions = function(swig) {
       getMaxPage: getMaxPage,
       getPageUrl: getPageUrl,
       url: url,
-      CURRENT_URL: self.CURRENT_URL,
+      getCurrentUrl: getCurrentUrl,
     };
   };
 
