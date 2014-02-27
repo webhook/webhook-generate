@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var utils = require('./utils.js');
-var slug = require('slug');
+var marked = require('marked');
 
 /**
  * Defines a set of filters available in swig templates
@@ -31,9 +31,31 @@ module.exports.init = function (swig) {
     return _(input).reverse();
   };
 
-  var makeSlug = function(input) {
-    return slug(input).toLowerCase();
-  }
+  var groupBy = function (input, key) {
+    if (!_.isArray(input)) {
+      return input;
+    }
+
+    var out = {};
+
+    _.forEach(input, function (value) {
+      if (!value.hasOwnProperty(key)) {
+        return;
+      }
+
+      var keyname = value[key],
+        newVal = utils.extend({}, value);
+
+      if (!out[keyname]) {
+        out[keyname] = [];
+      }
+
+      out[keyname].push(value);
+    });
+
+    return out;
+  };
+
 
   var imageSize = function(input, width, height, grow) {
 
@@ -81,12 +103,19 @@ module.exports.init = function (swig) {
     return _(input).size();
   };
 
+  var markdown = function(input) {
+    return marked(input);
+  }
+
+  markdown.safe = true;
+
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
   swig.setFilter('sort', sort);
   swig.setFilter('reverse', reverse);
   swig.setFilter('imageSize', imageSize);
   swig.setFilter('imageCrop', imageCrop);
-  swig.setFilter('slug', makeSlug);
   swig.setFilter('size', size);
+  swig.setFilter('groupBy', groupBy);
+  swig.setFilter('markdown', markdown);
 };

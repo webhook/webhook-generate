@@ -38,20 +38,28 @@ Template Basics
 
 In addition to the standard template filters and tags provided by Swig, we have included several helper functions and filters to aid in development. They are documented below.
 
+Template Variables:
+  * CURRENT_URL - Contains the current url of the template e.g {{ CURRENT_URL }}
+
 Template Functions:
   
-  * `get(contentType1, contentType2, contentType3, ...)` - Gets data for a content type (or multiple mixed content types)
-  * `paginate(data, perPage, urlPrefix)` - Tells the templating system that this data needs to be paginated, and will cause the engine to render this page into several pages. perPage is the number of items per page. urlPrefix is the prefix you want to use for the page url (default is /page-<pageNum>/). ONLY ONE SET OF DATA CAN BE PAGINATED PER TEMPLATE.
-  * `getCurrentPage` - Returns the current page in a paginated template.
-  * `getMaxPage` - Returns the max number of pages in a paginated template, only works after paginate.
+  * `get(contentType1, contentType2, contentType3, ...)` - Gets data for a content type (or multiple mixed content types) e.g. {% set data = get('type1') %}
+  * `getTypes` - Returns a list of all content types that are not one offs. e.g. {% set types = getTypes() %}
+  * `paginate(data, perPage, urlPrefix)` - Tells the templating system that this data needs to be paginated, and will cause the engine to render this page into several pages. perPage is the number of items per page. urlPrefix is the prefix you want to use for the page url (default is /page-<pageNum>/). ONLY ONE SET OF DATA CAN BE PAGINATED PER TEMPLATE. e.g {% set pageData = paginate(data, 10) %}
+  * `getCurPage` - Returns the current page in a paginated template. e.g. {% set curPage = getCurPage() %}
+  * `getMaxPage` - Returns the max number of pages in a paginated template, only works after paginate. e.g. {% set maxPage = getMaxPage() %}
+  * `getPageUrl(pageNum)` - Returns the full url for a page num. e.g. {% set curUrl = getPageUrl(curPage) %}
+  * `url(object)` - Returns the full url to an object (or type from getTypes). e.g. {{ url(object) }}
 
 Template Filters:
 
-  * `upper` - Makes a string entirely upper case
-  * `slice(offset, limit)` - Slices the array/object returning a set of data from offset up to limit items
-  * `sort(property)` - Sorts an array by the given property
-  * `reverse` - Reverses an array or object of keys
-  * `imageSize(width, height)` - Takes an image url, returns url of image with resize information on it
+  * `upper` - Makes a string entirely upper case e.g. {{ object.name|upper }}
+  * `slice(offset, limit)` - Slices the array/object returning a set of data from offset up to limit items e.g. {% set data = getData('articles')|slice(0, 10) %}
+  * `sort(property)` - Sorts an array by the given property e.g. {% set data = getData('articles')|sort('name') %}
+  * `reverse` - Reverses an array or object of keys e.g. {% set data = getData('articles')|sort('name')|reverse %}
+  * `imageSize(width, height)` - Takes an image url, returns url of image with resize information on it e.g. {{ object.image|imageSize(50, 50) }}
+  * `imageCrop(width, height)` - Takes an image url, returns url of image with crop information on it e.g. {{ object.image|imageCrop(50, 50) }}
+  * `size` - Returns the number of elements in a list e.g. {{ data|size }}
 
 
 Examples
