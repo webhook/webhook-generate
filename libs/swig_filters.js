@@ -107,6 +107,8 @@ module.exports.init = function (swig) {
     return marked(input);
   }
 
+  markdown.safe = true;
+
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
   swig.setFilter('sort', sort);
