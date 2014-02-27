@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var utils = require('./utils.js');
+var marked = require('marked');
 
 /**
  * Defines a set of filters available in swig templates
@@ -102,6 +103,10 @@ module.exports.init = function (swig) {
     return _(input).size();
   };
 
+  var markdown = function(input) {
+    return marked(input);
+  }
+
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
   swig.setFilter('sort', sort);
@@ -110,4 +115,5 @@ module.exports.init = function (swig) {
   swig.setFilter('imageCrop', imageCrop);
   swig.setFilter('size', size);
   swig.setFilter('groupBy', groupBy);
+  swig.setFilter('markdown', markdown);
 };
