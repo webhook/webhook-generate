@@ -72,7 +72,7 @@ module.exports.swigFunctions = function(swig) {
     names.forEach(function(name) {
       var tempData = self.data[name] || {};
 
-      if(self.typeInfo[name].oneOff) {
+      if(self.typeInfo[name] && self.typeInfo[name].oneOff) {
         data = tempData;
         return;
       }
