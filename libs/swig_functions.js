@@ -68,6 +68,8 @@ module.exports.swigFunctions = function(swig) {
       return self.cachedData[names.join(',')];
     }
 
+    // TODO, SLUG NAME THE SAME WAS CMS DOES
+
     var data = [];
     names.forEach(function(name) {
       var tempData = self.data[name] || {};
