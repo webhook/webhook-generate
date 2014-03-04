@@ -1,0 +1,9 @@
+{# List all images from this gallery. #}
+<ul>
+  {% for image in <%- value %> %}
+    <li>
+      <img src="{{ image.url|imageSize(200,200) }}">
+      <div>{{ image.caption }}</div>
+    </li>
+  {% endfor%}
+</ul>
