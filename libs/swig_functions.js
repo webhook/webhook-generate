@@ -62,11 +62,11 @@ module.exports.swigFunctions = function(swig) {
 
   var getItem = function(type, key) {
     
-    if(!self.typeInfo[name]) {
+    if(!self.typeInfo[type]) {
       return {};
     }
 
-    return self.data[name][key];
+    return self.data[type][key];
   };
 
   var getCombined = function() {
