@@ -66,7 +66,9 @@ module.exports.swigFunctions = function(swig) {
       return {};
     }
 
-    return self.data[type][key];
+    var item = self.data[type][key];
+    item._type = type;
+    return item;
   };
 
   var getCombined = function() {
