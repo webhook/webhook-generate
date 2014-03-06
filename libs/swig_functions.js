@@ -60,6 +60,17 @@ module.exports.swigFunctions = function(swig) {
     return types;
   };
 
+  var getItem = function(type, key) {
+    
+    if(!self.typeInfo[type]) {
+      return {};
+    }
+
+    var item = self.data[type][key];
+    item._type = type;
+    return item;
+  };
+
   var getCombined = function() {
     var names = [].slice.call(arguments, 0);
 
@@ -67,6 +78,8 @@ module.exports.swigFunctions = function(swig) {
     {
       return self.cachedData[names.join(',')];
     }
+
+    // TODO, SLUG NAME THE SAME WAS CMS DOES
 
     var data = [];
     names.forEach(function(name) {
@@ -151,6 +164,7 @@ module.exports.swigFunctions = function(swig) {
   this.getFunctions = function() {
     return {
       get: getCombined,
+      getItem: getItem,
       getTypes: getTypes,
       paginate: paginate,
       getCurPage: getCurPage,
