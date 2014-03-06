@@ -484,7 +484,7 @@ module.exports.generator = function (config, logger, fileParser) {
           self.makeScaffolding(name, function() { 
             sock.send('done');
           });
-        } else if {
+        } else if (message.indexOf('scaffolding_force:') === 0) {
           var name = message.replace('scaffolding_force:', '');
           self.makeScaffolding(name, function() { 
             sock.send('done');
