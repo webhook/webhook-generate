@@ -60,6 +60,15 @@ module.exports.swigFunctions = function(swig) {
     return types;
   };
 
+  var getItem = function(type, key) {
+    
+    if(!self.typeInfo[name]) {
+      return {};
+    }
+
+    return self.data[name][key];
+  };
+
   var getCombined = function() {
     var names = [].slice.call(arguments, 0);
 
@@ -153,6 +162,7 @@ module.exports.swigFunctions = function(swig) {
   this.getFunctions = function() {
     return {
       get: getCombined,
+      getItem: getItem,
       getTypes: getTypes,
       paginate: paginate,
       getCurPage: getCurPage,
