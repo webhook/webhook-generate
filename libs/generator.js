@@ -218,31 +218,22 @@ module.exports.generator = function (config, logger, fileParser) {
 
     getData(function(data) {
 
-      glob('pages/**/*.html', function(err, files) {
+      glob('pages/**/*.{html,xml,rss,xhtml,atom}', function(err, files) {
         files.forEach(function(file) {
 
-          if(path.extname(file) === '.html')
-          {
-            var newFile = file.replace('pages', './.build');
+          var newFile = file.replace('pages', './.build');
 
-            var dir = path.dirname(newFile);
-            var filename = path.basename(newFile, '.html');
-            var dontRefresh = false;
+          var dir = path.dirname(newFile);
+          var filename = path.basename(newFile, path.extname(file));
 
-            if(filename === 'cms') {
-               dontRefresh = true;
-            }
-
-            if(filename !== 'index' && path.basename(newFile) !== '404.html') {
-              dir = dir + '/' + filename;
-              filename = 'index';
-            }
-
-            newFile = dir + '/' + filename + '.html';
-
-            var destFile = writeTemplate(file, newFile);
+          if(path.extname(file) === '.html' && filename !== 'index' && path.basename(newFile) !== '404.html') {
+            dir = dir + '/' + filename;
+            filename = 'index';
           }
 
+          newFile = dir + '/' + filename + path.extname(file);
+
+          var destFile = writeTemplate(file, newFile);
         });
 
         if(fs.existsSync('pages/robots.txt'))
