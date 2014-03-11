@@ -526,5 +526,53 @@ module.exports.generator = function (config, logger, fileParser) {
     done(true);
   };
 
+  this.assets = function(grunt) {
+
+    if(fs.existsSync('dist')) {
+      wrench.rmdirSyncRecursive('dist');
+    }
+
+    mkdirp.sync('dist');
+
+    wrench.copyDirSyncRecursive('pages', 'dist/pages', {
+      forceDelete: true
+    });
+
+    wrench.copyDirSyncRecursive('templates', 'dist/templates', {
+      forceDelete: true
+    });
+
+    wrench.copyDirSyncRecursive('static', 'dist/static', {
+      forceDelete: true
+    });
+
+    grunt.task.run('useminPrepare');
+
+    grunt.option('force', true);
+    grunt.task.run('concat');
+    grunt.task.run('uglify');
+    grunt.task.run('cssmin');
+    grunt.task.run('rev');
+    grunt.task.run('usemin');
+    grunt.task.run('assetsAfter');
+
+  }
+
+  this.assetsAfter = function(grunt) {
+    wrench.rmdirSyncRecursive('.tmp');
+
+    var files = wrench.readdirSyncRecursive('static');
+
+    files.forEach(function(file) {
+      var filePath = 'static/' + file;
+      var distPath = 'dist/static/' + file;
+      if(!fs.lstatSync(filePath).isDirectory() && !fs.existsSync(distPath)) {
+        var fileData = fs.readFileSync(filePath);
+        fs.writeFileSync(distPath, fileData);
+      }
+    });
+  }
+
+
   return this;
 };

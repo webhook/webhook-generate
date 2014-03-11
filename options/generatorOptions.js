@@ -57,8 +57,37 @@ module.exports = function(grunt) {
       "wh-concurrent": {
         tasks: ["watch", "webListener-open"]
       }
-    }
+    },
 
+    // Compile static assets into dist/static
+    // Copy pages/html files into dist/pages and dist/html
+    // Run rev on dist/static and then run usemin on dist/pages and dist/html
+    // Copy unmodified static folder into dist/static
+
+    useminPrepare: {
+      src: ['dist/pages/**/*.html', 'dist/templates/**/*.html'],
+      options: {
+        root: '.',
+        dest: 'dist'
+      }
+    },
+
+    rev: {
+      assets: {
+        files: [{
+          src: [
+            'dist/static/**/*.{jpg,jpeg,gif,png,js,css,eot,svg,ttf,woff}',
+          ]
+        }]
+      }
+    },
+
+    usemin: {
+      html: ['dist/pages/**/*.html', 'dist/templates/**/*.html'],
+      options: {
+        assetsDirs: ['dist']
+      }
+    }
   };
 
   for(var key in mergeConfig) {
