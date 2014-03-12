@@ -203,7 +203,8 @@ module.exports.generator = function (config, logger, fileParser) {
         callback(presetData);
 
       } else {
-        callback('');
+        logger.ok('Done downloading.');
+        callback(null);
       }
     });
   };
