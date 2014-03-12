@@ -203,7 +203,7 @@ module.exports.generator = function (config, logger, fileParser) {
         callback(presetData);
 
       } else {
-        callback();
+        callback('');
       }
     });
   };
