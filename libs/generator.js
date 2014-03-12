@@ -187,7 +187,7 @@ module.exports.generator = function (config, logger, fileParser) {
         var newName = entry.entryName.split(path.sep).slice(1).join(path.sep);
         entry.entryName = newName;
       });
-      zip.extractAllTo('.');
+      zip.extractAllTo('.', true);
       fs.unlinkSync('.preset.zip');
       callback();
     });
