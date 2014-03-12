@@ -492,7 +492,7 @@ module.exports.generator = function (config, logger, fileParser) {
           }
           downloadPreset(url, function(data) {
 
-            var command = winSpawn('npm', ['install'], {
+            var command = spawn('npm', ['install'], {
               stdio: 'inherit',
               cwd: '.'
             });
