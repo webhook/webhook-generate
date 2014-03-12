@@ -15,6 +15,7 @@ var ws = require('ws').Server;
 var Zip   = require('adm-zip');
 var slug = require('slug');
 var async = require('async');
+var spawn = require('win-spawn');
 
 // Template requires
 // TODO: Abstract these later to make it simpler to change
@@ -187,7 +188,7 @@ module.exports.generator = function (config, logger, fileParser) {
         var newName = entry.entryName.split(path.sep).slice(1).join(path.sep);
         entry.entryName = newName;
       });
-      zip.extractAllTo('.');
+      zip.extractAllTo('.', true);
       fs.unlinkSync('.preset.zip');
       callback();
     });
@@ -490,7 +491,15 @@ module.exports.generator = function (config, logger, fileParser) {
             return;
           }
           downloadPreset(url, function(data) {
-            sock.send('done:' + JSON.stringify(data));
+
+            var command = spawn('npm', ['install'], {
+              stdio: 'inherit',
+              cwd: '.'
+            });
+
+            command.on('close', function() {
+              sock.send('done:' + JSON.stringify(data));
+            });
           });
         }
       });
