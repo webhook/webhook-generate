@@ -130,6 +130,10 @@ module.exports.swigFunctions = function(swig) {
   };
 
   var getPageUrl = function(pageNum) {
+    if(pageNum == 1) {
+      return self.paginationBaseUrl;
+    }
+
     return self.paginationBaseUrl + self.pageUrl + pageNum + '/';
   };
 
