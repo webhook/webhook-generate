@@ -42,6 +42,7 @@ module.exports.generator = function (config, logger, fileParser) {
   var self = this;
   var firebaseUrl = config.get('webhook').firebase || '';
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
+  var websocket = null;
 
   this.versionString = null;
   this.cachedData = null;
@@ -77,6 +78,8 @@ module.exports.generator = function (config, logger, fileParser) {
     if(self.cachedData)
     {
       swigFunctions.setData(self.cachedData.data);
+      swigFunctions.setTypeInfo(self.cachedData.typeInfo);
+      swigFunctions.setSettings(self.cachedData.settings);
       callback(self.cachedData.data, self.cachedData.typeInfo);
       return;
     }
@@ -89,12 +92,19 @@ module.exports.generator = function (config, logger, fileParser) {
     getBucket().once('value', function(data) {
       data = data.val();
       var typeInfo = {};
+      var settings = {};
 
       if(!data || !data['contentType'])
       {
         typeInfo = {};
       } else {
         typeInfo = data['contentType'];
+      }
+
+      if(!data || !data.settings) {
+        settings = {};
+      } else {
+        settings = data.settings;
       }
 
       // Get the data portion of bucket, other things are not needed for templates
@@ -106,11 +116,13 @@ module.exports.generator = function (config, logger, fileParser) {
 
       self.cachedData = {
         data: data,
-        typeInfo: typeInfo
+        typeInfo: typeInfo,
+        settings: settings
       };
       // Sets the context for swig functions
       swigFunctions.setData(data);
       swigFunctions.setTypeInfo(typeInfo);
+      swigFunctions.setSettings(settings);
       callback(data, typeInfo);
     }, function(error) {
       throw new Error(error);
@@ -135,7 +147,13 @@ module.exports.generator = function (config, logger, fileParser) {
     var outputUrl = outFile.replace('index.html', '').replace('./.build', '');
     swigFunctions.setParams({ CURRENT_URL: outputUrl });
 
-    var output = swig.renderFile(inFile, params);
+    try { 
+      var output = swig.renderFile(inFile, params);
+    } catch (e) {
+      self.sendSockMessage(e.toString());
+      return '';
+    }
+
     mkdirp.sync(path.dirname(outFile));
     fs.writeFileSync(outFile, output);
 
@@ -146,7 +164,14 @@ module.exports.generator = function (config, logger, fileParser) {
       outputUrl = outFile.replace('index.html', '').replace('./.build', '');
 
       swigFunctions.setParams({ CURRENT_URL: outputUrl });
-      var output = swig.renderFile(inFile, params);
+
+      try { 
+        var output = swig.renderFile(inFile, params);
+      } catch (e) {
+        self.sendSockMessage(e.toString());
+        return '';
+      }
+
       mkdirp.sync(path.dirname(outFile));
       fs.writeFileSync(outFile, output);
       
@@ -458,10 +483,17 @@ module.exports.generator = function (config, logger, fileParser) {
     tinylr().listen(liveReloadPort);
   };
 
+  this.sendSockMessage = function(message) {
+    if(websocket) {
+      websocket.send('message:' + JSON.stringify(message));
+    }
+  };
+
   this.webListener = function() {
     var server = new ws({ host: '127.0.0.1', port: 6557 });
 
     server.on('connection', function(sock) {
+      websocket = sock;
 
       var buildQueue = async.queue(function (task, callback) {
           self.buildBoth(function() {
