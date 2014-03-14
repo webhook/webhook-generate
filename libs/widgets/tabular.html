@@ -1,9 +1,9 @@
 {# Output tablular data #}
 <table>
   <tbody>
-    {% for row in <%- value %> %}
+    {% for key, row in <%- value %> %}
       <tr>
-        {% for cell in row %}
+        {% for key, cell in row %}
           <td>
             {{ cell }}
           </td>
