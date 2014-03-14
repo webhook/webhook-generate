@@ -15,6 +15,8 @@ module.exports.swigFunctions = function(swig) {
 
   this.context = {};
   this.data = {};
+  this.settings = {};
+  this.typeInfo = {};
 
   this.paginate = false;
   this.curPage = 1;
@@ -22,7 +24,6 @@ module.exports.swigFunctions = function(swig) {
   this.pageUrl = 'page-';
   this.paginationBaseUrl = null;
   this.cachedData = {};
-  this.typeInfo = {};
   this.CURRENT_URL = '/';
 
   var url = function(object) {
@@ -46,6 +47,10 @@ module.exports.swigFunctions = function(swig) {
 
   this.setTypeInfo = function(typeInfo) {
     self.typeInfo = typeInfo;
+  };
+
+  this.setSettings = function(settings) {
+    self.settings = settings;
   };
 
   var getTypes = function() {
@@ -141,6 +146,14 @@ module.exports.swigFunctions = function(swig) {
     return self.CURRENT_URL;
   };
 
+  var getSetting = function(key) {
+    if(!self.settings.general) {
+      return null;
+    }
+
+    return self.settings.general[key];
+  };
+
   // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
   this.shouldPaginate = function() {
     return self.curPage <= self.maxPage;
@@ -176,6 +189,7 @@ module.exports.swigFunctions = function(swig) {
       getPageUrl: getPageUrl,
       url: url,
       getCurrentUrl: getCurrentUrl,
+      getSetting: getSetting
     };
   };
 
