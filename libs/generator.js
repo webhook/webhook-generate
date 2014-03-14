@@ -151,6 +151,8 @@ module.exports.generator = function (config, logger, fileParser) {
       var output = swig.renderFile(inFile, params);
     } catch (e) {
       self.sendSockMessage(e.toString());
+      console.log('Build Failed'.red);
+      console.log(e.toString().red);
       return '';
     }
 
@@ -169,6 +171,8 @@ module.exports.generator = function (config, logger, fileParser) {
         var output = swig.renderFile(inFile, params);
       } catch (e) {
         self.sendSockMessage(e.toString());
+        console.log('Build Failed'.red);
+        console.log(e.toString().red);
         return '';
       }
 
