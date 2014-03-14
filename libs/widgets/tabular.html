@@ -1,0 +1,14 @@
+{# Output tablular data #}
+<table>
+  <tbody>
+    {% for row in <%- value %> %}
+      <tr>
+        {% for cell in row %}
+          <td>
+            {{ cell }}
+          </td>
+        {% endfor %}
+      </tr>
+    {% endfor%}
+  </tbody>
+</table>
