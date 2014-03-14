@@ -431,6 +431,7 @@ module.exports.generator = function (config, logger, fileParser) {
       return _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName });
     };
 
+    self.cachedData = null;
     getData(function(data, typeInfo) {
       fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {} }, { 'imports': { 'renderWidget' : renderWidget}}));
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
