@@ -23,7 +23,11 @@ module.exports.init = function (swig) {
     return utils.sliceDictionary(input, limit, offset);
   };
 
-  var sort = function(input, property) {
+  var sort = function(input, property, reverse) {
+    if(reverse) {
+      return _.sortBy(input, property).reverse();
+    }
+    
     return _.sortBy(input, property)
   };
 
