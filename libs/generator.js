@@ -131,7 +131,7 @@ module.exports.generator = function (config, logger, fileParser) {
       swigFunctions.setSettings(settings);
 
       getDnsChild().once('value', function(snap) {
-        var siteDns = snap.val();
+        var siteDns = snap.val() || config.get('webhook').siteName + '.webhook.org';
         self.cachedData.siteDns = siteDns;
         swigFilters.setSiteDns(siteDns);
 
