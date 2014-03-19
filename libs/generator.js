@@ -69,6 +69,10 @@ module.exports.generator = function (config, logger, fileParser) {
     return self.root.child('buckets/' + config.get('webhook').siteName + '/' + config.get('webhook').secretKey + '/dev');
   };
 
+  var getDnsChild = function() {
+    return self.root.child('management/sites/' + config.get('webhook').siteName + '/dns');
+  };
+
   /**
    * Retrieves snapshot of data from Firebase
    * @param  {Function}   callback   Callback function to run after data is retrieved, is sent the snapshot
@@ -80,6 +84,8 @@ module.exports.generator = function (config, logger, fileParser) {
       swigFunctions.setData(self.cachedData.data);
       swigFunctions.setTypeInfo(self.cachedData.typeInfo);
       swigFunctions.setSettings(self.cachedData.settings);
+      swigFilters.setSiteDns(self.cachedData.siteDns);
+
       callback(self.cachedData.data, self.cachedData.typeInfo);
       return;
     }
@@ -123,7 +129,14 @@ module.exports.generator = function (config, logger, fileParser) {
       swigFunctions.setData(data);
       swigFunctions.setTypeInfo(typeInfo);
       swigFunctions.setSettings(settings);
-      callback(data, typeInfo);
+
+      getDnsChild().once('value', function(snap) {
+        var siteDns = snap.val();
+        self.cachedData.siteDns = siteDns;
+        swigFilters.setSiteDns(siteDns);
+
+        callback(data, typeInfo);
+      });
     }, function(error) {
       throw new Error(error);
     });
