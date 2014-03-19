@@ -1,4 +1,6 @@
 var fs = require('fs');
+var proxy = require('proxy-middleware');
+var url = require('url');
 
 module.exports = function(grunt) {
 
@@ -11,6 +13,9 @@ module.exports = function(grunt) {
   }
 
   var oldConfig = grunt.config.data;
+  
+  var proxyOptions = url.parse('http://' + conf.siteName + '.webhook.org/webhook-uploads');
+  proxyOptions.route = '/webhook-uploads';
 
   var mergeConfig = {
     webhook: conf,
@@ -31,12 +36,13 @@ module.exports = function(grunt) {
             // Return array of whatever middlewares you want
             return [
               connect.static(options.base),
+              proxy(proxyOptions),
               function(req, res, next) {
                 if ('GET' != req.method && 'HEAD' != req.method) return next();
 
                 var contents = fs.readFileSync('./libs/debug404.html');
                 res.end(contents);
-              }
+              },
             ];
           }
         }
