@@ -30,6 +30,7 @@ module.exports = function(grunt) {
       'wh-server': {
         options: {
           port: 2002,
+          hostname: '*',
           base: '.build',
           livereload: 35730,
           middleware: function(connect, options) {
