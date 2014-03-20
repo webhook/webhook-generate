@@ -1,6 +1,7 @@
 var fs = require('fs');
 var proxy = require('proxy-middleware');
 var url = require('url');
+var header = require('connect-header');
 
 module.exports = function(grunt) {
 
@@ -36,6 +37,7 @@ module.exports = function(grunt) {
           middleware: function(connect, options) {
             // Return array of whatever middlewares you want
             return [
+              header({ 'X-Webhook-Local' : true }),
               connect.static(options.base),
               proxy(proxyOptions),
               function(req, res, next) {
