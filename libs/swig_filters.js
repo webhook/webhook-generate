@@ -26,6 +26,17 @@ module.exports.init = function (swig) {
   };
 
   var sort = function(input, property, reverse) {
+    if(_.size(input) === 0) {
+      return input;
+    }
+
+    var first = input[0];
+    var sortProperty = '_sort_' + property;
+
+    if(first[sortProperty]) {
+      property = sortProperty;
+    }
+
     if(reverse) {
       return _.sortBy(input, property).reverse();
     }
