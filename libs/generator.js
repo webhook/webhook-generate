@@ -332,13 +332,25 @@ module.exports.generator = function (config, logger, fileParser) {
               // Should pass in object as 'item'
               var baseNewPath = newPath;
               var number = 1;
-              for(var key in items)
-              {
-                if(key.indexOf('_') === 0)
-                {
-                  continue;
+
+              items = _.map(items, function(value, key) { value._id = key; value._type = objectName; return value });
+              items = _.filter(items, function(item) { 
+                if(!item.publish_date) {
+                  return false;
                 }
 
+                var now = Date.now();
+                var pdate = Date.parse(item.publish_date);
+
+                if(pdate > now + (1 * 60 * 1000)) {
+                  return false;
+                }
+
+                return true;
+              });
+
+              for(var key in items)
+              {
                 var val = items[key];
 
                 newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/index.html';
