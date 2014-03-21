@@ -107,7 +107,7 @@ module.exports.swigFunctions = function(swig) {
         var now = Date.now();
         var pdate = Date.parse(item.publish_date);
 
-        if(pdate > (now + (1 * 60 * 1000)) {
+        if(pdate > now) {
           return false;
         }
 
