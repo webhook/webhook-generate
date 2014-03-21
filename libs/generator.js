@@ -331,10 +331,9 @@ module.exports.generator = function (config, logger, fileParser) {
               // Output should be path + id + '/index.html'
               // Should pass in object as 'item'
               var baseNewPath = newPath;
-              var number = 1;
 
               items = _.map(items, function(value, key) { value._id = key; value._type = objectName; return value });
-              items = _.filter(items, function(item) { 
+              var publishedItems = _.filter(items, function(item) { 
                 if(!item.publish_date) {
                   return false;
                 }
@@ -349,14 +348,22 @@ module.exports.generator = function (config, logger, fileParser) {
                 return true;
               });
 
-              for(var key in items)
+
+              for(var key in publishedItems)
               {
                 var val = items[key];
 
                 newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/index.html';
                 writeTemplate(file, newPath, { item: val });
+              }
 
-                number = number + 1;
+              var previewPath = baseNewPath.replace('./.build', './.build/_wh_previews');
+              for(var key in items)
+              {
+                var val = items[key];
+
+                newPath = previewPath + '/' + val.preview_url + '/index.html';
+                writeTemplate(file, newPath, { item: val });
               }
             }
           }
