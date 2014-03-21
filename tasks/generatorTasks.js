@@ -6,16 +6,23 @@ var firebase = require('firebase');
 module.exports = function(grunt) {
 
   var firebaseUrl = grunt.config.get('webhook').firebase || '';
-  var root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
+  var root = null;
+  if(firebaseUrl) {
+    root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
+  }
 
   var checkVersion = function(callback) {
-    root.child('generator_version').once('value', function(snap) {
-      if(snap.val() !== curVersion) {
-        console.log('There is a new version of webhook generate, you can run wh update to get it'.red)
-       }
-       
-       callback();
-    });
+    if(root === null) {
+      callback();
+    } else {
+      root.child('generator_version').once('value', function(snap) {
+        if(snap.val() !== curVersion) {
+          console.log('There is a new version of webhook generate, you can run wh update to get it'.red)
+         }
+         
+         callback();
+      });
+    }
   };
 
   var generator = require('../libs/generator').generator(grunt.config, grunt.log, grunt.file);
