@@ -1,5 +1,5 @@
 
-var curVersion = 'v1';
+var curVersion = 'v2';
 
 var firebase = require('firebase');
 
