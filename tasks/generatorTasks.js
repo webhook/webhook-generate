@@ -17,9 +17,9 @@ module.exports = function(grunt) {
     } else {
       root.child('generator_version').once('value', function(snap) {
         if(snap.val() !== curVersion) {
-          console.log('There is a new version of webhook generate, you can run wh update to get it'.red)
+          console.log('Your site is using an old version of Webhook. Please run wh update in your site directory.'.red)
          }
-         
+
          callback();
       });
     }
