@@ -118,8 +118,6 @@ module.exports.init = function (swig) {
     
     return imageSource
   };
-  
-  
 
   var size = function(input) {
     return _(input).size();

@@ -99,6 +99,21 @@ module.exports.swigFunctions = function(swig) {
 
       // convert it into an array
       tempData = _.map(tempData, function(value, key) { value._id = key; value._type = name; return value });
+      tempData = _.filter(tempData, function(item) { 
+        if(!item.publish_date) {
+          return false;
+        }
+
+        var now = Date.now();
+        var pdate = Date.parse(item.publish_date);
+
+        if(pdate > (now + (1 * 60 * 1000)) {
+          return false;
+        }
+
+        return true;
+      });
+
       data = utils.extend(data, tempData);
     });
     
