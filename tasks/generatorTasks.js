@@ -1,31 +1,35 @@
 
-var curVersion = 'v5';
+var curVersion = 'v6';
 
-var firebase = require('firebase');
+var request = require('request');
 
 module.exports = function(grunt) {
 
   var firebaseUrl = grunt.config.get('webhook').firebase || '';
-  var root = null;
+  var firebaseUri = null;
   if(firebaseUrl) {
-    root = new firebase('https://' + firebaseUrl +  '.firebaseio.com/');
+    firebaseUri = 'https://' + firebaseUrl +  '.firebaseio.com/generator_version.json';
   }
 
   var checkVersion = function(callback) {
-    if(root === null) {
+    if(firebaseUri === null) {
       callback();
     } else {
-      root.child('generator_version').once('value', function(snap) {
-        if(snap.val() !== curVersion) {
-          console.log('Your site is using an old version of Webhook. Please run wh update in your site directory.'.red)
-         }
+      request({ url: firebaseUri, json: true }, function(e, r, body) {
+        if(body) {
+          if(body !== curVersion) {
+            console.log('Your site is using an old version of Webhook. Please run wh update in your site directory.'.red)
+          }
 
-         callback();
+          callback();
+        } else {
+          callback();
+        }
       });
     }
   };
 
-  var generator = require('../libs/generator').generator(grunt.config, grunt.log, grunt.file);
+  var generator = require('../libs/generator').generator(grunt.config, grunt.log, grunt.file, root);
 
   grunt.registerTask('buildTemplates', 'Generate static files from templates directory', function() {
     var done = this.async();
