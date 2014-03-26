@@ -580,7 +580,7 @@ module.exports.generator = function (config, logger, fileParser) {
    * @param  {String}    sitename  Name of site to generate config for
    * @param  {Function}  done      Callback to call when operation is done
    */
-  this.init = function(sitename, secretkey, done) {
+  this.init = function(sitename, secretkey, copyCms, done) {
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
     
     // TODO: Grab bucket information from server eventually, for now just use the site name
@@ -588,11 +588,14 @@ module.exports.generator = function (config, logger, fileParser) {
 
     fs.writeFileSync('./.firebase.conf', templated);
 
-    var cmsFile = fs.readFileSync('./libs/cms.html');
+    if(copyCms) {
+      var cmsFile = fs.readFileSync('./libs/cms.html');
 
-    var cmsTemplated = _.template(cmsFile, { siteName: sitename });
+      var cmsTemplated = _.template(cmsFile, { siteName: sitename });
 
-    fs.writeFileSync('./pages/cms.html', cmsTemplated);
+      fs.writeFileSync('./pages/cms.html', cmsTemplated); 
+    }
+
     done(true);
   };
 
