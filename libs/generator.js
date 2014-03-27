@@ -227,7 +227,7 @@ module.exports.generator = function (config, logger, fileParser) {
       var entries = zip.getEntries();
 
       entries.forEach(function(entry) {
-        var newName = entry.entryName.split(path.sep).slice(1).join(path.sep);
+        var newName = entry.entryName.split('/').slice(1).join('/');
         entry.entryName = newName;
       });
       zip.extractAllTo('.', true);
@@ -312,7 +312,7 @@ module.exports.generator = function (config, logger, fileParser) {
             // Here we try and abstract out the content type name from directory structure
             var baseName = path.basename(file, '.html');
             var newPath = path.dirname(file).replace('templates', './.build');
-            var pathParts = path.dirname(file).split(path.sep);
+            var pathParts = path.dirname(file).split('/');
             var objectName = pathParts[pathParts.length - 1];
             var items = data[objectName];
             var info = typeInfo[objectName];
@@ -455,7 +455,7 @@ module.exports.generator = function (config, logger, fileParser) {
     var widgetFiles = [];
 
     widgetFilesRaw.forEach(function(item) {
-      widgetFiles[(path.dirname(item) + path.sep + path.basename(item, '.html')).replace('./', '')] = true;
+      widgetFiles[(path.dirname(item) + '/' + path.basename(item, '.html')).replace('./', '')] = true;
     });
 
     var renderWidget = function(controlType, fieldName) {
