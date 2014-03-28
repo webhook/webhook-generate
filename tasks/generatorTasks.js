@@ -96,6 +96,12 @@ module.exports = function(grunt) {
       generator.setBuildVersion(versionString);
     }
 
+    var strict = grunt.option('strict');
+
+    if(strict === true) {
+      generator.enableStrictMode();
+    }
+
     checkVersion(function() {
       generator.buildBoth(done, generator.reloadFiles);
     })

@@ -43,6 +43,7 @@ module.exports.generator = function (config, logger, fileParser) {
   var firebaseUrl = config.get('webhook').firebase || '';
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
   var websocket = null;
+  var strictMode = false;
   
   this.versionString = null;
   this.cachedData = null;
@@ -164,8 +165,14 @@ module.exports.generator = function (config, logger, fileParser) {
       var output = swig.renderFile(inFile, params);
     } catch (e) {
       self.sendSockMessage(e.toString());
-      console.log('Build Failed'.red);
-      console.log(e.toString().red);
+
+      if(strictMode) {
+        throw e;
+      } else {
+        console.log('Build Failed'.red);
+        console.log(e.toString().red);
+      }
+      
       return '';
     }
 
@@ -184,8 +191,14 @@ module.exports.generator = function (config, logger, fileParser) {
         var output = swig.renderFile(inFile, params);
       } catch (e) {
         self.sendSockMessage(e.toString());
-        console.log('Build Failed'.red);
-        console.log(e.toString().red);
+
+        if(strictMode) {
+          throw e;
+        } else {
+          console.log('Build Failed'.red);
+          console.log(e.toString().red);
+        }
+
         return '';
       }
 
@@ -644,6 +657,10 @@ module.exports.generator = function (config, logger, fileParser) {
         fs.writeFileSync(distPath, fileData);
       }
     });
+  }
+
+  this.enableStrictMode = function() {
+    strictMode = true;
   }
 
 
