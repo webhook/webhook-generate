@@ -114,8 +114,9 @@ module.exports.swigFunctions = function(swig) {
         return true;
       });
 
-      data = utils.extend(data, tempData);
+      data = data.concat(tempData);
     });
+
     
     self.cachedData[names.join(',')] = data;
 
