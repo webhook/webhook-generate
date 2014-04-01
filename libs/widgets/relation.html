@@ -1,9 +1,11 @@
 <% if(controlInfo.meta ? controlInfo.meta.isSingle : false) { %>
-          {% set item = getItem(<%- value %>) %}
-          {{ item.name }}
+  {% set rel = getItem(<%- value %>) %}
+  {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
+  {{ rel.name }}
 <% } else { %>
-          {% for item in <%- value %> %}
-            {% set obj = getItem(item) %}
-            {{ obj.name }}
-          {% endfor %}
+  {% for relation in <%- value %> %}
+    {% set rel = getItem(relation) %}
+    {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
+    {{ rel.name }}
+  {% endfor %}
 <% } %>
