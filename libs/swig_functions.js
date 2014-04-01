@@ -66,6 +66,16 @@ module.exports.swigFunctions = function(swig) {
   };
 
   var getItem = function(type, key) {
+
+    if(!key) {
+      var parts = type.split(" ", 2);
+      if(parts.length !== 2) {
+        return {};
+      }
+
+      type = parts[0];
+      key = parts[1];
+    }
     
     if(!self.typeInfo[type]) {
       return {};
