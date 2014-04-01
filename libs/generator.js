@@ -126,6 +126,7 @@ module.exports.generator = function (config, logger, fileParser) {
         typeInfo: typeInfo,
         settings: settings
       };
+
       // Sets the context for swig functions
       swigFunctions.setData(data);
       swigFunctions.setTypeInfo(typeInfo);
@@ -471,14 +472,20 @@ module.exports.generator = function (config, logger, fileParser) {
       widgetFiles[(path.dirname(item) + '/' + path.basename(item, '.html')).replace('./', '')] = true;
     });
 
-    var renderWidget = function(controlType, fieldName) {
-
-      return _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName });
+    var renderWidget = function(controlType, fieldName, controlInfo) {
+      return _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName, controlInfo: controlInfo });
     };
 
     self.cachedData = null;
     getData(function(data, typeInfo) {
-      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {} }, { 'imports': { 'renderWidget' : renderWidget}}));
+      var controls = typeInfo[name] ? typeInfo[name].controls : [];
+      var controlsObj = {};
+
+      _.each(controls, function(item) {
+        controlsObj[item.name] = item;
+      });
+
+      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}}));
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();

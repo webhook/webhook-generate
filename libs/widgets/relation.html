@@ -1,0 +1,9 @@
+<% if(controlInfo.meta ? controlInfo.meta.isSingle : false) { %>
+          {% set item = getItem(<%- value %>) %}
+          {{ item.name }}
+<% } else { %>
+          {% for item in <%- value %> %}
+            {% set obj = getItem(item) %}
+            {{ obj.name }}
+          {% endfor %}
+<% } %>
