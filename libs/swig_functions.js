@@ -85,6 +85,11 @@ module.exports.swigFunctions = function(swig) {
     }
 
     var item = self.data[type][key];
+
+    if(!item) {
+      return {};
+    }
+
     item._type = type;
     return item;
   };
