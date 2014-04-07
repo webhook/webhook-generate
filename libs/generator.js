@@ -639,21 +639,21 @@ module.exports.generator = function (config, logger, fileParser) {
 
   this.assets = function(grunt) {
 
-    if(fs.existsSync('dist')) {
-      wrench.rmdirSyncRecursive('dist');
+    if(fs.existsSync('.whdist')) {
+      wrench.rmdirSyncRecursive('.whdist');
     }
 
-    mkdirp.sync('dist');
+    mkdirp.sync('.whdist');
 
-    wrench.copyDirSyncRecursive('pages', 'dist/pages', {
+    wrench.copyDirSyncRecursive('pages', '.whdist/pages', {
       forceDelete: true
     });
 
-    wrench.copyDirSyncRecursive('templates', 'dist/templates', {
+    wrench.copyDirSyncRecursive('templates', '.whdist/templates', {
       forceDelete: true
     });
 
-    wrench.copyDirSyncRecursive('static', 'dist/static', {
+    wrench.copyDirSyncRecursive('static', '.whdist/static', {
       forceDelete: true
     });
 
@@ -670,13 +670,15 @@ module.exports.generator = function (config, logger, fileParser) {
   }
 
   this.assetsAfter = function(grunt) {
-    wrench.rmdirSyncRecursive('.tmp');
+    if(fs.existsSync('.tmp')) {
+      wrench.rmdirSyncRecursive('.tmp');
+    }
 
     var files = wrench.readdirSyncRecursive('static');
 
     files.forEach(function(file) {
       var filePath = 'static/' + file;
-      var distPath = 'dist/static/' + file;
+      var distPath = '.whdist/static/' + file;
       if(!fs.lstatSync(filePath).isDirectory() && !fs.existsSync(distPath)) {
         var fileData = fs.readFileSync(filePath);
         fs.writeFileSync(distPath, fileData);
