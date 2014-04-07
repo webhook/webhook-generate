@@ -87,60 +87,90 @@ module.exports.init = function (swig) {
   };
 
 
-  var imageSize = function(input, width, height, grow) {
+  var imageSize = function(input, size, deprecatedHeight, deprecatedGrow) {
 
     if(!input) {
       return '';
     }
 
-    var params = [];
-    if(width) {
-      params.push('width=' + width);
-    }
+    var imageSource = '';
 
-    if(height) {
-      params.push('height=' + height);
-    }
+    if(typeof input === 'object') {
 
-    if(grow) {
-      params.push('grow=' + grow);
-    }
+      if(!size) {
+        return input.url;
+      }
 
-    if(input.indexOf('http://') === -1) {
-      input = 'http://' + siteDns + input;
-    }
+      imageSource = input.resize_url;
 
-    params.push('url=' + encodeURIComponent(input));
-    params.push('key=13dde81b8137446e89c7933edca679eb');
-    var imageSource = 'http://i.embed.ly/1/display/resize?' + params.join('&');
+      imageSource = imageSource + '=s' + size;
+
+    } else if (typeof input === 'string') {
+
+      var params = [];
+      if(size) {
+        params.push('width=' + size);
+      }
+
+      if(deprecatedHeight) {
+        params.push('height=' + deprecatedHeight);
+      }
+
+      if(deprecatedGrow) {
+        params.push('grow=' + deprecatedGrow);
+      }
+
+      if(input.indexOf('http://') === -1) {
+        input = 'http://' + siteDns + input;
+      }
+
+      params.push('url=' + encodeURIComponent(input));
+      params.push('key=13dde81b8137446e89c7933edca679eb');
+      imageSource = 'http://i.embed.ly/1/display/resize?' + params.join('&');
+    }
 
     return imageSource
   };
 
-  var imageCrop = function(input, width, height) {
+  var imageCrop = function(input, size, deprecatedHeight) {
 
     if(!input) {
       return '';
     }
     
-    var params = [];
-    if(width) {
-      params.push('width=' + width);
-    }
+    var imageSource = '';
 
-    if(height) {
-      params.push('height=' + height);
-    }
+    if(typeof input === 'object') {
 
-    if(input.indexOf('http://') === -1) {
-      input = 'http://' + siteDns + input;
-    }
+      if(!size) {
+        return input.url;
+      }
 
-    params.push('url=' + encodeURIComponent(input));
-    params.push('key=13dde81b8137446e89c7933edca679eb');
-    var imageSource = 'http://i.embed.ly/1/display/crop?' + params.join('&');
+      imageSource = input.resize_url;
+
+      imageSource = imageSource + '=s' + size + '-c';
+      
+    } else if (typeof input === 'string') {
+
+      var params = [];
+      if(size) {
+        params.push('width=' + size);
+      }
+
+      if(deprecatedHeight) {
+        params.push('height=' + deprecatedHeight);
+      }
+
+      if(input.indexOf('http://') === -1) {
+        input = 'http://' + siteDns + input;
+      }
+
+      params.push('url=' + encodeURIComponent(input));
+      params.push('key=13dde81b8137446e89c7933edca679eb');
+      imageSource = 'http://i.embed.ly/1/display/crop?' + params.join('&');
+    }
     
-    return imageSource
+    return imageSource;
   };
 
   var size = function(input) {

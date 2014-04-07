@@ -14,9 +14,9 @@
       <li>
         <strong><%- fieldInfo.label %>: </strong>
         <% if(widgetFiles[fieldInfo.controlType]) { %>
-          <% print(renderWidget(fieldInfo.controlType, fieldInfo.name, controls[fieldInfo.name])) %>
+        <% print(renderWidget(fieldInfo.controlType, fieldInfo.name, controls[fieldInfo.name])) %>
         <% } else { %>
-          {{ item.<%- fieldInfo.name %> }}
+        {{ item.<%- fieldInfo.name %> }}
         <% } %>
       </li>
     <% }); %>

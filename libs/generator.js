@@ -473,7 +473,23 @@ module.exports.generator = function (config, logger, fileParser) {
     });
 
     var renderWidget = function(controlType, fieldName, controlInfo) {
-      return _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName, controlInfo: controlInfo });
+      var widgetString = _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName, controlInfo: controlInfo });
+
+      var lines = widgetString.split('\n');
+      var newLines = [];
+      var first = true;
+
+      lines.forEach(function(line) {
+        if(first) {
+          first = false;
+          newLines.push(line);
+        } else {
+          var newLine = '        ' + line;
+          newLines.push(newLine);
+        }
+      });
+
+      return newLines.join('\n');
     };
 
     self.cachedData = null;
@@ -485,7 +501,9 @@ module.exports.generator = function (config, logger, fileParser) {
         controlsObj[item.name] = item;
       });
 
-      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}}));
+      var template = _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}});
+      template = template.replace(/^\s*\n/gm, '');
+      fs.writeFileSync(individual, template);
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();
