@@ -85,7 +85,7 @@ module.exports = function(grunt) {
       assets: {
         files: [{
           src: [
-            '.whdist/static/**/*.{jpg,jpeg,gif,png,js,css,eot,svg,ttf,woff}',
+            '.whdist/static/**/*.{js,css}',
           ]
         }]
       }
