@@ -101,6 +101,10 @@ module.exports.init = function (swig) {
         return input.url;
       }
 
+      if(!input.resize_url) {
+        return input.url;
+      }
+
       imageSource = input.resize_url;
 
       imageSource = imageSource + '=s' + size;

@@ -658,11 +658,29 @@ module.exports.generator = function (config, logger, fileParser) {
     });
 
     grunt.task.run('useminPrepare');
+    grunt.task.run('assetsMiddle');
+
+  }
+
+  this.assetsMiddle = function(grunt) {
 
     grunt.option('force', true);
-    grunt.task.run('concat');
-    grunt.task.run('uglify');
-    grunt.task.run('cssmin');
+
+    if(!_.isEmpty(grunt.config.get('concat')))
+    {
+      grunt.task.run('concat');
+    }
+
+    if(!_.isEmpty(grunt.config.get('uglify')))
+    {
+      grunt.task.run('uglify');
+    }
+
+    if(!_.isEmpty(grunt.config.get('cssmin')))
+    {
+      grunt.task.run('cssmin');
+    }
+    
     grunt.task.run('rev');
     grunt.task.run('usemin');
     grunt.task.run('assetsAfter');

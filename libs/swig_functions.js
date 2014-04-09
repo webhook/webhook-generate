@@ -223,7 +223,8 @@ module.exports.swigFunctions = function(swig) {
       getPageUrl: getPageUrl,
       url: url,
       getCurrentUrl: getCurrentUrl,
-      getSetting: getSetting
+      getSetting: getSetting,
+      cmsVersion: 'v2'
     };
   };
 

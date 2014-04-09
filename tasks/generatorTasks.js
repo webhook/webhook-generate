@@ -1,5 +1,5 @@
 
-var curVersion = 'v11';
+var curVersion = 'v14';
 
 var request = require('request');
 
@@ -110,6 +110,10 @@ module.exports = function(grunt) {
   // Change this to optionally prompt instead of requiring a sitename
   grunt.registerTask('assets', 'Initialize the firebase configuration file (installer should do this as well)', function() {
     generator.assets(grunt);
+  });
+
+  grunt.registerTask('assetsMiddle', 'Initialize the firebase configuration file (installer should do this as well)', function() {
+    generator.assetsMiddle(grunt);
   });
 
   grunt.registerTask('assetsAfter', 'Initialize the firebase configuration file (installer should do this as well)', function() {
