@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       request({ url: firebaseUri, json: true }, function(e, r, body) {
         if(body) {
           if(body !== curVersion) {
-            console.log('Your site is using an old version of Webhook. Please run wh update in your site directory.'.red)
+            console.log('Your site is out of date. Please run "wh update" in the site directory to get the newest changes.'.red)
           }
 
           callback();
