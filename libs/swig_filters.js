@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var utils = require('./utils.js');
 var marked = require('marked');
+var dateFormatter = require('./dateformatter.js');
 
 if (typeof String.prototype.startsWith != 'function') {
   // see below for better implementation!
@@ -205,6 +206,49 @@ module.exports.init = function (swig) {
     siteDns = dns;
   }
 
+  var date = function(input, format, offset, abbr) {
+    var l = format.length,
+      date = new dateFormatter.DateZ(input),
+      cur,
+      i = 0,
+      out = '';
+
+    if(!offset && typeof input === 'string') {
+      var offsetString = input.match(/[\+-]\d{2}:\d{2}$/);
+
+      var modifier = 1;
+      if(offsetString) {
+        offsetString = offsetString[0];
+        if(offsetString[0] === '+') {
+          modifier = -1;
+        }
+
+        offsetString = offsetString.slice(1);
+        var parts = offsetString.split(':');
+
+        var hours = parts[0] * 1;
+        var minutes = parts[1] * 1;
+        
+        offset = modifier * ((hours * 60) + minutes);
+      }
+    }
+
+    if (offset) {
+      date.setTimezoneOffset(offset, abbr);
+    }
+
+    for (i; i < l; i += 1) {
+      cur = format.charAt(i);
+      if (dateFormatter.hasOwnProperty(cur)) {
+        out += dateFormatter[cur](date, offset, abbr);
+      } else {
+        out += cur;
+      }
+    }
+
+    return out;
+  };
+
   markdown.safe = true;
 
   swig.setFilter('upper', upper);
@@ -218,4 +262,5 @@ module.exports.init = function (swig) {
   swig.setFilter('size', size);
   swig.setFilter('groupBy', groupBy);
   swig.setFilter('markdown', markdown);
+  swig.setFilter('date', date);
 };

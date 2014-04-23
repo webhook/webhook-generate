@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('lodash');
+
 /**
  * Extends source dictionaries into the target dictionary
  * @param  {Object}   target        Target to extend into
@@ -62,4 +64,8 @@ module.exports.slice = function(data, limit, offset) {
   } else {
     return this.sliceDictionary(data, limit, offset);
   }
+};
+
+module.exports.each = function(obj, cb) {
+  _.each(obj, cb);
 };
