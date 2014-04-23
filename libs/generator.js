@@ -13,7 +13,7 @@ var wrench = require('wrench');
 var utils = require('./utils.js');
 var ws = require('ws').Server;
 var Zip   = require('adm-zip');
-var slug = require('slug');
+var slug = require('uslug');
 var async = require('async');
 var spawn = require('win-spawn');
 

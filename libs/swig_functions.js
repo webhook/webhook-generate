@@ -3,7 +3,7 @@
 var utils = require('./utils.js');
 var _ = require('lodash');
 
-var slugger = require('slug');
+var slugger = require('uslug');
 
 /**
  * Defines a set of functions usable in all swig templates, are merged into context on render
