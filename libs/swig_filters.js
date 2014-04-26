@@ -42,6 +42,21 @@ module.exports.init = function (swig) {
     return utils.sliceDictionary(input, limit, offset);
   };
 
+  var truncate = function(input, limit) {
+    if (!input || !limit) { return input; }
+
+    if (input.length > limit && input.length > 0) {
+        var new_str = input + " ";
+        new_str = input.substr (0, limit);
+        new_str = input.substr (0, new_str.lastIndexOf(" "));
+        new_str = (new_str.length > 0) ? new_str : input.substr (0, limit);
+ 
+        return new_str + '...' ;
+    }
+
+    return input;
+  }
+
   var sort = function(input, property, reverse) {
     if(_.size(input) === 0) {
       return input;
@@ -256,6 +271,7 @@ module.exports.init = function (swig) {
 
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
+  swig.setFilter('truncate', truncate);
   swig.setFilter('sort', sort);
   swig.setFilter('startsWith', startsWith);
   swig.setFilter('endsWith', endsWith)
