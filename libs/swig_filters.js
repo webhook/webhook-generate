@@ -31,6 +31,9 @@ module.exports.init = function (swig) {
   };
 
   var slice = function(input, offset, limit) {
+    if(typeof input === 'string') {
+      return input.slice(offset, offset + limit);
+    }
     if(Array.isArray(input))
     {
       return input.slice(offset || 0, offset + limit)
@@ -228,7 +231,7 @@ module.exports.init = function (swig) {
 
         var hours = parts[0] * 1;
         var minutes = parts[1] * 1;
-        
+
         offset = modifier * ((hours * 60) + minutes);
       }
     }

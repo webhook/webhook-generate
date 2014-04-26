@@ -335,6 +335,7 @@ module.exports.generator = function (config, logger, fileParser) {
               logger.error('Missing data for content type ' + objectName);
             }
 
+            // TODO, DETECT IF FILE ALREADY EXISTS, IF IT DOES APPEND A NUMBER TO IT DUMMY
             if(baseName === 'list')
             {
 
