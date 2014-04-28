@@ -68,16 +68,16 @@ module.exports = function(grunt) {
       }
     },
 
-    // Compile static assets into dist/static
-    // Copy pages/html files into dist/pages and dist/html
-    // Run rev on dist/static and then run usemin on dist/pages and dist/html
-    // Copy unmodified static folder into dist/static
+    // Compile static assets into .whdist/static
+    // Copy pages/html files into .whdist/pages and .whdist/html
+    // Run rev on .whdist/static and then run usemin on .whdist/pages and .whdist/html
+    // Copy unmodified static folder into .whdist/static
 
     useminPrepare: {
-      src: ['dist/pages/**/*.html', 'dist/templates/**/*.html'],
+      src: ['.whdist/pages/**/*.html', '.whdist/templates/**/*.html'],
       options: {
         root: '.',
-        dest: 'dist'
+        dest: '.whdist'
       }
     },
 
@@ -85,16 +85,16 @@ module.exports = function(grunt) {
       assets: {
         files: [{
           src: [
-            'dist/static/**/*.{jpg,jpeg,gif,png,js,css,eot,svg,ttf,woff}',
+            '.whdist/static/**/*.{js,css}',
           ]
         }]
       }
     },
 
     usemin: {
-      html: ['dist/pages/**/*.html', 'dist/templates/**/*.html'],
+      html: ['.whdist/pages/**/*.html', '.whdist/templates/**/*.html'],
       options: {
-        assetsDirs: ['dist']
+        assetsDirs: ['.whdist']
       }
     }
   };
@@ -110,4 +110,14 @@ module.exports = function(grunt) {
   }
 
   grunt.initConfig(oldConfig);
+  
+  grunt.loadNpmTasks('grunt-simple-watch');
+  grunt.loadNpmTasks('grunt-rev');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-concurrent');
+  grunt.loadNpmTasks('grunt-usemin');
 };

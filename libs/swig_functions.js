@@ -3,7 +3,7 @@
 var utils = require('./utils.js');
 var _ = require('lodash');
 
-var slugger = require('slug');
+var slugger = require('uslug');
 
 /**
  * Defines a set of functions usable in all swig templates, are merged into context on render
@@ -66,12 +66,30 @@ module.exports.swigFunctions = function(swig) {
   };
 
   var getItem = function(type, key) {
+    if(!type) {
+      return {};
+    }
+
+    if(!key) {
+      var parts = type.split(" ", 2);
+      if(parts.length !== 2) {
+        return {};
+      }
+
+      type = parts[0];
+      key = parts[1];
+    }
     
     if(!self.typeInfo[type]) {
       return {};
     }
 
     var item = self.data[type][key];
+
+    if(!item) {
+      return {};
+    }
+
     item._type = type;
     return item;
   };
@@ -114,8 +132,9 @@ module.exports.swigFunctions = function(swig) {
         return true;
       });
 
-      data = utils.extend(data, tempData);
+      data = data.concat(tempData);
     });
+
     
     self.cachedData[names.join(',')] = data;
 
@@ -204,7 +223,8 @@ module.exports.swigFunctions = function(swig) {
       getPageUrl: getPageUrl,
       url: url,
       getCurrentUrl: getCurrentUrl,
-      getSetting: getSetting
+      getSetting: getSetting,
+      cmsVersion: 'v2'
     };
   };
 

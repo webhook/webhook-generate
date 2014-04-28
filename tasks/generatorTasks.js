@@ -1,5 +1,5 @@
 
-var curVersion = 'v6';
+var curVersion = 'v19';
 
 var request = require('request');
 
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       request({ url: firebaseUri, json: true }, function(e, r, body) {
         if(body) {
           if(body !== curVersion) {
-            console.log('Your site is using an old version of Webhook. Please run wh update in your site directory.'.red)
+            console.log('Your site is out of date. Please run "wh update" in the site directory to get the newest changes.'.red)
           }
 
           callback();
@@ -96,6 +96,12 @@ module.exports = function(grunt) {
       generator.setBuildVersion(versionString);
     }
 
+    var strict = grunt.option('strict');
+
+    if(strict === true) {
+      generator.enableStrictMode();
+    }
+
     checkVersion(function() {
       generator.buildBoth(done, generator.reloadFiles);
     })
@@ -104,6 +110,10 @@ module.exports = function(grunt) {
   // Change this to optionally prompt instead of requiring a sitename
   grunt.registerTask('assets', 'Initialize the firebase configuration file (installer should do this as well)', function() {
     generator.assets(grunt);
+  });
+
+  grunt.registerTask('assetsMiddle', 'Initialize the firebase configuration file (installer should do this as well)', function() {
+    generator.assetsMiddle(grunt);
   });
 
   grunt.registerTask('assetsAfter', 'Initialize the firebase configuration file (installer should do this as well)', function() {
@@ -116,8 +126,9 @@ module.exports = function(grunt) {
 
     var sitename = grunt.option('sitename');
     var secretkey = grunt.option('secretkey');
+    var copyCms = grunt.option('copycms');
 
-    generator.init(sitename, secretkey, done);
+    generator.init(sitename, secretkey, copyCms, done);
   });
 
   // Check if initialized properly before running all these tasks

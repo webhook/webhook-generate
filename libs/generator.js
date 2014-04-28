@@ -13,7 +13,7 @@ var wrench = require('wrench');
 var utils = require('./utils.js');
 var ws = require('ws').Server;
 var Zip   = require('adm-zip');
-var slug = require('slug');
+var slug = require('uslug');
 var async = require('async');
 var spawn = require('win-spawn');
 
@@ -72,6 +72,7 @@ module.exports.generator = function (config, logger, fileParser) {
   var firebaseUrl = config.get('webhook').firebase || '';
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
   var websocket = null;
+  var strictMode = false;
   
   this.versionString = null;
   this.cachedData = null;
@@ -154,6 +155,7 @@ module.exports.generator = function (config, logger, fileParser) {
         typeInfo: typeInfo,
         settings: settings
       };
+
       // Sets the context for swig functions
       swigFunctions.setData(data);
       swigFunctions.setTypeInfo(typeInfo);
@@ -193,8 +195,14 @@ module.exports.generator = function (config, logger, fileParser) {
       var output = swig.renderFile(inFile, params);
     } catch (e) {
       self.sendSockMessage(e.toString());
-      console.log('Build Failed'.red);
-      console.log(e.toString().red);
+
+      if(strictMode) {
+        throw e;
+      } else {
+        console.log('Build Failed'.red);
+        console.log(e.toString().red);
+      }
+      
       return '';
     }
 
@@ -213,8 +221,14 @@ module.exports.generator = function (config, logger, fileParser) {
         var output = swig.renderFile(inFile, params);
       } catch (e) {
         self.sendSockMessage(e.toString());
-        console.log('Build Failed'.red);
-        console.log(e.toString().red);
+
+        if(strictMode) {
+          throw e;
+        } else {
+          console.log('Build Failed'.red);
+          console.log(e.toString().red);
+        }
+
         return '';
       }
 
@@ -256,7 +270,7 @@ module.exports.generator = function (config, logger, fileParser) {
       var entries = zip.getEntries();
 
       entries.forEach(function(entry) {
-        var newName = entry.entryName.split(path.sep).slice(1).join(path.sep);
+        var newName = entry.entryName.split('/').slice(1).join('/');
         entry.entryName = newName;
       });
       zip.extractAllTo('.', true);
@@ -341,7 +355,7 @@ module.exports.generator = function (config, logger, fileParser) {
             // Here we try and abstract out the content type name from directory structure
             var baseName = path.basename(file, '.html');
             var newPath = path.dirname(file).replace('templates', './.build');
-            var pathParts = path.dirname(file).split(path.sep);
+            var pathParts = path.dirname(file).split('/');
             var objectName = pathParts[pathParts.length - 1];
             var items = data[objectName];
             var info = typeInfo[objectName];
@@ -350,6 +364,7 @@ module.exports.generator = function (config, logger, fileParser) {
               logger.error('Missing data for content type ' + objectName);
             }
 
+            // TODO, DETECT IF FILE ALREADY EXISTS, IF IT DOES APPEND A NUMBER TO IT DUMMY
             if(baseName === 'list')
             {
 
@@ -484,17 +499,41 @@ module.exports.generator = function (config, logger, fileParser) {
     var widgetFiles = [];
 
     widgetFilesRaw.forEach(function(item) {
-      widgetFiles[(path.dirname(item) + path.sep + path.basename(item, '.html')).replace('./', '')] = true;
+      widgetFiles[(path.dirname(item) + '/' + path.basename(item, '.html')).replace('./', '')] = true;
     });
 
-    var renderWidget = function(controlType, fieldName) {
+    var renderWidget = function(controlType, fieldName, controlInfo) {
+      var widgetString = _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName, controlInfo: controlInfo });
 
-      return _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName });
+      var lines = widgetString.split('\n');
+      var newLines = [];
+      var first = true;
+
+      lines.forEach(function(line) {
+        if(first) {
+          first = false;
+          newLines.push(line);
+        } else {
+          var newLine = '        ' + line;
+          newLines.push(newLine);
+        }
+      });
+
+      return newLines.join('\n');
     };
 
     self.cachedData = null;
     getData(function(data, typeInfo) {
-      fs.writeFileSync(individual,  _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {} }, { 'imports': { 'renderWidget' : renderWidget}}));
+      var controls = typeInfo[name] ? typeInfo[name].controls : [];
+      var controlsObj = {};
+
+      _.each(controls, function(item) {
+        controlsObj[item.name] = item;
+      });
+
+      var template = _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}});
+      template = template.replace(/^\s*\n/gm, '');
+      fs.writeFileSync(individual, template);
       fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
       if(done) done();
@@ -609,7 +648,7 @@ module.exports.generator = function (config, logger, fileParser) {
    * @param  {String}    sitename  Name of site to generate config for
    * @param  {Function}  done      Callback to call when operation is done
    */
-  this.init = function(sitename, secretkey, done) {
+  this.init = function(sitename, secretkey, copyCms, done) {
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
     
     // TODO: Grab bucket information from server eventually, for now just use the site name
@@ -617,40 +656,61 @@ module.exports.generator = function (config, logger, fileParser) {
 
     fs.writeFileSync('./.firebase.conf', templated);
 
-    var cmsFile = fs.readFileSync('./libs/cms.html');
+    if(copyCms) {
+      var cmsFile = fs.readFileSync('./libs/cms.html');
 
-    var cmsTemplated = _.template(cmsFile, { siteName: sitename });
+      var cmsTemplated = _.template(cmsFile, { siteName: sitename });
 
-    fs.writeFileSync('./pages/cms.html', cmsTemplated);
+      fs.writeFileSync('./pages/cms.html', cmsTemplated); 
+    }
+
     done(true);
   };
 
   this.assets = function(grunt) {
 
-    if(fs.existsSync('dist')) {
-      wrench.rmdirSyncRecursive('dist');
+    if(fs.existsSync('.whdist')) {
+      wrench.rmdirSyncRecursive('.whdist');
     }
 
-    mkdirp.sync('dist');
+    mkdirp.sync('.whdist');
 
-    wrench.copyDirSyncRecursive('pages', 'dist/pages', {
+    wrench.copyDirSyncRecursive('pages', '.whdist/pages', {
       forceDelete: true
     });
 
-    wrench.copyDirSyncRecursive('templates', 'dist/templates', {
+    wrench.copyDirSyncRecursive('templates', '.whdist/templates', {
       forceDelete: true
     });
 
-    wrench.copyDirSyncRecursive('static', 'dist/static', {
+    wrench.copyDirSyncRecursive('static', '.whdist/static', {
       forceDelete: true
     });
 
     grunt.task.run('useminPrepare');
+    grunt.task.run('assetsMiddle');
+
+  }
+
+  this.assetsMiddle = function(grunt) {
 
     grunt.option('force', true);
-    grunt.task.run('concat');
-    grunt.task.run('uglify');
-    grunt.task.run('cssmin');
+
+    if(!_.isEmpty(grunt.config.get('concat')))
+    {
+      grunt.task.run('concat');
+    }
+
+    if(!_.isEmpty(grunt.config.get('uglify')))
+    {
+      grunt.task.run('uglify');
+    }
+
+    if(!_.isEmpty(grunt.config.get('cssmin')))
+    {
+      grunt.task.run('cssmin');
+    }
+    
     grunt.task.run('rev');
     grunt.task.run('usemin');
     grunt.task.run('assetsAfter');
@@ -658,18 +718,24 @@ module.exports.generator = function (config, logger, fileParser) {
   }
 
   this.assetsAfter = function(grunt) {
-    wrench.rmdirSyncRecursive('.tmp');
+    if(fs.existsSync('.tmp')) {
+      wrench.rmdirSyncRecursive('.tmp');
+    }
 
     var files = wrench.readdirSyncRecursive('static');
 
     files.forEach(function(file) {
       var filePath = 'static/' + file;
-      var distPath = 'dist/static/' + file;
+      var distPath = '.whdist/static/' + file;
       if(!fs.lstatSync(filePath).isDirectory() && !fs.existsSync(distPath)) {
         var fileData = fs.readFileSync(filePath);
         fs.writeFileSync(distPath, fileData);
       }
     });
+  }
+
+  this.enableStrictMode = function() {
+    strictMode = true;
   }
 
 
