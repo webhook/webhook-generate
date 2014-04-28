@@ -646,16 +646,52 @@ module.exports.generator = function (config, logger, fileParser) {
 
     mkdirp.sync('.whdist');
 
-    wrench.copyDirSyncRecursive('pages', '.whdist/pages', {
-      forceDelete: true
+    var files = wrench.readdirSyncRecursive('pages');
+
+    files.forEach(function(file) {
+      var originalFile = 'pages/' + file;
+      var destFile = '.whdist/pages/' + file;
+
+      if(!fs.lstatSync(originalFile).isDirectory())
+      {
+        var content = fs.readFileSync(originalFile).toString();
+        content = content.replace('\r\n', '\n').replace('\r', '\n');
+
+        mkdirp.sync(path.dirname(destFile));
+        fs.writeFileSync(destFile, content);
+      }
     });
 
-    wrench.copyDirSyncRecursive('templates', '.whdist/templates', {
-      forceDelete: true
+    files = wrench.readdirSyncRecursive('templates');
+
+    files.forEach(function(file) {
+      var originalFile = 'templates/' + file;
+      var destFile = '.whdist/templates/' + file;
+
+      if(!fs.lstatSync(originalFile).isDirectory())
+      {
+        var content = fs.readFileSync(originalFile).toString();
+        content = content.replace('\r\n', '\n').replace('\r', '\n');
+
+        mkdirp.sync(path.dirname(destFile));
+        fs.writeFileSync(destFile, content);
+      }
     });
 
-    wrench.copyDirSyncRecursive('static', '.whdist/static', {
-      forceDelete: true
+    files = wrench.readdirSyncRecursive('static');
+    
+    files.forEach(function(file) {
+      var originalFile = 'static/' + file;
+      var destFile = '.whdist/static/' + file;
+
+      if(!fs.lstatSync(originalFile).isDirectory())
+      {
+        var content = fs.readFileSync(originalFile).toString();
+        content = content.replace('\r\n', '\n').replace('\r', '\n');
+
+        mkdirp.sync(path.dirname(destFile));
+        fs.writeFileSync(destFile, content);
+      }
     });
 
     grunt.task.run('useminPrepare');
