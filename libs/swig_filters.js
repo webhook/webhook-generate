@@ -274,7 +274,7 @@ module.exports.init = function (swig) {
     var secondsString = '';
     var hourString = '';
 
-    var seconds = input % 60;
+    var seconds = Math.floor(input % 60);
     var minutesRaw = Math.floor(input / 60);
     var minutes = minutesRaw % 60;
     var hours = Math.floor(minutesRaw / 60);
