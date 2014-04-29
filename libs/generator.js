@@ -654,8 +654,12 @@ module.exports.generator = function (config, logger, fileParser) {
 
       if(!fs.lstatSync(originalFile).isDirectory())
       {
-        var content = fs.readFileSync(originalFile).toString();
-        content = content.replace('\r\n', '\n').replace('\r', '\n');
+        var content = fs.readFileSync(originalFile);
+
+        if(path.extname(originalFile) === '.html') {
+          content = content.toString();
+          content = content.replace('\r\n', '\n').replace('\r', '\n');
+        }
 
         mkdirp.sync(path.dirname(destFile));
         fs.writeFileSync(destFile, content);
@@ -670,8 +674,12 @@ module.exports.generator = function (config, logger, fileParser) {
 
       if(!fs.lstatSync(originalFile).isDirectory())
       {
-        var content = fs.readFileSync(originalFile).toString();
-        content = content.replace('\r\n', '\n').replace('\r', '\n');
+        var content = fs.readFileSync(originalFile);
+
+        if(path.extname(originalFile) === '.html') {
+          content = content.toString();
+          content = content.replace('\r\n', '\n').replace('\r', '\n');
+        }
 
         mkdirp.sync(path.dirname(destFile));
         fs.writeFileSync(destFile, content);
@@ -686,8 +694,12 @@ module.exports.generator = function (config, logger, fileParser) {
 
       if(!fs.lstatSync(originalFile).isDirectory())
       {
-        var content = fs.readFileSync(originalFile).toString();
-        content = content.replace('\r\n', '\n').replace('\r', '\n');
+        var content = fs.readFileSync(originalFile);
+
+        if(path.extname(originalFile) === '.html') {
+          content = content.toString();
+          content = content.replace('\r\n', '\n').replace('\r', '\n');
+        }
 
         mkdirp.sync(path.dirname(destFile));
         fs.writeFileSync(destFile, content);
