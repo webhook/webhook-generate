@@ -1,5 +1,4 @@
 var fs = require('fs');
-var proxy = require('proxy-middleware');
 var url = require('url');
 var header = require('connect-header');
 
@@ -15,9 +14,6 @@ module.exports = function(grunt) {
 
   var oldConfig = grunt.config.data;
   
-  var proxyOptions = url.parse('http://' + conf.siteName + '.webhook.org/webhook-uploads');
-  proxyOptions.route = '/webhook-uploads';
-
   var mergeConfig = {
     webhook: conf,
 
@@ -39,7 +35,7 @@ module.exports = function(grunt) {
             return [
               header({ 'X-Webhook-Local' : true }),
               connect.static(options.base),
-              proxy(proxyOptions),
+              require('grunt-connect-proxy/lib/utils').proxyRequest,
               function(req, res, next) {
                 if ('GET' != req.method && 'HEAD' != req.method) return next();
 
@@ -48,7 +44,18 @@ module.exports = function(grunt) {
               },
             ];
           }
-        }
+        },
+        proxies: [
+            {
+                context: '/webhook-uploads',
+                host:  conf.siteName + '.webhook.org',
+                port: 80,
+                changeOrigin: true,
+                headers: {
+                  host: conf.siteName + '.webhook.org'
+                }
+            }
+        ]
       }
     },
 
@@ -117,6 +124,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-connect-proxy');
   grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-concurrent');
   grunt.loadNpmTasks('grunt-usemin');

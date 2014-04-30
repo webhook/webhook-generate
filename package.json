@@ -38,6 +38,7 @@
     "win-spawn": "~2.0.0",
     "proxy-middleware": "~0.5.0",
     "connect-header": "0.0.5",
-    "uslug": "~1.0.3"
+    "uslug": "~1.0.3",
+    "grunt-connect-proxy": "~0.1.10"
   }
 }
