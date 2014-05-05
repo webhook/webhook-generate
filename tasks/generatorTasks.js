@@ -21,7 +21,7 @@ module.exports = function(grunt) {
             console.log('========================================================'.red);
             console.log('# This site is using old Webhook code.     #'.red);
             console.log('========================================================'.red);
-            console.log('#'.red + ' To fix, run "wh update" in this folder.')
+            console.log('#'.red + ' To update, run "wh update" in this folder.')
             console.log('# ---------------------------------------------------- #'.red)
           }
 
