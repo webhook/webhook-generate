@@ -366,7 +366,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
               for(var key in publishedItems)
               {
-                var val = items[key];
+                var val = publishedItems[key];
 
                 newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/index.html';
                 writeTemplate(file, newPath, { item: val });
