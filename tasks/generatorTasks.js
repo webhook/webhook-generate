@@ -1,5 +1,5 @@
 
-var curVersion = 'v19';
+var curVersion = 'v22';
 
 var request = require('request');
 
@@ -18,7 +18,11 @@ module.exports = function(grunt) {
       request({ url: firebaseUri, json: true }, function(e, r, body) {
         if(body) {
           if(body !== curVersion) {
-            console.log('Your site is out of date. Please run "wh update" in the site directory to get the newest changes.'.red)
+            console.log('========================================================'.red);
+            console.log('# This site is using old Webhook code.     #'.red);
+            console.log('========================================================'.red);
+            console.log('#'.red + ' To update, run "wh update" in this folder.')
+            console.log('# ---------------------------------------------------- #'.red)
           }
 
           callback();
@@ -133,6 +137,7 @@ module.exports = function(grunt) {
 
   // Check if initialized properly before running all these tasks
   grunt.registerTask('default',  'Clean, Build, Start Local Server, and Watch', function() {
+    grunt.task.run('configureProxies:wh-server')
     grunt.task.run('connect:wh-server');
     grunt.task.run('build');
     grunt.task.run('concurrent:wh-concurrent');

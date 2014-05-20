@@ -15,7 +15,5 @@ results
 npm-debug.log
 node_modules
 
-pages/cms.html
-
 /.build
 /.firebase.conf

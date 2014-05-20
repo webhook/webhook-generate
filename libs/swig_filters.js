@@ -58,6 +58,7 @@ module.exports.init = function (swig) {
   }
 
   var sort = function(input, property, reverse) {
+
     if(_.size(input) === 0) {
       return input;
     }
@@ -267,6 +268,65 @@ module.exports.init = function (swig) {
     return out;
   };
 
+  var duration = function(input) {
+    var timestring = '';
+    var minutesString = '';
+    var secondsString = '';
+    var hourString = '';
+
+    var seconds = Math.floor(input % 60);
+    var minutesRaw = Math.floor(input / 60);
+    var minutes = minutesRaw % 60;
+    var hours = Math.floor(minutesRaw / 60);
+
+    if(minutes === 0) {
+      minutesString = '00';
+    } else if (minutes < 10) {
+      minutesString = '0' + minutes;
+    } else {
+      minutesString = '' + minutes;
+    }
+
+    if(seconds === 0) {
+      secondsString = '00';
+    } else if (seconds < 10) {
+      secondsString = '0' + seconds;
+    } else {
+      secondsString = '' + seconds;
+    }
+
+    if (hours === 0) {
+      hourString = '';
+    }  else if (hours < 10) {
+      hourString = '0' + hours;
+    } else {
+      hourString = '' + hours;
+    }
+
+    timestring = minutesString + ':' + secondsString;
+
+    if(hours > 0) {
+      timestring = hourString + ':' + timestring;
+    }
+
+    return timestring;
+  };
+
+  var where = function(input, property, filter) {
+    var filtered = [];
+
+    input.forEach(function(item) {
+      if(typeof filter === 'undefined') {
+        if(item[property]) // Exists
+          filtered.push(item);
+      } else {
+        if(item[property] === filter) 
+          filtered.push(item);
+      }
+    });
+    return filtered;
+  }
+
   markdown.safe = true;
 
   swig.setFilter('upper', upper);
@@ -282,4 +342,6 @@ module.exports.init = function (swig) {
   swig.setFilter('groupBy', groupBy);
   swig.setFilter('markdown', markdown);
   swig.setFilter('date', date);
+  swig.setFilter('where', where);
+  swig.setFilter('duration', duration);
 };
