@@ -5,7 +5,7 @@ var request = require('request');
 
 module.exports = function(grunt) {
 
-  var firebaseUrl = grunt.config.get('webhook').firebase || '';
+  var firebaseUrl = 'webhook';
   var firebaseUri = null;
   if(firebaseUrl) {
     firebaseUri = 'https://' + firebaseUrl +  '.firebaseio.com/generator_version.json';
