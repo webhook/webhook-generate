@@ -171,7 +171,7 @@ module.exports.generator = function (config, logger, fileParser) {
     }, function(error) {
       if(error.code === 'PERMISSION_DENIED') {
         console.log('Unable to access bucket data, site may no longer be active?');
-        console.log('https://billing.webhook.com/site/' + config.get('webhook').siteName);
+        console.log('https://billing.webhook.com/site/' + config.get('webhook').siteName + '/');
         process.exit(0);
       } else {
         throw new Error(error);
