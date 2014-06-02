@@ -39,12 +39,12 @@ var wrap = function()
   last = 'debugger;' +
          'var global = null;' +
          'var console = null;' +
-         'var v8debug = null;' + 
+         'var v8debug = null;' +
          'var setTimeout = null;' +
-         'var setInterval = null;' + 
+         'var setInterval = null;' +
          'var setImmediate = null;' +
          'var clearTimeout = null;' +
-         'var clearInterval = null;' + 
+         'var clearInterval = null;' +
          'var clearImmediate = null;' +
          'var root = null;' +
          'var GLOBAL = null;' +
@@ -75,7 +75,7 @@ module.exports.generator = function (config, logger, fileParser) {
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
   var websocket = null;
   var strictMode = false;
-  
+
   this.versionString = null;
   this.cachedData = null;
 
@@ -172,8 +172,12 @@ module.exports.generator = function (config, logger, fileParser) {
       });
     }, function(error) {
       if(error.code === 'PERMISSION_DENIED') {
-        console.log('Unable to access bucket data, site may no longer be active?');
-        console.log('https://billing.webhook.com/site/' + config.get('webhook').siteName + '/');
+        console.log('\n========================================================'.red);
+        console.log('# Permission denied                                         #'.red);
+        console.log('========================================================'.red);
+        console.log('#'.red + ' You don\'t have permission to this site or your subscription expired.'.red);
+        console.log('# Visit '.red + 'https://billing.webhook.com/site/'.yellow + config.get('webhook').siteName.yellow + '/'.yellow ' to manage your subscription.'.red);
+        console.log('# ---------------------------------------------------- #'.red)
         process.exit(0);
       } else {
         throw new Error(error);
@@ -199,7 +203,7 @@ module.exports.generator = function (config, logger, fileParser) {
     var outputUrl = outFile.replace('index.html', '').replace('./.build', '');
     swigFunctions.setParams({ CURRENT_URL: outputUrl });
 
-    try { 
+    try {
       var output = swig.renderFile(inFile, params);
     } catch (e) {
       self.sendSockMessage(e.toString());
@@ -210,7 +214,7 @@ module.exports.generator = function (config, logger, fileParser) {
         console.log('Build Failed'.red);
         console.log(e.toString().red);
       }
-      
+
       return '';
     }
 
@@ -225,7 +229,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
       swigFunctions.setParams({ CURRENT_URL: outputUrl });
 
-      try { 
+      try {
         var output = swig.renderFile(inFile, params);
       } catch (e) {
         self.sendSockMessage(e.toString());
@@ -242,7 +246,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
       mkdirp.sync(path.dirname(outFile));
       fs.writeFileSync(outFile, output);
-      
+
       swigFunctions.increasePage();
     }
 
@@ -385,7 +389,7 @@ module.exports.generator = function (config, logger, fileParser) {
               var baseNewPath = newPath;
 
               items = _.map(items, function(value, key) { value._id = key; value._type = objectName; return value });
-              var publishedItems = _.filter(items, function(item) { 
+              var publishedItems = _.filter(items, function(item) {
                 if(!item.publish_date) {
                   return false;
                 }
@@ -553,7 +557,7 @@ module.exports.generator = function (config, logger, fileParser) {
   /**
    * Send signal to local livereload server to reload files
    * @param  {Array}      files     List of files to reload
-   * @param  {Function}   done      Callback passed either a true value to indicate its done, or an error 
+   * @param  {Function}   done      Callback passed either a true value to indicate its done, or an error
    */
   this.reloadFiles = function(done) {
     request({ url : 'http://localhost:' + liveReloadPort + '/changed?files=true', timeout: 10  }, function(error, response, body) {
@@ -619,12 +623,12 @@ module.exports.generator = function (config, logger, fileParser) {
         if(message.indexOf('scaffolding:') === 0)
         {
           var name = message.replace('scaffolding:', '');
-          self.makeScaffolding(name, function() { 
+          self.makeScaffolding(name, function() {
             sock.send('done');
           });
         } else if (message.indexOf('scaffolding_force:') === 0) {
           var name = message.replace('scaffolding_force:', '');
-          self.makeScaffolding(name, function() { 
+          self.makeScaffolding(name, function() {
             sock.send('done');
           }, true);
         } else if (message === 'build') {
@@ -651,14 +655,14 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   };
 
-  /** 
+  /**
    * Inintializes firebase configuration for a new site
    * @param  {String}    sitename  Name of site to generate config for
    * @param  {Function}  done      Callback to call when operation is done
    */
   this.init = function(sitename, secretkey, copyCms, done) {
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
-    
+
     // TODO: Grab bucket information from server eventually, for now just use the site name
     var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename });
 
@@ -669,7 +673,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
       var cmsTemplated = _.template(cmsFile, { siteName: sitename });
 
-      fs.writeFileSync('./pages/cms.html', cmsTemplated); 
+      fs.writeFileSync('./pages/cms.html', cmsTemplated);
     }
 
     done(true);
@@ -724,7 +728,7 @@ module.exports.generator = function (config, logger, fileParser) {
     });
 
     files = wrench.readdirSyncRecursive('static');
-    
+
     files.forEach(function(file) {
       var originalFile = 'static/' + file;
       var destFile = '.whdist/static/' + file;
@@ -766,7 +770,7 @@ module.exports.generator = function (config, logger, fileParser) {
     {
       grunt.task.run('cssmin');
     }
-    
+
     grunt.task.run('rev');
     grunt.task.run('usemin');
     grunt.task.run('assetsAfter');
