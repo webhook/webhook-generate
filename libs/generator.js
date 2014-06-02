@@ -17,6 +17,8 @@ var slug = require('uslug');
 var async = require('async');
 var spawn = require('win-spawn');
 
+require('colors');
+
 // Template requires
 // TODO: Abstract these later to make it simpler to change
 var swig = require('swig');
