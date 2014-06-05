@@ -176,7 +176,7 @@ module.exports.generator = function (config, logger, fileParser) {
         console.log('# Permission denied                                         #'.red);
         console.log('========================================================'.red);
         console.log('#'.red + ' You don\'t have permission to this site or your subscription expired.'.red);
-        console.log('# Visit '.red + 'https://billing.webhook.com/site/'.yellow + config.get('webhook').siteName.yellow + '/'.yellow ' to manage your subscription.'.red);
+        console.log('# Visit '.red + 'https://billing.webhook.com/site/'.yellow + config.get('webhook').siteName.yellow + '/'.yellow  + ' to manage your subscription.'.red);
         console.log('# ---------------------------------------------------- #'.red)
         process.exit(0);
       } else {
