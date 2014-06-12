@@ -3,8 +3,8 @@
 {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
 <a href="{{ url(rel) }}">{{ rel.name }}</a>
 <% } else { %>
-{% for rel in getItems(<%- value %>) %}
+{% for relation in getItems(<%- value %>) %}
   {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
-  <a href="{{ url(rel) }}">{{ rel.name }}</a>{% if not loop.last %},{% endif %}
+  <a href="{{ url(relation) }}">{{ relation.name }}</a>{% if not loop.last %},{% endif %}
 {% endfor %}
 <% } %>
