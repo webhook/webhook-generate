@@ -90,9 +90,37 @@ module.exports.swigFunctions = function(swig) {
       return {};
     }
 
+    if(!self.typeInfo[type].oneOff) {
+      if(!item.publish_date) {
+        return {};
+      }
+
+      var now = Date.now();
+      var pdate = Date.parse(item.publish_date);
+
+      if(pdate > now + (1 * 60 * 1000)) {
+        return {};
+      }
+    }
+
     item._type = type;
     return item;
   };
+
+  var getItems = function(arr) {
+    if(!arr) {
+      return [];
+    }
+    var items = [];
+    arr.forEach(function(itm) {
+      var obj = getItem(itm);
+      if(!_.isEmpty(obj)) {
+        items.push(getItem(itm));
+      }
+    });
+
+    return items;
+  }
 
   var getCombined = function() {
     var names = [].slice.call(arguments, 0);
@@ -216,6 +244,7 @@ module.exports.swigFunctions = function(swig) {
     return {
       get: getCombined,
       getItem: getItem,
+      getItems: getItems,
       getTypes: getTypes,
       paginate: paginate,
       getCurPage: getCurPage,
