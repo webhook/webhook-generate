@@ -1,8 +1,14 @@
+{# ------------------------------------------------------- #}
+
+{# YOUR BASE TEMPLATE. EVERYTHING GETS LOADED INTO THIS PAGE. #}
+
 {# Webhook uses the SWIG.js (like Djagno/Twig) templating system. Their documentation is here: #}
 {# http://paularmstrong.github.io/swig/docs/tags/ #}
 
 {# Learn about calling data into Webhook pages here: #}
 {# http://www.webhook.com/docs/template-rules-and-filters/ #}
+
+{# ------------------------------------------------------- #}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -26,6 +32,9 @@
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.0/normalize.min.css">
 
+    {# Put your CSS in here and we'll minify it into one file. No CDN scripts. More info: #}
+    {# http://www.webhook.com/docs/minify-your-js-and-css/ #}
+
     <!-- build:css /static/css/minified.css -->
     <link rel="stylesheet" href="/static/css/main.css"/>
     <link rel="stylesheet" href="/static/css/wysiwyg_figures.css"/>
@@ -33,6 +42,7 @@
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 
+    {# Useful block for loading outside scripts in other pages. #}
     {% block head_extra %}{% endblock %}
   </head>
   <body>
@@ -43,11 +53,15 @@
 
       {% include "templates/partials/header.html" %}
 
+      {# By default, your inner pages will load into this block. #}
       {% block content %}{% endblock %}
 
       {% include "templates/partials/footer.html" %}
 
       <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+      {# Put your JS in here and we'll minify it into one file. No CDN scripts. More info: #}
+      {# http://www.webhook.com/docs/minify-your-js-and-css/ #}
 
       <!-- build:js /static/javascript/minified.js -->
       <script src="/static/javascript/main.js"></script>
