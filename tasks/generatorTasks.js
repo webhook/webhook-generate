@@ -93,13 +93,6 @@ module.exports = function(grunt) {
   grunt.registerTask('build', 'Clean files and then generate static site into build', function() {
     var done = this.async();
 
-    var versionString = grunt.option('build-version');
-
-    if(versionString)
-    {
-      generator.setBuildVersion(versionString);
-    }
-
     var strict = grunt.option('strict');
 
     if(strict === true) {
