@@ -78,7 +78,9 @@ module.exports = function(grunt) {
       opts: { stdio: 'inherit' }
     }, function (err, result, code) {
       if (err || code > 0) {
-        grunt.warn(result.stderr || result.stdout);
+        grunt.log.warn('A problem occured while trying to open a browser window to connect to the site.')
+        grunt.log.warn(result.stderr || result.stdout);
+        grunt.log.warn('In order to access the site, please navigate to \'localhost:2002\' in your web browser.')
       }
       grunt.log.writeln('\n' + result.stdout);
     });
