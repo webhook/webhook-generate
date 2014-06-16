@@ -1,5 +1,7 @@
+{# Relations require some special code. More info about relations here: #}
+{# http://www.webhook.com/docs/template-rules-and-filters/#getitem #}
 <% if(controlInfo.meta ? controlInfo.meta.isSingle : false) { %>
-{% set rel = getItem(<%- value %>) %}
+{% set relation = getItem(<%- value %>) %}
 {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
 <a href="{{ url(rel) }}">{{ rel.name }}</a>
 <% } else { %>
