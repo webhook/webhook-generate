@@ -101,6 +101,9 @@ module.exports.generator = function (config, logger, fileParser) {
     return self.root.child('buckets/' + config.get('webhook').siteName + '/' + config.get('webhook').secretKey + '/dev');
   };
 
+  /**
+   * Used to get the dns information about a site (used for certain swig functions)
+   */
   var getDnsChild = function() {
     return self.root.child('management/sites/' + config.get('webhook').siteName + '/dns');
   };
@@ -221,6 +224,9 @@ module.exports.generator = function (config, logger, fileParser) {
     mkdirp.sync(path.dirname(outFile));
     fs.writeFileSync(outFile, output);
 
+    // Haha this crazy nonsense is to handle pagination, the swig function "paginate" makes
+    // shouldPaginate return true if there are more pages left, so we enter a while loop to
+    // generate each page of the pagination (todo one day, abstract this with above code into simple functions)
     swigFunctions.increasePage();
     while(swigFunctions.shouldPaginate())
     {
@@ -253,7 +259,11 @@ module.exports.generator = function (config, logger, fileParser) {
     return outFile.replace('./.build', '');
   };
 
-
+  /**
+   * Downloads a zip file from the requested url and extracts it into the main directory
+   * @param  {string}   zipUrl     Url to zip file to download
+   * @param  {Function}   callback   Callback, first parameter is error (true if error occured);
+   */
   var downloadRepo = function(zipUrl, callback) {
     logger.ok('Downloading preset...');
 
@@ -291,6 +301,11 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   };
 
+  /**
+   * Downloads zip file and then sends the preset data for the theme to the CMS for installation
+   * @param  {string}   zipUrl     Url to zip file to download
+   * @param  {Function}   callback   Callback, first parameter is preset data to send to CMS
+   */
   var downloadPreset = function(zipUrl, callback) {
     downloadRepo(zipUrl, function() {
       if(fs.existsSync('.preset-data.json')) {
@@ -404,7 +419,7 @@ module.exports.generator = function (config, logger, fileParser) {
                 return true;
               });
 
-
+              // TODO: Check to make sure file does not exist yet, and then adjust slug if it does? (how to handle in swig functions)
               for(var key in publishedItems)
               {
                 var val = publishedItems[key];
@@ -433,6 +448,10 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   };
 
+  /**
+   * Copies the static directory into .build/static for asset generation
+   * @param  {Function}   callback     Callback called after creation of directory is done
+   */
   this.copyStatic = function(callback) {
     logger.ok('Copying static');
     if(fs.existsSync('static')) {
@@ -459,10 +478,6 @@ module.exports.generator = function (config, logger, fileParser) {
       if (done) done(true);
   };
 
-  this.setBuildVersion = function(versionString) {
-    self.versionString = versionString;
-  };
-
   /**
    * Builds templates from both /pages and /templates to the build directory
    * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
@@ -484,6 +499,8 @@ module.exports.generator = function (config, logger, fileParser) {
   /**
    * Generates scaffolding for content type with name
    * @param  {String}   name     Name of content type to generate scaffolding for
+   * @param  {Function}   done     Callback called when scaffolding generation is done
+   * @param  {Boolean}   force    If true, forcibly overwrites old scaffolding
    */
   this.makeScaffolding = function(name, done, force) {
     logger.ok('Creating Scaffolding\n');
@@ -566,46 +583,26 @@ module.exports.generator = function (config, logger, fileParser) {
   };
 
   /**
-   * Runs forever, rebuilding the whole project when data is changed in firebase
-   */
-  this.watchFirebase = function() {
-
-    if(!self.root)
-    {
-      throw new Error('Missing firebase reference, may need to run init');
-    }
-
-    var initial = true;
-    getBucket().on('value', function(data) {
-
-      // We ignore the initial run (in the default path its already built)
-      if(!initial)
-      {
-        self.buildBoth(null, self.reloadFiles);
-      } else {
-        logger.ok('Watching');
-      }
-
-      initial = false;
-
-    }, function(error) {
-      throw new Error(error);
-    });
-  };
-
-  /**
-   * Starts a live reload server to detect changes
+   * Starts a live reload server, which will refresh the pages when signaled
    */
   this.startLiveReload = function() {
     tinylr().listen(liveReloadPort);
   };
 
+  /**
+   * Sends a message to the CMS through a websocket initiated by the CMS
+   * @param  {String}      message    Message to send
+   */
   this.sendSockMessage = function(message) {
     if(websocket) {
       websocket.send('message:' + JSON.stringify(message));
     }
   };
 
+  /**
+   * Starts a websocket listener on 0.0.0.0 (for people who want to run wh serv over a network)
+   * Accepts messages for generating scaffolding and downloading preset themes.
+   */
   this.webListener = function() {
     var server = new ws({ host: '0.0.0.0', port: 6557 });
 
@@ -658,6 +655,8 @@ module.exports.generator = function (config, logger, fileParser) {
   /**
    * Inintializes firebase configuration for a new site
    * @param  {String}    sitename  Name of site to generate config for
+   * @param  {String}    secretkey Secret key for the site (gotten from firebase)
+   * @param  {Boolean}   copyCms   True if the CMS should be overwritten, false otherwise
    * @param  {Function}  done      Callback to call when operation is done
    */
   this.init = function(sitename, secretkey, copyCms, done) {
@@ -679,6 +678,10 @@ module.exports.generator = function (config, logger, fileParser) {
     done(true);
   };
 
+  /**
+   * Sets up asset generation (automatic versioning) for pushing to production
+   * @param  {Object}    grunt  Grunt object from generatorTasks
+   */
   this.assets = function(grunt) {
 
     if(fs.existsSync('.whdist')) {
@@ -752,6 +755,10 @@ module.exports.generator = function (config, logger, fileParser) {
 
   }
 
+  /**
+   * Run asset versioning software if configs exist for them
+   * @param  {Object}    grunt  Grunt object from generatorTasks
+   */
   this.assetsMiddle = function(grunt) {
 
     grunt.option('force', true);
@@ -777,6 +784,10 @@ module.exports.generator = function (config, logger, fileParser) {
 
   }
 
+  /**
+   * Finish asset versioning
+   * @param  {Object}    grunt  Grunt object from generatorTasks
+   */
   this.assetsAfter = function(grunt) {
     if(fs.existsSync('.tmp')) {
       wrench.rmdirSyncRecursive('.tmp');
@@ -794,6 +805,9 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   }
 
+  /**
+   * Enables strict mode, exceptions cause full crash, normally for production (so bad generators do not ruin sites)
+   */
   this.enableStrictMode = function() {
     strictMode = true;
   }

@@ -26,6 +26,11 @@ module.exports.swigFunctions = function(swig) {
   this.cachedData = {};
   this.CURRENT_URL = '/';
 
+  /**
+   * Returns a standard url for a given object, only works for standard scaffolding url structure
+   * @param  {Object}   object     Object to generate url for
+   * @returns {String}   Url for the object passed in
+   */
   var url = function(object) {
     var slug = object.slug ? object.slug : (object.name ? slugger(object.name).toLowerCase() : null);
     var prefix = object._type ? object._type : '';
@@ -40,19 +45,35 @@ module.exports.swigFunctions = function(swig) {
     return url;
   };
 
+  /**
+   * Sets the data set used by all the functions in this class
+   * @param  {Object}   data   The data to be used by all functions in this class
+   */
   this.setData = function(data) {
     self.cachedData = {};
     self.data = data;
   };
 
+  /**
+   * Sets the type info used by all the functions in this class
+   * @param  {Object}   typeInfo   The type info to be used by all functions in this class
+   */
   this.setTypeInfo = function(typeInfo) {
     self.typeInfo = typeInfo;
   };
 
+  /**
+   * Sets the settings used by all the functions in this class
+   * @param  {Object}   settings   The settings to be used by all functions in this class
+   */
   this.setSettings = function(settings) {
     self.settings = settings;
   };
 
+  /**
+   * Returns all content types for a given site
+   * @returns  {Array}  An array of type object (slug and name of type)
+   */
   var getTypes = function() {
     var types = [];
 
@@ -65,6 +86,12 @@ module.exports.swigFunctions = function(swig) {
     return types;
   };
 
+  /**
+   * Returns a published item based off its type and id or a relation string from the CMS
+   * @param    {String} Can either be a relation string (from the CMS) or a type name
+   * @param    {String} (OPTIONAL) If the first parameter was the type, this must be the ID of the item
+   * @returns  {Object} The published item specified by the type/id or relation string passed in
+   */
   var getItem = function(type, key) {
     if(!type) {
       return {};
@@ -107,6 +134,11 @@ module.exports.swigFunctions = function(swig) {
     return item;
   };
 
+  /**
+   * Returns an array of items from a relation
+   * @param    {Array}  An array of relation strings from the CMS
+   * @returns  {Array}  All published items specified by relation strings
+   */
   var getItems = function(arr) {
     if(!arr) {
       return [];
@@ -122,6 +154,12 @@ module.exports.swigFunctions = function(swig) {
     return items;
   }
 
+  /**
+   * Returns all the data specified by the arguments
+   * @param    {String} Name of type to retrieve data for
+   * @param    {String} (optional) Other type to return with this data, can specifiy as many types as needed
+   * @returns  {Array}  All items from type (or types)
+   */
   var getCombined = function() {
     var names = [].slice.call(arguments, 0);
 
