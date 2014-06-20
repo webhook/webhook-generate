@@ -587,11 +587,11 @@ module.exports.generator = function (config, logger, fileParser) {
 
       var individualMD5 = md5(template);
       fs.writeFileSync(individual, template);
+      
+      var lTemplate = _.template(listTemplate, { typeName: name });
 
-      var listTemplate = _.template(listTemplate, { typeName: name });
-
-      var listMD5 = md5(listTemplate);
-      fs.writeFileSync(list, listTemplate);
+      var listMD5 = md5(lTemplate);
+      fs.writeFileSync(list, lTemplate);
 
       if(done) done(individualMD5, listMD5);
     });
