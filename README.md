@@ -1,6 +1,5 @@
-## Webhook site builder
+## A Webhook website
 
-This repository is a collection of [Grunt](http://www.gruntjs.com) tasks, templates
-and static assets that build and serve a Webhook powered site.
+This is a site built on the [Webhook CMS](http://www.webhook.com) system.
 
 [Documentation found here](http://webhook.com/docs/)
