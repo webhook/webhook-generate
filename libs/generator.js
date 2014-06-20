@@ -16,6 +16,7 @@ var Zip   = require('adm-zip');
 var slug = require('uslug');
 var async = require('async');
 var spawn = require('win-spawn');
+var md5 = require('MD5');
 
 require('colors');
 
@@ -496,6 +497,27 @@ module.exports.generator = function (config, logger, fileParser) {
 
   };
 
+  this.checkScaffoldingMD5 = function(name, callback) {
+    var directory = 'templates/' + name + '/';
+    var individual = directory + 'individual.html';
+    var list = directory + 'list.html';
+
+    var individualMD5 = null;
+    var listMD5 = null;
+
+    if(fs.existsSync(individual)) {
+      var indContent = fs.readFileSync(individual);
+      individualMD5 = md5(indContent);
+    }
+
+    if(fs.existsSync(individual)) {
+      var listContent = fs.readFileSync(list);
+      listMD5 = md5(listContent);
+    }
+
+    callback(individualMD5, listMD5);
+  }
+
   /**
    * Generates scaffolding for content type with name
    * @param  {String}   name     Name of content type to generate scaffolding for
@@ -507,7 +529,7 @@ module.exports.generator = function (config, logger, fileParser) {
     var directory = 'templates/' + name + '/';
 
     if(!force && fs.existsSync(directory)) {
-      if(done) done();
+      if(done) done(null, null);
       return false;
     }
 
@@ -562,10 +584,16 @@ module.exports.generator = function (config, logger, fileParser) {
 
       var template = _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}});
       template = template.replace(/^\s*\n/gm, '');
-      fs.writeFileSync(individual, template);
-      fs.writeFileSync(list, _.template(listTemplate, { typeName: name }));
 
-      if(done) done();
+      var individualMD5 = md5(template);
+      fs.writeFileSync(individual, template);
+
+      var listTemplate = _.template(listTemplate, { typeName: name });
+
+      var listMD5 = md5(listTemplate);
+      fs.writeFileSync(list, listTemplate);
+
+      if(done) done(individualMD5, listMD5);
     });
 
     return true;
@@ -620,14 +648,19 @@ module.exports.generator = function (config, logger, fileParser) {
         if(message.indexOf('scaffolding:') === 0)
         {
           var name = message.replace('scaffolding:', '');
-          self.makeScaffolding(name, function() {
-            sock.send('done');
+          self.makeScaffolding(name, function(individualMD5, listMD5) {
+            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
           });
         } else if (message.indexOf('scaffolding_force:') === 0) {
           var name = message.replace('scaffolding_force:', '');
-          self.makeScaffolding(name, function() {
-            sock.send('done');
+          self.makeScaffolding(name, function(individualMD5, listMD5) {
+            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
           }, true);
+        } else if (message.indexOf('check_scaffolding:') === 0) {
+          var name = message.replace('check_scaffolding:', '');
+          self.checkScaffoldingMD5(name, function(individualMD5, listMD5) {
+            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
+          });
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
         } else if (message.indexOf('preset:') === 0) {
@@ -647,6 +680,8 @@ module.exports.generator = function (config, logger, fileParser) {
               sock.send('done:' + JSON.stringify(data));
             });
           });
+        } else {
+          sock.send('done');
         }
       });
     });

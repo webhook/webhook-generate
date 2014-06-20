@@ -98,6 +98,13 @@ module.exports.swigFunctions = function(swig) {
     }
 
     if(!key) {
+      if(Array.isArray(type)) {
+        if(type.length > 0) {
+          type = type[0];
+        } else {
+          return {};
+        }
+      }
       var parts = type.split(" ", 2);
       if(parts.length !== 2) {
         return {};
