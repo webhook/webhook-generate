@@ -14,19 +14,21 @@ module.exports = function(grunt) {
 
   var oldConfig = grunt.config.data;
   
+  var port = grunt.option('port') || '2002';
+
   var mergeConfig = {
     webhook: conf,
 
     open : {
       'wh-open': {
-        path: 'http://localhost:2002/'
+        path: 'http://localhost:' + port + '/'
       }
     },
 
     connect: {
       'wh-server': {
         options: {
-          port: 2002,
+          port: port * 1,
           hostname: '*',
           base: '.build',
           livereload: 35730,
