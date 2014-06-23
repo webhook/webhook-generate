@@ -344,7 +344,7 @@ module.exports.generator = function (config, logger, fileParser) {
       });
 
       fs.unlinkSync('.reset.zip');
-      callback();
+      self.init(config.get('webhook').siteName, config.get('webhook').secretKey, true, callback);
     });
   };
 
