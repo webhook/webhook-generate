@@ -302,6 +302,55 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   };
 
+
+  var resetGenerator = function(callback) {
+    logger.ok('Resetting Generator...');
+    var zipUrl = 'http://dump.webhook.com/static/generate-repo.zip';
+
+    // Keep track if the request fails to prevent the continuation of the install
+    var requestFailed = false;
+
+    // TODO: have this hit different templating repos
+    var repoRequest = request(zipUrl);
+
+    repoRequest
+    .on('response', function (response) {
+      // If we fail, set it as failing and remove zip file
+      if (response.statusCode !== 200) {
+        requestFailed = true;
+        fs.unlinkSync('.reset.zip');
+        callback(true);
+      }
+    })
+    .pipe(fs.createWriteStream('.reset.zip'))
+    .on('close', function () {
+      if (requestFailed) return;
+
+      // Unzip into temporary file
+      var zip = new Zip('.reset.zip');
+
+      var entries = zip.getEntries();
+
+      entries.forEach(function(entry) {
+        if(entry.entryName.indexOf('pages/') === 0
+           || entry.entryName.indexOf('templates/') === 0 
+           || entry.entryName.indexOf('static/') === 0) {
+          console.log(entry.entryName);
+        }
+      //  zip.extractEntryTo(entryName, '.', true, true);
+      });
+
+      fs.unlinkSync('.reset.zip');
+      callback();
+    });
+  };
+
+  this.resetFiles = function(grunt, done) {
+    resetGenerator(function() {
+      done();
+    });
+  };
+
   /**
    * Downloads zip file and then sends the preset data for the theme to the CMS for installation
    * @param  {string}   zipUrl     Url to zip file to download
