@@ -331,23 +331,20 @@ module.exports.generator = function (config, logger, fileParser) {
 
       var entries = zip.getEntries();
 
+      wrench.rmdirSyncRecursive('pages');
+      wrench.rmdirSyncRecursive('templates');
+      wrench.rmdirSyncRecursive('static');
+
       entries.forEach(function(entry) {
         if(entry.entryName.indexOf('pages/') === 0
            || entry.entryName.indexOf('templates/') === 0 
            || entry.entryName.indexOf('static/') === 0) {
-          console.log(entry.entryName);
+          zip.extractEntryTo(entry.entryName, '.', true, true);
         }
-      //  zip.extractEntryTo(entryName, '.', true, true);
       });
 
       fs.unlinkSync('.reset.zip');
       callback();
-    });
-  };
-
-  this.resetFiles = function(grunt, done) {
-    resetGenerator(function() {
-      done();
     });
   };
 
@@ -709,6 +706,10 @@ module.exports.generator = function (config, logger, fileParser) {
           var name = message.replace('check_scaffolding:', '');
           self.checkScaffoldingMD5(name, function(individualMD5, listMD5) {
             sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
+          });
+        } else if (message === 'reset_files') {
+          resetGenerator(function() {
+            sock.send('done');
           });
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
