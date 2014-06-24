@@ -371,7 +371,9 @@ module.exports.generator = function (config, logger, fileParser) {
       wrench.rmdirSyncRecursive('.static-old');
 
       fs.unlinkSync('.reset.zip');
-      self.init(config.get('webhook').siteName, config.get('webhook').secretKey, true, callback);
+      self.init(config.get('webhook').siteName, config.get('webhook').secretKey, true, function() {
+        callback();
+      });
     });
   };
 
