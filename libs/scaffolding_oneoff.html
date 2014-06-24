@@ -16,12 +16,12 @@
 {# http://www.webhook.com/help/template-inheritance/ #}
 {% extends "templates/partials/base.html" %}
 
+{% set item = get('<%- typeName %>') %}
+
 {# This sets our page <title>. It will append this <%- typeName %>'s name to the site title defined in base.html #}
 {% block title %}{% parent %} - {{ item.name }}{% endblock %}
 
 {% block content %}
-
-  {% set item = get('<%- typeName %>') %}
 
   <h1>{{ item.name }}</h1>
 
