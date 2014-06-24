@@ -572,24 +572,36 @@ module.exports.generator = function (config, logger, fileParser) {
   };
 
   this.checkScaffoldingMD5 = function(name, callback) {
-    var directory = 'templates/' + name + '/';
-    var individual = directory + 'individual.html';
-    var list = directory + 'list.html';
+    self.cachedData = null;
+    getData(function(data, typeInfo) {
+      var directory = 'templates/' + name + '/';
+      var individual = directory + 'individual.html';
+      var list = directory + 'list.html';
+      var oneOff = 'pages/' + name + '.html';
 
-    var individualMD5 = null;
-    var listMD5 = null;
+      var individualMD5 = null;
+      var listMD5 = null;
+      var oneOffMD5 = null;
 
-    if(fs.existsSync(individual)) {
-      var indContent = fs.readFileSync(individual);
-      individualMD5 = md5(indContent);
-    }
+      if(typeInfo[name].oneOff) {
+        if(fs.existsSync(oneOff)) {
+          var oneOffContent = fs.readFileSync(oneOff);
+          oneOffMD5 = md5(oneOffContent);
+        }
+      } else {
+        if(fs.existsSync(individual)) {
+          var indContent = fs.readFileSync(individual);
+          individualMD5 = md5(indContent);
+        }
 
-    if(fs.existsSync(individual)) {
-      var listContent = fs.readFileSync(list);
-      listMD5 = md5(listContent);
-    }
+        if(fs.existsSync(list)) {
+          var listContent = fs.readFileSync(list);
+          listMD5 = md5(listContent);
+        }
+      }
 
-    callback(individualMD5, listMD5);
+      callback(individualMD5, listMD5, oneOffMD5);
+    });
   }
 
   /**
@@ -602,18 +614,13 @@ module.exports.generator = function (config, logger, fileParser) {
     logger.ok('Creating Scaffolding\n');
     var directory = 'templates/' + name + '/';
 
-    if(!force && fs.existsSync(directory)) {
-      if(done) done(null, null);
-      return false;
-    }
-
-    mkdirp.sync(directory);
-
     var list = directory + 'list.html';
     var individual = directory +  'individual.html';
+    var oneOff = 'pages/' + name + '.html';
 
     var individualTemplate = fs.readFileSync('./libs/scaffolding_individual.html');
     var listTemplate = fs.readFileSync('./libs/scaffolding_list.html');
+    var oneOffTemplate = fs.readFileSync('./libs/scaffolding_oneoff.html');
 
     var widgetFilesRaw = [];
 
@@ -656,18 +663,45 @@ module.exports.generator = function (config, logger, fileParser) {
         controlsObj[item.name] = item;
       });
 
-      var template = _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}});
-      template = template.replace(/^\s*\n/gm, '');
+      var individualMD5 = null;
+      var listMD5 = null;
+      var oneOffMD5 = null;
 
-      var individualMD5 = md5(template);
-      fs.writeFileSync(individual, template);
-      
-      var lTemplate = _.template(listTemplate, { typeName: name });
+      if(typeInfo[name].oneOff) {
+        if(!force && fs.existsSync(oneOff)) {
+          if(done) done(null, null, null);
+          logger.error('Scaffolding for ' + name + ' already exists, use --force to overwrite');
+          return false;
+        }
 
-      var listMD5 = md5(lTemplate);
-      fs.writeFileSync(list, lTemplate);
+        var oneOffFile = _.template(oneOffTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}});
+        oneOffFile = oneOffFile.replace(/^\s*\n/gm, '');
 
-      if(done) done(individualMD5, listMD5);
+        oneOffMD5 = md5(oneOffFile);
+        fs.writeFileSync(oneOff, oneOffFile);
+      } else {
+
+        if(!force && fs.existsSync(directory)) {
+          if(done) done(null, null, null);
+          logger.error('Scaffolding for ' + name + ' already exists, use --force to overwrite');
+          return false;
+        }
+
+        mkdirp.sync(directory);
+
+        var template = _.template(individualTemplate, { widgetFiles: widgetFiles, typeName: name, typeInfo: typeInfo[name] || {}, controls: controlsObj }, { 'imports': { 'renderWidget' : renderWidget}});
+        template = template.replace(/^\s*\n/gm, '');
+
+        individualMD5 = md5(template);
+        fs.writeFileSync(individual, template);
+        
+        var lTemplate = _.template(listTemplate, { typeName: name });
+
+        listMD5 = md5(lTemplate);
+        fs.writeFileSync(list, lTemplate);
+      }
+
+      if(done) done(individualMD5, listMD5, oneOffMD5);
     });
 
     return true;
@@ -722,18 +756,21 @@ module.exports.generator = function (config, logger, fileParser) {
         if(message.indexOf('scaffolding:') === 0)
         {
           var name = message.replace('scaffolding:', '');
-          self.makeScaffolding(name, function(individualMD5, listMD5) {
-            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
+            console.log(name);
+          self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
+            console.log(name);
+            console.log(oneOffMD5);
+            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
           });
         } else if (message.indexOf('scaffolding_force:') === 0) {
           var name = message.replace('scaffolding_force:', '');
-          self.makeScaffolding(name, function(individualMD5, listMD5) {
-            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
+          self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
+            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
           }, true);
         } else if (message.indexOf('check_scaffolding:') === 0) {
           var name = message.replace('check_scaffolding:', '');
-          self.checkScaffoldingMD5(name, function(individualMD5, listMD5) {
-            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
+          self.checkScaffoldingMD5(name, function(individualMD5, listMD5, oneOffMD5) {
+            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
           });
         } else if (message === 'reset_files') {
           resetGenerator(function(error) {
