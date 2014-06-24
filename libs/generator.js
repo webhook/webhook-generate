@@ -826,6 +826,8 @@ module.exports.generator = function (config, logger, fileParser) {
 
       var cmsTemplated = _.template(cmsFile, { siteName: sitename });
 
+      mkdirp.sync('./pages/cms.html');
+
       fs.writeFileSync('./pages/cms.html', cmsTemplated);
     }
 
