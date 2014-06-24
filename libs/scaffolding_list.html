@@ -14,6 +14,9 @@
 {# http://www.webhook.com/help/template-inheritance/ #}
 {% extends "templates/partials/base.html" %}
 
+{# This sets our page <title>. It will append <%- typeName %> to the site title defined in base.html #}
+{% block title %}{% parent %} - <%= typeName %>{% endblock %}
+
 {% block content %}
 
   {# The first thing we do is call <%= typeName %> data from the CMS. #}
