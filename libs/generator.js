@@ -331,9 +331,32 @@ module.exports.generator = function (config, logger, fileParser) {
 
       var entries = zip.getEntries();
 
-      wrench.rmdirSyncRecursive('pages');
-      wrench.rmdirSyncRecursive('templates');
-      wrench.rmdirSyncRecursive('static');
+      try {
+        fs.renameSync('pages', '.pages-old');
+      } catch(error) {
+        fs.unlinkSync('.reset.zip');
+        callback(true);
+        return;
+      }
+
+      try {
+        fs.renameSync('templates', '.templates-old');
+      } catch(error) {
+        fs.renameSync('.pages-old', 'pages');
+        fs.unlinkSync('.reset.zip');
+        callback(true);
+        return;
+      }
+
+      try {
+        fs.renameSync('static', '.static-old');
+      } catch(error) {
+        fs.renameSync('.pages-old', 'pages');
+        fs.renameSync('.templates-old', 'templates');
+        fs.unlinkSync('.reset.zip');
+        callback(true);
+        return;
+      }
 
       entries.forEach(function(entry) {
         if(entry.entryName.indexOf('pages/') === 0
@@ -342,6 +365,10 @@ module.exports.generator = function (config, logger, fileParser) {
           zip.extractEntryTo(entry.entryName, '.', true, true);
         }
       });
+
+      wrench.rmdirSyncRecursive('.pages-old');
+      wrench.rmdirSyncRecursive('.templates-old');
+      wrench.rmdirSyncRecursive('.static-old');
 
       fs.unlinkSync('.reset.zip');
       self.init(config.get('webhook').siteName, config.get('webhook').secretKey, true, callback);
@@ -540,7 +567,6 @@ module.exports.generator = function (config, logger, fileParser) {
         });
       });
     });
-
   };
 
   this.checkScaffoldingMD5 = function(name, callback) {
@@ -708,8 +734,12 @@ module.exports.generator = function (config, logger, fileParser) {
             sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5 }));
           });
         } else if (message === 'reset_files') {
-          resetGenerator(function() {
-            sock.send('done');
+          resetGenerator(function(error) {
+            if(error) {
+              sock.send('done:' + JSON.stringify({ err: 'Error while resetting files' }));
+            } else {
+              sock.send('done');
+            }
           });
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
