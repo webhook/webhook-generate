@@ -455,17 +455,40 @@ module.exports.generator = function (config, logger, fileParser) {
           // We ignore partials, special directory to allow making of partial includes
           if(path.extname(file) === '.html' && file.indexOf('templates/partials') !== 0)
           {
+            if(path.dirname(file).split('/').length <= 1) {
+              return true;
+            }
             // Here we try and abstract out the content type name from directory structure
             var baseName = path.basename(file, '.html');
-            var newPath = path.dirname(file).replace('templates', './.build');
+            var newPath = path.dirname(file).replace('templates', './.build').split('/').slice(0,3).join('/');
             var pathParts = path.dirname(file).split('/');
-            var objectName = pathParts[pathParts.length - 1];
+            var objectName = pathParts[1];
             var items = data[objectName];
             var info = typeInfo[objectName];
+            var filePath = path.dirname(file);
 
             if(!items) {
               logger.error('Missing data for content type ' + objectName);
             }
+
+            items = _.map(items, function(value, key) { value._id = key; value._type = objectName; return value });
+
+            var publishedItems = _.filter(items, function(item) {
+              if(!item.publish_date) {
+                return false;
+              }
+
+              var now = Date.now();
+              var pdate = Date.parse(item.publish_date);
+
+              if(pdate > now + (1 * 60 * 1000)) {
+                return false;
+              }
+
+              return true;
+            });
+
+            var baseNewPath = '';
 
             // TODO, DETECT IF FILE ALREADY EXISTS, IF IT DOES APPEND A NUMBER TO IT DUMMY
             if(baseName === 'list')
@@ -477,23 +500,7 @@ module.exports.generator = function (config, logger, fileParser) {
             } else if (baseName === 'individual') {
               // Output should be path + id + '/index.html'
               // Should pass in object as 'item'
-              var baseNewPath = newPath;
-
-              items = _.map(items, function(value, key) { value._id = key; value._type = objectName; return value });
-              var publishedItems = _.filter(items, function(item) {
-                if(!item.publish_date) {
-                  return false;
-                }
-
-                var now = Date.now();
-                var pdate = Date.parse(item.publish_date);
-
-                if(pdate > now + (1 * 60 * 1000)) {
-                  return false;
-                }
-
-                return true;
-              });
+              baseNewPath = newPath;
 
               // TODO: Check to make sure file does not exist yet, and then adjust slug if it does? (how to handle in swig functions)
               for(var key in publishedItems)
@@ -510,6 +517,19 @@ module.exports.generator = function (config, logger, fileParser) {
                 var val = items[key];
 
                 newPath = previewPath + '/' + val.preview_url + '/index.html';
+                writeTemplate(file, newPath, { item: val });
+              }
+            } else if(filePath.indexOf('templates/' + objectName + '/templates') !== 0) { // Handle sub pages in here
+              baseNewPath = newPath;
+
+              var middlePathName = filePath.replace('templates/' + objectName, '') + '/' + baseName;
+              middlePathName = middlePathName.substring(1);
+
+              for(var key in publishedItems)
+              {
+                var val = publishedItems[key];
+
+                newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/' + middlePathName + '/index.html';
                 writeTemplate(file, newPath, { item: val });
               }
             }
