@@ -795,16 +795,15 @@ module.exports.generator = function (config, logger, fileParser) {
     command.on('error', function() {
       callback(true);
     });
-    command.on('close', function() { 
-      command.on('close', function(exit, signal) {
+    
+    command.on('close', function(exit, signal) {
 
-        if(exit === 0) {
-          callback(null);
-        } else {
-          callback(exit);
-        }
+      if(exit === 0) {
+        callback(null);
+      } else {
+        callback(exit);
+      }
 
-      });
     });
   }
 
