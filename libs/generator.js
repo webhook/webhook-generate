@@ -783,6 +783,23 @@ module.exports.generator = function (config, logger, fileParser) {
     }
   };
 
+  /*
+    Runs 'wh push', used by web listener to give push button on CMS
+  */
+  var pushSite = function(callback) {
+    var command = spawn('wh', ['push'], {
+      stdio: 'inherit',
+      cwd: '.'
+    });
+
+    command.on('error', function() {
+      callback({ err: "Error while running wh push" });
+    });
+    command.on('close', function() {
+      callback();
+    });
+  }
+
   /**
    * Starts a websocket listener on 0.0.0.0 (for people who want to run wh serv over a network)
    * Accepts messages for generating scaffolding and downloading preset themes.
@@ -824,6 +841,14 @@ module.exports.generator = function (config, logger, fileParser) {
           resetGenerator(function(error) {
             if(error) {
               sock.send('done:' + JSON.stringify({ err: 'Error while resetting files' }));
+            } else {
+              sock.send('done');
+            }
+          });
+        } else if (message === 'push') {
+          pushSite(function(error) {
+            if(error) {
+              sock.send('done:' + JSON.stringify(error));
             } else {
               sock.send('done');
             }
