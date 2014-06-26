@@ -796,7 +796,7 @@ module.exports.generator = function (config, logger, fileParser) {
       callback(true);
     });
     command.on('close', function() { 
-      spawnedCommand.on('close', function(exit, signal) {
+      command.on('close', function(exit, signal) {
 
         if(exit === 0) {
           callback(null);
