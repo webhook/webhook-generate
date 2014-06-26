@@ -853,6 +853,11 @@ module.exports.generator = function (config, logger, fileParser) {
               sock.send('done');
             }
           });
+        } else if (message === 'supported_messages') {
+          sock.send('done:' + JSON.stringify([
+            'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
+            'push', 'build', 'preset'
+          ]));
         } else if (message === 'push') {
           pushSite(function(error) {
             if(error) {
