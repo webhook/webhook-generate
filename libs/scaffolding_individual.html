@@ -27,6 +27,7 @@
 
   <ul>
     <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
+    <% if(fieldInfo.controlType !== 'template') { %>
       <li>
         <strong><%- fieldInfo.label %>: </strong>
         <% if(widgetFiles[fieldInfo.controlType]) { %>
@@ -35,6 +36,7 @@
         {{ item.<%- fieldInfo.name %> }}
         <% } %>
       </li>
+    <% } %>
     <% }); %>
   </ul>
 

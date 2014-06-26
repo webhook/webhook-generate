@@ -466,6 +466,7 @@ module.exports.generator = function (config, logger, fileParser) {
             var items = data[objectName];
             var info = typeInfo[objectName];
             var filePath = path.dirname(file);
+            var overrideFile = null;
 
             if(!items) {
               logger.error('Missing data for content type ' + objectName);
@@ -490,6 +491,15 @@ module.exports.generator = function (config, logger, fileParser) {
 
             var baseNewPath = '';
 
+            // Find if this thing has a template control
+            var templateWidgetName = null;
+
+            typeInfo[objectName].controls.forEach(function(control) {
+              if(control.controlType === 'template') {
+                templateWidgetName = control.name;
+              }
+            });
+
             // TODO, DETECT IF FILE ALREADY EXISTS, IF IT DOES APPEND A NUMBER TO IT DUMMY
             if(baseName === 'list')
             {
@@ -507,8 +517,17 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = publishedItems[key];
 
+                if(templateWidgetName) {
+                  overrideFile = 'templates/' + objectName + '/templates/' + val[templateWidgetName];
+                }
+
                 newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/index.html';
-                writeTemplate(file, newPath, { item: val });
+
+                if(fs.existsSync(overrideFile)) {
+                  writeTemplate(overrideFile, newPath, { item: val });
+                } else {
+                  writeTemplate(file, newPath, { item: val });
+                }
               }
 
               var previewPath = baseNewPath.replace('./.build', './.build/_wh_previews');
@@ -516,8 +535,17 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = items[key];
 
+                if(templateWidgetName) {
+                  overrideFile = 'templates/' + objectName + '/templates/' + val[templateWidgetName];
+                }
+
                 newPath = previewPath + '/' + val.preview_url + '/index.html';
-                writeTemplate(file, newPath, { item: val });
+
+                if(fs.existsSync(overrideFile)) {
+                  writeTemplate(overrideFile, newPath, { item: val });
+                } else {
+                  writeTemplate(file, newPath, { item: val });
+                }
               }
             } else if(filePath.indexOf('templates/' + objectName + '/templates') !== 0) { // Handle sub pages in here
               baseNewPath = newPath;
