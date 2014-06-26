@@ -793,10 +793,18 @@ module.exports.generator = function (config, logger, fileParser) {
     });
 
     command.on('error', function() {
-      callback({ err: "Error while running wh push" });
+      callback(true);
     });
-    command.on('close', function() {
-      callback();
+    command.on('close', function() { 
+      spawnedCommand.on('close', function(exit, signal) {
+
+        if(exit === 0) {
+          callback(null);
+        } else {
+          callback(exit);
+        }
+
+      });
     });
   }
 
@@ -848,7 +856,7 @@ module.exports.generator = function (config, logger, fileParser) {
         } else if (message === 'push') {
           pushSite(function(error) {
             if(error) {
-              sock.send('done:' + JSON.stringify(error));
+              sock.send('done:' + JSON.stringify({ err: 'Error while pushing site.' }));
             } else {
               sock.send('done');
             }
