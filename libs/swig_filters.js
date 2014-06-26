@@ -326,7 +326,12 @@ module.exports.init = function (swig) {
     return filtered;
   }
 
+  var json = function(input) {
+    return JSON.stringify(input);
+  };
+
   markdown.safe = true;
+  json.safe = true;
 
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
@@ -343,4 +348,5 @@ module.exports.init = function (swig) {
   swig.setFilter('date', date);
   swig.setFilter('where', where);
   swig.setFilter('duration', duration);
+  swig.setFilter('json', json);
 };
