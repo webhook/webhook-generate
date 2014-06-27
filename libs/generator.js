@@ -494,11 +494,13 @@ module.exports.generator = function (config, logger, fileParser) {
             // Find if this thing has a template control
             var templateWidgetName = null;
 
-            typeInfo[objectName].controls.forEach(function(control) {
-              if(control.controlType === 'template') {
-                templateWidgetName = control.name;
-              }
-            });
+            if(typeInfo[objectName]) {
+              typeInfo[objectName].controls.forEach(function(control) {
+                if(control.controlType === 'template') {
+                  templateWidgetName = control.name;
+                }
+              });
+            }
 
             // TODO, DETECT IF FILE ALREADY EXISTS, IF IT DOES APPEND A NUMBER TO IT DUMMY
             if(baseName === 'list')
@@ -795,7 +797,7 @@ module.exports.generator = function (config, logger, fileParser) {
     command.on('error', function() {
       callback(true);
     });
-    
+
     command.on('close', function(exit, signal) {
 
       if(exit === 0) {
