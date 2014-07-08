@@ -496,7 +496,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
             if(typeInfo[objectName]) {
               typeInfo[objectName].controls.forEach(function(control) {
-                if(control.controlType === 'template') {
+                if(control.controlType === 'layout') {
                   templateWidgetName = control.name;
                 }
               });

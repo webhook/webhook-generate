@@ -27,7 +27,7 @@
 
   <ul>
     <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
-    <% if(fieldInfo.controlType !== 'template') { %>
+    <% if(fieldInfo.controlType !== 'layout') { %>
       <li>
         <strong><%- fieldInfo.label %>: </strong>
         <% if(widgetFiles[fieldInfo.controlType]) { %>
