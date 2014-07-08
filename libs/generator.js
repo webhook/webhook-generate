@@ -520,7 +520,7 @@ module.exports.generator = function (config, logger, fileParser) {
                 var val = publishedItems[key];
 
                 if(templateWidgetName) {
-                  overrideFile = 'templates/' + objectName + '/templates/' + val[templateWidgetName];
+                  overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
                 newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/index.html';
@@ -538,7 +538,7 @@ module.exports.generator = function (config, logger, fileParser) {
                 var val = items[key];
 
                 if(templateWidgetName) {
-                  overrideFile = 'templates/' + objectName + '/templates/' + val[templateWidgetName];
+                  overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
                 newPath = previewPath + '/' + val.preview_url + '/index.html';
@@ -549,7 +549,7 @@ module.exports.generator = function (config, logger, fileParser) {
                   writeTemplate(file, newPath, { item: val });
                 }
               }
-            } else if(filePath.indexOf('templates/' + objectName + '/templates') !== 0) { // Handle sub pages in here
+            } else if(filePath.indexOf('templates/' + objectName + '/layouts') !== 0) { // Handle sub pages in here
               baseNewPath = newPath;
 
               var middlePathName = filePath.replace('templates/' + objectName, '') + '/' + baseName;
