@@ -298,7 +298,7 @@ module.exports.swigFunctions = function(swig) {
       url: url,
       getCurrentUrl: getCurrentUrl,
       getSetting: getSetting,
-      cmsVersion: 'v2'
+      cmsVersion: 'democms'
     };
   };
 
