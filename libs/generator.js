@@ -72,7 +72,7 @@ Function = wrap;
 module.exports.generator = function (config, logger, fileParser) {
 
   var self = this;
-  var firebaseUrl = 'webhook';
+  var firebaseUrl = 'webhook-demo';
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
   var websocket = null;
   var strictMode = false;
