@@ -869,7 +869,7 @@ module.exports.generator = function (config, logger, fileParser) {
           });
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
-        } else if (message.indexOf('preset:') === 0) {
+        /*} else if (message.indexOf('preset:') === 0) {
           var url = message.replace('preset:', '');
           if(!url) {
             sock.send('done');
@@ -885,7 +885,7 @@ module.exports.generator = function (config, logger, fileParser) {
             command.on('close', function() {
               sock.send('done:' + JSON.stringify(data));
             });
-          });
+          });*/
         } else {
           sock.send('done');
         }
