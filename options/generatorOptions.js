@@ -73,7 +73,7 @@ module.exports = function(grunt) {
         logConcurrentOutput: true
       },
       "wh-concurrent": {
-        tasks: ["watch", "webListener-open"]
+        tasks: ["watch"]
       }
     },
 
