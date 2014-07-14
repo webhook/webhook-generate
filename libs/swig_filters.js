@@ -338,6 +338,13 @@ module.exports.init = function (swig) {
     return '<p>' + joined + '</p>'
   };
 
+  var jsonP = function(input, callbackName) {
+    if(!callbackName) {
+      callbackName = 'callback';
+    }
+    return '/**/' + callbackName +  '(' + JSON.stringify(input) + ')';
+  };
+
   var pluralize = function(input, singular, suffix) {
     if(singular && !suffix) {
       suffix = singular;
@@ -370,6 +377,7 @@ module.exports.init = function (swig) {
 
   markdown.safe = true;
   linebreaks.safe = true;
+  jsonP.safe = true;
 
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
@@ -389,4 +397,5 @@ module.exports.init = function (swig) {
   swig.setFilter('abs', abs);
   swig.setFilter('linebreaks', linebreaks);
   swig.setFilter('pluralize', pluralize);
+  swig.setFilter('jsonp', jsonP);
 };
