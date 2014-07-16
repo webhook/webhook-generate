@@ -830,10 +830,7 @@ module.exports.generator = function (config, logger, fileParser) {
         if(message.indexOf('scaffolding:') === 0)
         {
           var name = message.replace('scaffolding:', '');
-            console.log(name);
           self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
-            console.log(name);
-            console.log(oneOffMD5);
             sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
           });
         } else if (message.indexOf('scaffolding_force:') === 0) {
