@@ -74,11 +74,11 @@ module.exports.swigFunctions = function(swig) {
    * Returns all content types for a given site
    * @returns  {Array}  An array of type object (slug and name of type)
    */
-  var getTypes = function() {
+  var getTypes = function(returnOneOffs) {
     var types = [];
 
     for(var key in self.typeInfo) {
-      if(!self.typeInfo[key].oneOff) {
+      if(returnOneOffs || !self.typeInfo[key].oneOff) {
         types.push({ slug: key, name: self.typeInfo[key].name });
       }
     }
@@ -189,7 +189,7 @@ module.exports.swigFunctions = function(swig) {
       tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
 
       // convert it into an array
-      tempData = _.map(tempData, function(value, key) { value._id = key; value._type = name; return value });
+      tempData = _.map(tempData, function(value, key) { value._id = key; value._type = name; if(value.name) value.slug = slugger(value.name).toLowerCase(); return value });
       tempData = _.filter(tempData, function(item) { 
         if(!item.publish_date) {
           return false;
@@ -261,6 +261,15 @@ module.exports.swigFunctions = function(swig) {
     return self.settings.general[key];
   };
 
+  var randomElement = function(array) {
+    if(!array || !_.isArray(array)) {
+      return null;
+    }
+
+    var index = [Math.floor(Math.random() * array.length)];
+    return array[index];
+  };
+
   // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
   this.shouldPaginate = function() {
     return self.curPage <= self.maxPage;
@@ -298,7 +307,8 @@ module.exports.swigFunctions = function(swig) {
       url: url,
       getCurrentUrl: getCurrentUrl,
       getSetting: getSetting,
-      cmsVersion: 'democms'
+      cmsVersion: 'democms',
+      random: randomElement
     };
   };
 

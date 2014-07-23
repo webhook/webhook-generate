@@ -11,7 +11,7 @@
 {# ------------------------------------------------------- #}
 
 {# Confused what extends and blocks do? Watch a primer: #}
-{# http://www.webhook.com/help/template-inheritance/ #}
+{# http://www.webhook.com/docs/template-inheritance-blocks/ #}
 {% extends "templates/partials/base.html" %}
 
 {# This sets our page <title>. It will append "- Homepage" to the site title defined in base. #}
@@ -26,7 +26,7 @@
   <p><a href="/cms/">Looking for the CMS?</a></p>
 
   {# Grabs the data to list all the content types (set as multiple) from the CMS. #}
-  {% set types = getTypes() %}
+  {% set types = getTypes(true) %}
 
   {# If you have at least content page type, we show a list. #}
   {% if types|size !== 0 %}
