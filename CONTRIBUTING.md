@@ -1,36 +1,38 @@
-# Contributing to the Webhook Generator
+# What the generator does
 
-We always welcome pull requests to the webhook generator, as fixes and extensions to webhook are always welcome. However, since this generator is used by many of our customers we will apply strict scrutiny to any and all pull requests.
+The Webhook generator does not contain the code for the CMS.
 
-## Getting Started
+The Webhook generator repo contains the blank, default files that get installed with any Webhook site. It is essentially a small grunt project that talks to firebase and builds the site based upon changes to the data there and to the template layer.
 
-To start contributing you will need to set up your environment. The easiest way to run the generator locally is to run the command `wh init <sitename>` in the webhook-generator directory, where sitename is some site you run or have access to. From there you can then use the normal `wh serve` command to serve the site with your local version of generator.
+Generator also stores all the additional functions and filters we've added to the Swig JS templating system.
 
-The only caveat running is that running `wh init` will generate a `cms.html` file in the pages directory, we strongly recommend not commitin this file to any of your changes, and any pull requests with cms.html will be ignored (or if its easy, will be accepted without the cms.html). For various reasons we can not add this file to the .gitignore list, so please do not try and add it there.
+# Contributing to this repo
 
-## Example Getting Started Commands
+We welcome contributions to this repo, but please be cognisant that this code runs on thousands of websites. Therefor we're pretty strict about what we accept.
 
-```
-cd webhook-generate
-wh init my-personal-site
-[?] Enter your Webhook email: ltsquigs@gmail.com
-[?] Enter your Webhook password: *********************
------ Initialization -----
+Please consider the following before submitting your pull request:
 
-wh serve
+1. Is the code backwards compatible with previous versions of the generator?
+2. Is the code documented, properly explained and follow the naming patterns of the current code?
+3. Does it add generic abilities that are useful to most projects, not just your own?
+4. You are contributing your code under the MIT license this code is provided with.
 
-```
+## Setting up a dev environment
+
+Goes without saying you'll need to have Node, Grunt and Webhook installed to work on this repo.
+
+1. Clone this repo somewhere locally.
+2. `cd webhook-generate`
+3. Run `wh init your_site_name`. You'll need to use an existing Webhook site you have control over.
+4. View your site at http://localhost:2002 as normal.
+
+Running `wh init` will create a pages and templates folder. You do not want to commit any of these files. Most importantly don't commit the `cms.html` file we generate. They are added simply so you can run things locally.
+
 
 ## Submitting Pull Requests
 
-When submitting a pull request, please create a corresponding issue for the pull requests.
+Please do the following when submitting a pull request:
 
-If the pull requests is to fix a bug, please indicate that in the issue name, if it is to add a new feature please indicate that as well.
-
-Finally, mention the issue in the text of the pull request.
-
-## Documentation
-
-Please document any code inline as you think makes sense (try and match the already existing documentation).
-
-When contributing a feature such as a new swig function or filter, please provide some documentation/description for the new function or filter in the pull request.
+1. Please create a corresponding issue for the pull request.
+2. Please name the issue as eitehr a feature addition or a bug fix.
+3. Please reference an issues in your pull requests.
