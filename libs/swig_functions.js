@@ -74,11 +74,13 @@ module.exports.swigFunctions = function(swig) {
    * Returns all content types for a given site
    * @returns  {Array}  An array of type object (slug and name of type)
    */
-  var getTypes = function() {
+  var getTypes = function(returnOneOffs) {
     var types = [];
 
     for(var key in self.typeInfo) {
-      types.push({ slug: key, name: self.typeInfo[key].name });
+      if(returnOneOffs || !self.typeInfo[key].oneOff) {
+        types.push({ slug: key, name: self.typeInfo[key].name });
+      }
     }
 
     return types;
