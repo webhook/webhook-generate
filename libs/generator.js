@@ -382,9 +382,11 @@ module.exports.generator = function (config, logger, fileParser) {
   * @param zipUrl   The location of the zip file on disk
   * @param callback The callback to call with the data from the theme
   */
-  var extractPresetLocal = function(zipUrl, callback) {
+  var extractPresetLocal = function(fileData, callback) {
+
+    fs.writeFileSync('.preset.zip', fileData);
     // Unzip into temporary file
-    var zip = new Zip(zipUrl);
+    var zip = new Zip('.preset.zip');
 
     var entries = zip.getEntries();
 
@@ -393,6 +395,8 @@ module.exports.generator = function (config, logger, fileParser) {
       entry.entryName = newName;
     });
     zip.extractAllTo('.', true);
+
+    fs.unlinkSync('.preset.zip');
 
     if(fs.existsSync('.preset-data.json')) {
       var presetData = fileParser.readJSON('.preset-data.json');
@@ -897,14 +901,14 @@ module.exports.generator = function (config, logger, fileParser) {
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
         } else if (message.indexOf('preset_local:') === 0) {
-          var fileLocation = message.replace('preset:', '');
+          var fileData = message.replace('preset:', '');
 
-          if(!fileLocation) {
+          if(!fileData) {
             sock.send('done');
             return;
           }
 
-          extractPresetLocal(fileLocation, function(data) {
+          extractPresetLocal(fileData, function(data) {
             var command = spawn('npm', ['install'], {
               stdio: 'inherit',
               cwd: '.'
