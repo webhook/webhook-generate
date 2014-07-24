@@ -888,7 +888,7 @@ module.exports.generator = function (config, logger, fileParser) {
         } else if (message === 'supported_messages') {
           sock.send('done:' + JSON.stringify([
             'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
-            'push', 'build', 'preset', 'layouts', 'preset_local'
+            'push', 'build', 'preset', 'layouts', 'preset_localv2'
           ]));
         } else if (message === 'push') {
           pushSite(function(error) {
