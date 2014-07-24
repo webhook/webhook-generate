@@ -384,7 +384,7 @@ module.exports.generator = function (config, logger, fileParser) {
   */
   var extractPresetLocal = function(fileData, callback) {
 
-    fs.writeFileSync('.preset.zip', fileData);
+    fs.writeFileSync('.preset.zip', fileData, { encoding: 'base64' });
     // Unzip into temporary file
     var zip = new Zip('.preset.zip');
 
