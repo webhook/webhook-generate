@@ -901,7 +901,7 @@ module.exports.generator = function (config, logger, fileParser) {
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
         } else if (message.indexOf('preset_local:') === 0) {
-          var fileData = message.replace('preset:', '');
+          var fileData = message.replace('preset_local:', '');
 
           if(!fileData) {
             sock.send('done');
