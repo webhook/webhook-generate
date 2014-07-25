@@ -32,22 +32,46 @@ Running `wh init` will create a pages and templates folder. You do not want to c
 
 Here is a description of the various files that are in the generator repo, and what their purpose is:
 
-1. Gruntfile.js - The main gruntfile, should never change, imports the generator specific gruntfile. Is blank to allow for easy customization by users
-2. tasks/generatorTasks.js - Where all the of the webhook generator specific tasks are defined.
-3. options/generatorOptions.js - Where all the options for the generator specific tasks are defined.
-4. pages, static, templates folders - Contains some default pages that are used to bootstrap the clients website when first created. Generally should not need changing.
-5. libs folder - The folder that contains all the executing code for the generator, can not be edited by local clients.
-6. libs/generator.js - The main meat of the generator, handles all tasks defined in generatorTasks.js. This handles the static generation, the web socket server, and the live reload server.
-7. libs/swig_filters.js - Defines all additional swig filters that are available in the swig templates.
-8. libs/swig_functions.js - Defines all additional swig functions that are available in the swig templates.
-9. libs/swig_tags.js - Not used, please do not modify.
-10. libs/utils.js - Contains generic utility functions shared between files.
-11. libs/scaffolding_*.html - The templates used to generate scaffolding for new types.
-12. libs/debug404.html - The 404 page shown on the local development server.
-13. libs/widgets/*.html - The template used to generate scaffolding for a specific widget. If the file <widgetname>.html is defined, then its contents are used when generating scaffolding, otherwise scaffolding defaults to {{ item.propertyname }}.
+```
+Gruntfile.js 
+ - The main gruntfile, should never change, imports the generator specific gruntfile. Is blank to allow for easy customization by users
 
+tasks/generatorTasks.js 
+ - Where all the of the webhook generator specific tasks are defined.
 
+options/generatorOptions.js 
+ - Where all the options for the generator specific tasks are defined.
 
+pages, static, templates folders 
+ - Contains some default pages that are used to bootstrap the clients website when first created. Generally should not need changing.
+
+libs folder 
+ - The folder that contains all the executing code for the generator, can not be edited by local clients.
+
+libs/generator.js 
+ - The main meat of the generator, handles all tasks defined in generatorTasks.js. This handles the static generation, the web socket server, and the live reload server.
+
+libs/swig_filters.js 
+ - Defines all additional swig filters that are available in the swig templates.
+
+libs/swig_functions.js 
+ - Defines all additional swig functions that are available in the swig templates.
+
+libs/swig_tags.js 
+ - Not used, please do not modify.
+
+libs/utils.js 
+ - Contains generic utility functions shared between files.
+
+libs/scaffolding_*.html 
+ - The templates used to generate scaffolding for new types.
+
+libs/debug404.html 
+ - The 404 page shown on the local development server.
+
+libs/widgets/*.html 
+ - The template used to generate scaffolding for a specific widget. If the file <widgetname>.html is defined, then its contents are used when generating scaffolding, otherwise scaffolding defaults to {{ item.propertyname }}.
+```
 
 ### Submitting Pull Requests
 
