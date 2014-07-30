@@ -378,6 +378,40 @@ module.exports.generator = function (config, logger, fileParser) {
   };
 
   /**
+  * Extracts a local theme zip into the current generator directory
+  * @param zipUrl   The location of the zip file on disk
+  * @param callback The callback to call with the data from the theme
+  */
+  var extractPresetLocal = function(fileData, callback) {
+
+    fs.writeFileSync('.preset.zip', fileData, { encoding: 'base64' });
+    // Unzip into temporary file
+    var zip = new Zip('.preset.zip');
+
+    var entries = zip.getEntries();
+
+    entries.forEach(function(entry) {
+      var newName = entry.entryName.split('/').slice(1).join('/');
+      entry.entryName = newName;
+    });
+    zip.extractAllTo('.', true);
+
+    fs.unlinkSync('.preset.zip');
+
+    if(fs.existsSync('.preset-data.json')) {
+      var presetData = fileParser.readJSON('.preset-data.json');
+
+      fs.unlinkSync('.preset-data.json');
+      logger.ok('Done extracting.');
+      callback(presetData);
+
+    } else {
+      logger.ok('Done extracting.');
+      callback(null);
+    }
+  }
+
+  /**
    * Downloads zip file and then sends the preset data for the theme to the CMS for installation
    * @param  {string}   zipUrl     Url to zip file to download
    * @param  {Function}   callback   Callback, first parameter is preset data to send to CMS
@@ -854,7 +888,7 @@ module.exports.generator = function (config, logger, fileParser) {
         } else if (message === 'supported_messages') {
           sock.send('done:' + JSON.stringify([
             'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
-            'push', 'build', 'preset', 'layouts'
+            'push', 'build', 'preset', 'layouts', 'preset_localv2'
           ]));
         } else if (message === 'push') {
           pushSite(function(error) {
@@ -866,6 +900,24 @@ module.exports.generator = function (config, logger, fileParser) {
           });
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
+        } else if (message.indexOf('preset_local:') === 0) {
+          var fileData = message.replace('preset_local:', '');
+
+          if(!fileData) {
+            sock.send('done');
+            return;
+          }
+
+          extractPresetLocal(fileData, function(data) {
+            var command = spawn('npm', ['install'], {
+              stdio: 'inherit',
+              cwd: '.'
+            });
+
+            command.on('close', function() {
+              sock.send('done:' + JSON.stringify(data));
+            });
+          });
         } else if (message.indexOf('preset:') === 0) {
           var url = message.replace('preset:', '');
           if(!url) {

@@ -28,6 +28,50 @@ Goes without saying you'll need to have Node, Grunt and Webhook installed to wor
 
 Running `wh init` will create a pages and templates folder. You do not want to commit any of these files. Most importantly don't commit the `cms.html` file we generate. They are added simply so you can run things locally.
 
+### Description of Files
+
+Here is a description of the various files that are in the generator repo, and what their purpose is:
+
+```
+Gruntfile.js 
+ - The main gruntfile, should never change, imports the generator specific gruntfile. Is blank to allow for easy customization by users
+
+tasks/generatorTasks.js 
+ - Where all the of the webhook generator specific tasks are defined.
+
+options/generatorOptions.js 
+ - Where all the options for the generator specific tasks are defined.
+
+pages, static, templates folders 
+ - Contains some default pages that are used to bootstrap the clients website when first created. Generally should not need changing.
+
+libs folder 
+ - The folder that contains all the executing code for the generator, can not be edited by local clients.
+
+libs/generator.js 
+ - The main meat of the generator, handles all tasks defined in generatorTasks.js. This handles the static generation, the web socket server, and the live reload server.
+
+libs/swig_filters.js 
+ - Defines all additional swig filters that are available in the swig templates.
+
+libs/swig_functions.js 
+ - Defines all additional swig functions that are available in the swig templates.
+
+libs/swig_tags.js 
+ - Not used, please do not modify.
+
+libs/utils.js 
+ - Contains generic utility functions shared between files.
+
+libs/scaffolding_*.html 
+ - The templates used to generate scaffolding for new types.
+
+libs/debug404.html 
+ - The 404 page shown on the local development server.
+
+libs/widgets/*.html 
+ - The template used to generate scaffolding for a specific widget. If the file <widgetname>.html is defined, then its contents are used when generating scaffolding, otherwise scaffolding defaults to {{ item.propertyname }}.
+```
 
 ### Submitting Pull Requests
 
