@@ -7,7 +7,7 @@
     "url": "git://github.com/webhook/webhook-generate.git"
   },
   "author": "Webhook",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/webhook/webhook-generate/issues"
   },

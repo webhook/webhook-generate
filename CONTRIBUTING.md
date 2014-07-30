@@ -28,55 +28,81 @@ Goes without saying you'll need to have Node, Grunt and Webhook installed to wor
 
 Running `wh init` will create a pages and templates folder. You do not want to commit any of these files. Most importantly don't commit the `cms.html` file we generate. They are added simply so you can run things locally.
 
-### Description of Files
-
-Here is a description of the various files that are in the generator repo, and what their purpose is:
-
-```
-Gruntfile.js 
- - The main gruntfile, should never change, imports the generator specific gruntfile. Is blank to allow for easy customization by users
-
-tasks/generatorTasks.js 
- - Where all the of the webhook generator specific tasks are defined.
-
-options/generatorOptions.js 
- - Where all the options for the generator specific tasks are defined.
-
-pages, static, templates folders 
- - Contains some default pages that are used to bootstrap the clients website when first created. Generally should not need changing.
-
-libs folder 
- - The folder that contains all the executing code for the generator, can not be edited by local clients.
-
-libs/generator.js 
- - The main meat of the generator, handles all tasks defined in generatorTasks.js. This handles the static generation, the web socket server, and the live reload server.
-
-libs/swig_filters.js 
- - Defines all additional swig filters that are available in the swig templates.
-
-libs/swig_functions.js 
- - Defines all additional swig functions that are available in the swig templates.
-
-libs/swig_tags.js 
- - Not used, please do not modify.
-
-libs/utils.js 
- - Contains generic utility functions shared between files.
-
-libs/scaffolding_*.html 
- - The templates used to generate scaffolding for new types.
-
-libs/debug404.html 
- - The 404 page shown on the local development server.
-
-libs/widgets/*.html 
- - The template used to generate scaffolding for a specific widget. If the file <widgetname>.html is defined, then its contents are used when generating scaffolding, otherwise scaffolding defaults to {{ item.propertyname }}.
-```
-
 ### Submitting Pull Requests
 
 Please do the following when submitting a pull request:
 
 1. Please create a corresponding issue for the pull request.
-2. Please name the issue as eitehr a feature addition or a bug fix.
+2. Please name the issue as either a feature addition or a bug fix.
 3. Please reference an issues in your pull requests.
+
+### Description of Files
+
+Here is a description of the various files that are in the generator repo, and what their purpose is:
+
+### Primary Grunt tasks
+
+[Gruntfile.js](https://github.com/webhook/webhook-generate/blob/master/Gruntfile.js)
+
+* The main gruntfile.
+* It should never charge.
+* Imports the tasks from /tasks/.
+* Is instaled into new projects blank so that users can add their own Grunt tasks.
+
+[tasks/generatorTasks.js](https://github.com/webhook/webhook-generate/blob/master/tasks/generatorTasks.js)
+
+* Contains the main grunt tasks run by the generator
+* Taks include watching for changes, building scaffolding and building the site.
+
+[options/generatorOptions.js](https://github.com/webhook/webhook-generate/blob/master/options/generatorOptions.js)
+
+* Defines the options for the tasks defined above.
+
+pages, static, templates folders
+
+* Houses the static assets and templates that are installed in a fresh Webhook site.
+* These files are often overwritten by themes or later modified by users. In that sense they are pure boilerplate.
+
+#### libs
+
+The libs folder contains all the executing code for the generator. It can not be edited by local clients.
+
+[libs/generator.js](https://github.com/webhook/webhook-generate/blob/master/libs/generator.js)
+
+* Handles all tasks defined in generatorTasks.js.
+* Handles static generation, the web socket server, and the live reload server.
+
+[libs/swig_filters.js](https://github.com/webhook/webhook-generate/blob/master/libs/swig_filters.js)
+
+* Adds Webhook specific [Swig JS](http://paularmstrong.github.io/swig/) filters.
+* You can see documentation for them [here](http://www.webhook.com/docs/template-rules-and-filters/).
+
+[libs/swig_functions.js](https://github.com/webhook/webhook-generate/blob/master/libs/swig_functions.js)
+
+* Adds Webhook specific [Swig JS](http://paularmstrong.github.io/swig/) functions.
+* You can see documentation for them [here](http://www.webhook.com/docs/template-rules-and-filters/).
+
+[libs/swig_tags.js](https://github.com/webhook/webhook-generate/blob/master/libs/swig_tags.js)
+
+* Not used, please do not modify.
+
+[libs/utils.js ](https://github.com/webhook/webhook-generate/blob/master/libs/utils.js)
+
+Contains generic utility functions shared between files.
+
+[libs/scaffolding_*.html](https://github.com/webhook/webhook-generate/tree/master/libs)
+
+* Templates generated when a user creates a new content type in the CMS.
+* Usually contains a forloop that loads the individual widgets or fields in the form.
+
+[libs/widgets/*.html](https://github.com/webhook/webhook-generate/tree/master/libs/widgets)
+
+* The templates used in scaffolding for each field/property the user adds to their content-type form.
+* If the file <widgetname>.html is not defined, then the scaffolding simply spits out {{ item.propertyname }}.
+
+[libs/debug404.html ](https://github.com/webhook/webhook-generate/blob/master/libs/debug404.html)
+
+* The 404 page shown on the local development server.
+* On the live server, the `pages/404.html` page is used instead, which is stylable.
+
+
