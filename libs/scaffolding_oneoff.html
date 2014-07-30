@@ -16,6 +16,7 @@
 {# http://www.webhook.com/docs/template-inheritance-blocks/ #}
 {% extends "templates/partials/base.html" %}
 
+{# You can copy/paste this line to any page on your site to access the <%- typeName %> data. #}
 {% set item = get('<%- typeName %>') %}
 
 {# This sets our page <title>. It will append this <%- typeName %>'s name to the site title defined in base.html #}
