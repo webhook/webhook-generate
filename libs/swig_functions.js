@@ -270,6 +270,18 @@ module.exports.swigFunctions = function(swig) {
     return array[index];
   };
 
+  var merge = function() {
+    var arrs = [].slice.call(arguments, 0);
+
+    var newArr = [];
+
+    arrs.forEach(function(arr) {
+      newArr = newArr.concat(arr);
+    })
+
+    return newArr;
+  }
+
   // FUNCTIONS USED FOR PAGINATION HELPING, IGNORE FOR MOST CASES
   this.shouldPaginate = function() {
     return self.curPage <= self.maxPage;
@@ -308,7 +320,8 @@ module.exports.swigFunctions = function(swig) {
       getCurrentUrl: getCurrentUrl,
       getSetting: getSetting,
       random: randomElement,
-      cmsVersion: 'v2'
+      cmsVersion: 'v2',
+      merge: merge
     };
   };
 
