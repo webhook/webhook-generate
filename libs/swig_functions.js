@@ -189,7 +189,13 @@ module.exports.swigFunctions = function(swig) {
       tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
 
       // convert it into an array
-      tempData = _.map(tempData, function(value, key) { value._id = key; value._type = name; if(value.name) value.slug = slugger(value.name).toLowerCase(); return value });
+      tempData = _.map(tempData, function(value, key) { 
+        value._id = key; 
+        value._type = name; 
+        if(value.name && !value.slug) 
+          value.slug = slugger(value.name).toLowerCase(); 
+        return value 
+      });
       tempData = _.filter(tempData, function(item) { 
         if(!item.publish_date) {
           return false;

@@ -17,6 +17,7 @@ var slug = require('uslug');
 var async = require('async');
 var spawn = require('win-spawn');
 var md5 = require('MD5');
+var moment = require('moment');
 
 require('colors');
 
@@ -473,6 +474,54 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   };
 
+
+  // Handle custom type path here
+  // Basically, if there is a custom path defined, throw out newPath and construct it from base
+  // newPath should be ./.build/<typename> so repace newPath.split('/')[2] with new thing
+
+  // Support dates in the url and the typename
+  // All refer to the publish date of the item
+  // #Y - Year Full
+  // #y - Year last two digits
+  // #m - Month number, leading zero
+  // #n - Month number, no leading zero
+  // #F - Month name full (january, october, etc)
+  // #M - Month short name (jan, oct, etc)
+  // #d - Day leading zero
+  // #j - Day, no leading zero
+  // #T - The typename (e.g. articles)
+  var parseCustomUrl = function(url, object) {
+    var publishDate = moment(object.publish_date);
+
+    function replacer(match, timeIdent, offset, string){
+      if(timeIdent === 'Y') {
+        return moment.format('YYYY').toLowerCase();
+      } else if (timeIdent === 'y') {
+        return moment.format('YY').toLowerCase();
+      } else if (timeIdent === 'm') {
+        return moment.format('MM').toLowerCase();
+      } else if (timeIdent === 'n') {
+        return moment.format('M').toLowerCase();
+      } else if (timeIdent === 'F') {
+        return moment.format('MMMM').toLowerCase();
+      } else if (timeIdent === 'M') {
+        return moment.format('MMM').toLowerCase();
+      } else if (timeIdent === 'd') {
+        return moment.format('DD').toLowerCase();
+      } else if (timeIdent === 'j') {
+        return moment.format('D').toLowerCase();
+      } else if (timeIdent === 'T') {
+        return object._type.toLowerCase();
+      } else {
+        return match;
+      }
+    }
+
+    url = url.replace(/#(\w)/, replacer);
+
+    return url;
+  }
+
   /**
    * Renders all templates in the /templates directory to the build directory
    * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
@@ -495,6 +544,7 @@ module.exports.generator = function (config, logger, fileParser) {
             // Here we try and abstract out the content type name from directory structure
             var baseName = path.basename(file, '.html');
             var newPath = path.dirname(file).replace('templates', './.build').split('/').slice(0,3).join('/');
+
             var pathParts = path.dirname(file).split('/');
             var objectName = pathParts[1];
             var items = data[objectName];
@@ -540,6 +590,14 @@ module.exports.generator = function (config, logger, fileParser) {
             if(baseName === 'list')
             {
 
+              if(typeInfo.customUrls[objectName]) {
+                var customPathParts = newPath.split('/');
+
+                customPathParts[2] = typeInfo.customUrls[objectName].listUrl;
+
+                newPath = customPathParts.join('/');
+              }
+
               newPath = newPath + '/index.html';
               writeTemplate(file, newPath);
 
@@ -547,6 +605,7 @@ module.exports.generator = function (config, logger, fileParser) {
               // Output should be path + id + '/index.html'
               // Should pass in object as 'item'
               baseNewPath = newPath;
+              var previewPath = baseNewPath.replace('./.build', './.build/_wh_previews');
 
               // TODO: Check to make sure file does not exist yet, and then adjust slug if it does? (how to handle in swig functions)
               for(var key in publishedItems)
@@ -557,7 +616,17 @@ module.exports.generator = function (config, logger, fileParser) {
                   overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
-                newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/index.html';
+                if(typeInfo.customUrls[objectName]) {
+                  var customPathParts = baseNewPath.split('/');
+
+                  customPathParts[2] = parseCustomUrl(typeInfo.customUrls[objectName].individualUrl, val);
+
+                  baseNewPath = customPathParts.join('/');
+                }
+
+                var slug = val.slug ? val.slug : slug(val.name).toLowerCase();
+
+                newPath = baseNewPath + '/' + slug+ '/index.html';
 
                 if(fs.existsSync(overrideFile)) {
                   writeTemplate(overrideFile, newPath, { item: val });
@@ -566,7 +635,6 @@ module.exports.generator = function (config, logger, fileParser) {
                 }
               }
 
-              var previewPath = baseNewPath.replace('./.build', './.build/_wh_previews');
               for(var key in items)
               {
                 var val = items[key];
@@ -593,7 +661,16 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = publishedItems[key];
 
-                newPath = baseNewPath + '/' + slug(val.name).toLowerCase() + '/' + middlePathName + '/index.html';
+                if(typeInfo.customUrls[objectName]) {
+                  var customPathParts = baseNewPath.split('/');
+
+                  customPathParts[2] = parseCustomUrl(typeInfo.customUrls[objectName].individualUrl, val);
+
+                  baseNewPath = customPathParts.join('/');
+                }
+
+                var slug = val.slug ? val.slug : slug(val.name).toLowerCase();
+                newPath = baseNewPath + '/' + slug + '/' + middlePathName + '/index.html';
                 writeTemplate(file, newPath, { item: val });
               }
             }
