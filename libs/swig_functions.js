@@ -307,10 +307,10 @@ module.exports.swigFunctions = function(swig) {
     var nextItem = null;
     var previousItem = null;
 
-    items.forEach(function(itm) {
+    items.some(function(itm) {
       if(previousItem && previousItem.name == item.name) {
-        nextItem = item;
-        return false;
+        nextItem = itm;
+        return true;
       }
 
       previousItem = itm;
@@ -330,10 +330,10 @@ module.exports.swigFunctions = function(swig) {
     var returnItem = null;
     var previousItem = null;
 
-    items.forEach(function(itm) {
+    items.some(function(itm) {
       if(itm.name == item.name) {
         returnItem = previousItem;
-        return false;
+        return true;
       }
 
       previousItem = itm;
