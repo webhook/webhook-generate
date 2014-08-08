@@ -590,7 +590,7 @@ module.exports.generator = function (config, logger, fileParser) {
             if(baseName === 'list')
             {
 
-              if(typeInfo.customUrls[objectName]) {
+              if(typeInfo.customUrls && typeInfo.customUrls[objectName]) {
                 var customPathParts = newPath.split('/');
 
                 customPathParts[2] = typeInfo.customUrls[objectName].listUrl;
@@ -616,7 +616,7 @@ module.exports.generator = function (config, logger, fileParser) {
                   overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
-                if(typeInfo.customUrls[objectName]) {
+                if(typeInfo.customUrls && typeInfo.customUrls[objectName]) {
                   var customPathParts = baseNewPath.split('/');
 
                   customPathParts[2] = parseCustomUrl(typeInfo.customUrls[objectName].individualUrl, val);
@@ -624,9 +624,9 @@ module.exports.generator = function (config, logger, fileParser) {
                   baseNewPath = customPathParts.join('/');
                 }
 
-                var slug = val.slug ? val.slug : slug(val.name).toLowerCase();
+                var tmpSlug = val.slug ? val.slug : slug(val.name).toLowerCase();
 
-                newPath = baseNewPath + '/' + slug+ '/index.html';
+                newPath = baseNewPath + '/' + tmpSlug + '/index.html';
 
                 if(fs.existsSync(overrideFile)) {
                   writeTemplate(overrideFile, newPath, { item: val });
@@ -661,7 +661,7 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = publishedItems[key];
 
-                if(typeInfo.customUrls[objectName]) {
+                if(typeInfo.customUrls && typeInfo.customUrls[objectName]) {
                   var customPathParts = baseNewPath.split('/');
 
                   customPathParts[2] = parseCustomUrl(typeInfo.customUrls[objectName].individualUrl, val);
@@ -669,8 +669,8 @@ module.exports.generator = function (config, logger, fileParser) {
                   baseNewPath = customPathParts.join('/');
                 }
 
-                var slug = val.slug ? val.slug : slug(val.name).toLowerCase();
-                newPath = baseNewPath + '/' + slug + '/' + middlePathName + '/index.html';
+                var tmpSlug = val.slug ? val.slug : slug(val.name).toLowerCase();
+                newPath = baseNewPath + '/' + tmpSlug + '/' + middlePathName + '/index.html';
                 writeTemplate(file, newPath, { item: val });
               }
             }
