@@ -276,6 +276,72 @@ module.exports.swigFunctions = function(swig) {
     return array[index];
   };
 
+  var sortItems = function(input, property, reverse) {
+
+    if(_.size(input) === 0) {
+      return input;
+    }
+
+    var first = input[0];
+    var sortProperty = '_sort_' + property;
+
+    if(first[sortProperty]) {
+      property = sortProperty;
+    }
+
+    if(reverse) {
+      return _.sortBy(input, property).reverse();
+    }
+    
+    return _.sortBy(input, property)
+  };
+
+  var nextItem = function(item, sort_name, reverse_sort) {
+    var type = item._type;
+    var items = getCombined(type);
+
+    if(sort_name) {
+      items = sortItems(items, sort_name, reverse_sort);
+    }
+
+    var nextItem = null;
+    var previousItem = null;
+
+    items.forEach(function(itm) {
+      if(previousItem && previousItem.name == item.name) {
+        nextItem = item;
+        return false;
+      }
+
+      previousItem = itm;
+    });
+
+    return nextItem;
+  };
+
+  var prevItem = function(item, sort_name, reverse_sort) {
+    var type = item._type;
+    var items = getCombined(type);
+
+    if(sort_name) {
+      items = sortItems(items, sort_name, reverse_sort);
+    }
+
+    var returnItem = null;
+    var previousItem = null;
+
+    items.forEach(function(itm) {
+      if(itm.name == item.name) {
+        returnItem = previousItem;
+        return false;
+      }
+
+      previousItem = itm;
+    });
+
+    return returnItem;
+  };
+
   var merge = function() {
     var arrs = [].slice.call(arguments, 0);
 
@@ -327,7 +393,9 @@ module.exports.swigFunctions = function(swig) {
       getSetting: getSetting,
       random: randomElement,
       cmsVersion: 'v2',
-      merge: merge
+      merge: merge,
+      nextItem: nextItem,
+      prevItem: prevItem
     };
   };
 
