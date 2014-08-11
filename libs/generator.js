@@ -590,10 +590,10 @@ module.exports.generator = function (config, logger, fileParser) {
             if(baseName === 'list')
             {
 
-              if(typeInfo.customUrls && typeInfo.customUrls[objectName]) {
+              if(typeInfo[objectName].customUrls) {
                 var customPathParts = newPath.split('/');
 
-                customPathParts[2] = typeInfo.customUrls[objectName].listUrl;
+                customPathParts[2] = typeInfo[objectName].customUrls.listUrl;
 
                 newPath = customPathParts.join('/');
               }
@@ -616,10 +616,10 @@ module.exports.generator = function (config, logger, fileParser) {
                   overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
-                if(typeInfo.customUrls && typeInfo.customUrls[objectName]) {
+                if(typeInfo[objectName].customUrls) {
                   var customPathParts = baseNewPath.split('/');
 
-                  customPathParts[2] = parseCustomUrl(typeInfo.customUrls[objectName].individualUrl, val);
+                  customPathParts[2] = parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val);
 
                   baseNewPath = customPathParts.join('/');
                 }
@@ -661,10 +661,10 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = publishedItems[key];
 
-                if(typeInfo.customUrls && typeInfo.customUrls[objectName]) {
+                if(typeInfo[objectName].customUrls) {
                   var customPathParts = baseNewPath.split('/');
 
-                  customPathParts[2] = parseCustomUrl(typeInfo.customUrls[objectName].individualUrl, val);
+                  customPathParts[2] = parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val);
 
                   baseNewPath = customPathParts.join('/');
                 }
