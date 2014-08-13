@@ -36,7 +36,7 @@ module.exports.swigFunctions = function(swig) {
     var prefix = object._type ? object._type : '';
 
     if(object._type) {
-      if(self.typeInfo[object._type].customUrls &&  self.typeInfo[object.slug].customUrls.individualUrl) {
+      if(self.typeInfo[object._type].customUrls &&  self.typeInfo[object._type].customUrls.individualUrl) {
         prefix = utils.parseCustomUrl(self.typeInfo[object._type].customUrls.individualUrl, object);
       }
     } else {
