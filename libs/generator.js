@@ -17,7 +17,6 @@ var slug = require('uslug');
 var async = require('async');
 var spawn = require('win-spawn');
 var md5 = require('MD5');
-var moment = require('moment');
 
 require('colors');
 
