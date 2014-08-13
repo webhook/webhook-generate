@@ -73,7 +73,7 @@ Function = wrap;
 module.exports.generator = function (config, logger, fileParser) {
 
   var self = this;
-  var firebaseUrl = 'webhook';
+  var firebaseUrl = config.get('webhook').firebase || 'webhook';
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
   var websocket = null;
   var strictMode = false;
@@ -372,7 +372,7 @@ module.exports.generator = function (config, logger, fileParser) {
       wrench.rmdirSyncRecursive('.static-old');
 
       fs.unlinkSync('.reset.zip');
-      self.init(config.get('webhook').siteName, config.get('webhook').secretKey, true, function() {
+      self.init(config.get('webhook').siteName, config.get('webhook').secretKey, true, config.get('webhook').firebase, function() {
         callback();
       });
     });
@@ -1026,11 +1026,15 @@ module.exports.generator = function (config, logger, fileParser) {
    * @param  {Boolean}   copyCms   True if the CMS should be overwritten, false otherwise
    * @param  {Function}  done      Callback to call when operation is done
    */
-  this.init = function(sitename, secretkey, copyCms, done) {
+  this.init = function(sitename, secretkey, copyCms, firebase, done) {
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
 
+    if(firebase) {
+      confFile = fs.readFileSync('./libs/.firebase-custom.conf.jst');
+    }
+
     // TODO: Grab bucket information from server eventually, for now just use the site name
-    var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename });
+    var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename, firebase: firebase });
 
     fs.writeFileSync('./.firebase.conf', templated);
 

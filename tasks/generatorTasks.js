@@ -122,8 +122,9 @@ module.exports = function(grunt) {
     var sitename = grunt.option('sitename');
     var secretkey = grunt.option('secretkey');
     var copyCms = grunt.option('copycms');
+    var firebase = grunt.option('firebase');
 
-    generator.init(sitename, secretkey, copyCms, done);
+    generator.init(sitename, secretkey, copyCms, firebase, done);
   });
 
   // Check if initialized properly before running all these tasks
