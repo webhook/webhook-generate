@@ -69,3 +69,50 @@ module.exports.slice = function(data, limit, offset) {
 module.exports.each = function(obj, cb) {
   _.each(obj, cb);
 };
+
+// Handle custom type path here
+// Basically, if there is a custom path defined, throw out newPath and construct it from base
+// newPath should be ./.build/<typename> so repace newPath.split('/')[2] with new thing
+
+// Support dates in the url and the typename
+// All refer to the publish date of the item
+// #Y - Year Full
+// #y - Year last two digits
+// #m - Month number, leading zero
+// #n - Month number, no leading zero
+// #F - Month name full (january, october, etc)
+// #M - Month short name (jan, oct, etc)
+// #d - Day leading zero
+// #j - Day, no leading zero
+// #T - The typename (e.g. articles)
+module.exports.parseCustomUrl = function(url, object) {
+    var publishDate = moment(object.publish_date);
+
+    function replacer(match, timeIdent, offset, string){
+      if(timeIdent === 'Y') {
+        return moment.format('YYYY').toLowerCase();
+      } else if (timeIdent === 'y') {
+        return moment.format('YY').toLowerCase();
+      } else if (timeIdent === 'm') {
+        return moment.format('MM').toLowerCase();
+      } else if (timeIdent === 'n') {
+        return moment.format('M').toLowerCase();
+      } else if (timeIdent === 'F') {
+        return moment.format('MMMM').toLowerCase();
+      } else if (timeIdent === 'M') {
+        return moment.format('MMM').toLowerCase();
+      } else if (timeIdent === 'd') {
+        return moment.format('DD').toLowerCase();
+      } else if (timeIdent === 'j') {
+        return moment.format('D').toLowerCase();
+      } else if (timeIdent === 'T') {
+        return object._type.toLowerCase();
+      } else {
+        return match;
+      }
+    }
+
+    url = url.replace(/#(\w)/, replacer);
+
+    return url;
+  }
