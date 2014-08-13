@@ -1,8 +1,8 @@
 'use strict';
 
 var _ = require('lodash');
-
 var moment = require('moment');
+
 /**
  * Extends source dictionaries into the target dictionary
  * @param  {Object}   target        Target to extend into
