@@ -32,6 +32,10 @@ module.exports.swigFunctions = function(swig) {
    * @returns {String}   Url for the object passed in
    */
   var url = function(object) {
+    if(typeof object === 'string') {
+      object = { slug: object, name: object };
+    }
+
     var slug = object.slug ? object.slug : (object.name ? slugger(object.name).toLowerCase() : null);
     var prefix = object._type ? object._type : '';
 
