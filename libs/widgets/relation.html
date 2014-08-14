@@ -3,7 +3,7 @@
 <% if(controlInfo.meta ? controlInfo.meta.isSingle : false) { %>
 {% set relation = getItem(<%- value %>) %}
 {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
-<a href="{{ url(rel) }}">{{ rel.name }}</a>
+<a href="{{ url(relation) }}">{{ relation.name }}</a>
 <% } else { %>
 {% for relation in getItems(<%- value %>) %}
   {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
