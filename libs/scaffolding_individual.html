@@ -21,7 +21,7 @@
 
 {% block content %}
 
-  <p><a href="/<%- typeName %>/">View a list of all <%- typeName %></a></p>
+  <p><a href="{{ url('<%- typeName %>') }}">View a list of all <%- typeName %></a></p>
 
   <h1>{{ item.name }}</h1>
 
