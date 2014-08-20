@@ -1,0 +1,79 @@
+{# ------------------------------------------------------- #}
+
+{# YOUR BASE TEMPLATE. EVERYTHING GETS LOADED INTO THIS PAGE. #}
+
+{# Webhook uses the SWIG.js (like Djagno/Twig) templating system. Their documentation is here: #}
+{# http://paularmstrong.github.io/swig/docs/tags/ #}
+
+{# Learn about calling data into Webhook pages here: #}
+{# http://www.webhook.com/docs/template-rules-and-filters/ #}
+
+{# ------------------------------------------------------- #}
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+  {# Grab the title and description from the CMS general settings. #}
+  {% set site_title = getSetting('site_name')%}
+  {% set site_description = getSetting('site_description')%}
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{% block title %}{{ site_title|default('Webhook site') }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{{ site_description|default('Built with Webhook.') }}{% endblock %}">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+    <link rel="apple-touch-icon icon-precomposed" href="/static/images/apple-touch-icon.png"/>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.0/normalize.min.css">
+
+    {# Put your CSS in here and we'll minify it into one file. No CDN scripts. More info: #}
+    {# http://www.webhook.com/docs/minify-your-js-and-css/ #}
+
+    <!-- build:css /static/css/minified.css -->
+    <link rel="stylesheet" href="/static/css/main.css"/>
+    <link rel="stylesheet" href="/static/css/wysiwyg_figures.css"/>
+    <!-- endbuild -->
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
+
+    {# Useful block for loading outside scripts in other pages. #}
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    {% block body %}
+      <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+      <![endif]-->
+
+      {% include "templates/partials/header.html" %}
+
+      {# By default, your inner pages will load into this block. #}
+      {% block content %}{% endblock %}
+
+      {% include "templates/partials/footer.html" %}
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+      {# Put your JS in here and we'll minify it into one file. No CDN scripts. More info: #}
+      {# http://www.webhook.com/docs/minify-your-js-and-css/ #}
+
+      <!-- build:js /static/javascript/minified.js -->
+      <script src="/static/javascript/main.js"></script>
+      <!-- endbuild -->
+
+      {# Google Analytics code. Feel free to remove. #}
+      <script>
+        var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+        g.src='//www.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g,s)}(document,'script'));
+      </script>
+    {% endblock %}
+  </body>
+</html>
