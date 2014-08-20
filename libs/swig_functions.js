@@ -175,6 +175,30 @@ module.exports.swigFunctions = function(swig) {
     return items;
   }
 
+  var generatedSlugs = {};
+  var generateSlug = function(value) {
+    if(!generatedSlugs[value._type]) {
+      generatedSlugs[value._type] = {};
+    }
+
+    if(value.slug) {
+      generatedSlugs[value._type][value.slug] = true;
+      return value.slug;
+    }
+
+    var tmpSlug = slugger(value.name).toLowerCase();
+
+    var no = 2;
+    while(generatedSlugs[value._type][tmpSlug]) {
+      tmpSlug = slugger(value.name).toLowerCase() + '_' + no;
+      no++;
+    }
+
+    generatedSlugs[value._type][tmpSlug] = true;
+
+    return tmpSlug;
+  }
+
   /**
    * Returns all the data specified by the arguments
    * @param    {String} Name of type to retrieve data for
@@ -191,6 +215,7 @@ module.exports.swigFunctions = function(swig) {
 
     // TODO, SLUG NAME THE SAME WAS CMS DOES
 
+    generatedSlugs = {};
     var data = [];
     names.forEach(function(name) {
       var tempData = self.data[name] || {};
@@ -202,13 +227,19 @@ module.exports.swigFunctions = function(swig) {
 
       tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
 
+      var no = 1;
       // convert it into an array
       tempData = _.map(tempData, function(value, key) { 
+        var tmpSlug = "";
+
         value._id = key; 
         value._type = name; 
-        if(value.name && !value.slug) 
-          value.slug = slugger(value.name).toLowerCase(); 
-        return value 
+
+        if(value.name)  {
+          value.slug = generateSlug(value); 
+        }
+
+        return value;
       });
       tempData = _.filter(tempData, function(item) { 
         if(!item.publish_date) {
@@ -322,7 +353,7 @@ module.exports.swigFunctions = function(swig) {
     var previousItem = null;
 
     items.some(function(itm) {
-      if(previousItem && previousItem.name == item.name) {
+      if(previousItem && previousItem._id == item._id) {
         nextItem = itm;
         return true;
       }
@@ -345,7 +376,7 @@ module.exports.swigFunctions = function(swig) {
     var previousItem = null;
 
     items.some(function(itm) {
-      if(itm.name == item.name) {
+      if(itm._id == item._id) {
         returnItem = previousItem;
         return true;
       }
