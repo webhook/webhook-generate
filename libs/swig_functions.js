@@ -492,6 +492,9 @@ module.exports.swigFunctions = function(swig) {
       getItem: function(holder) {
         return holder;
       },
+      _realGetItem: function(type, key) {
+        return getItem(type, key);
+      },
       getItems: function(holder) {
         return holder;
       },

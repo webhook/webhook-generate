@@ -207,6 +207,10 @@ module.exports.generator = function (config, logger, fileParser) {
     var outputUrl = outFile.replace('index.html', '').replace('./.build', '');
     swigFunctions.setParams({ CURRENT_URL: outputUrl });
 
+    if(params.item) {
+      params.item = params._realGetItem(item._type, item._id);
+    }
+
     try {
       var output = swig.renderFile(inFile, params);
     } catch (e) {
