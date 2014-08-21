@@ -25,9 +25,6 @@
 
   <p><a href="/cms/">Looking for the CMS?</a></p>
 
-  {# Grabs the data to list all the content types (set as multiple) from the CMS. #}
-  {% set types = getTypes(true) %}
-
   {# If you have at least content page type, we show a list. #}
   {% if types|size !== 0 %}
 

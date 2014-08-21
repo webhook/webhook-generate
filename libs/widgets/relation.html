@@ -1,11 +1,10 @@
 {# Relations require some special code. More info about relations here: #}
 {# http://www.webhook.com/docs/template-rules-and-filters/#getitem #}
 <% if(controlInfo.meta ? controlInfo.meta.isSingle : false) { %>
-{% set relation = getItem(<%- value %>) %}
 {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
-<a href="{{ url(relation) }}">{{ relation.name }}</a>
+<a href="{{ url(relation) }}">{{ <%- value %>.name }}</a>
 <% } else { %>
-{% for relation in getItems(<%- value %>) %}
+{% for relation in <%- value %> %}
   {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
   <a href="{{ url(relation) }}">{{ relation.name }}</a>{% if not loop.last %},{% endif %}
 {% endfor %}
