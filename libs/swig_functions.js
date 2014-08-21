@@ -256,13 +256,6 @@ module.exports.swigFunctions = function(swig) {
     names.forEach(function(name) {
       var tempData = self.data[name] || {};
 
-      if(self.typeInfo[name] && self.typeInfo[name].oneOff) {
-        data = tempData;
-        return;
-      }
-
-      tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
-
       var relationshipFields = [];
 
       if(self.typeInfo[name] && self.typeInfo[name].controls) {
@@ -272,6 +265,40 @@ module.exports.swigFunctions = function(swig) {
           }
         });
       }
+
+      if(self.typeInfo[name] && self.typeInfo[name].oneOff) {
+        relationshipFields.forEach(function(field) {
+          var desc = Object.getOwnPropertyDescriptor(data, field.name);
+          if(desc && desc.get) { // Don't double dip
+            return;
+          }
+
+          var val = data[field.name];
+
+          if(field.isSingle) {
+            Object.defineProperty(data, field.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                return getItem(val);
+              }
+            });
+          } else {
+            Object.defineProperty(data, field.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                return getItems(val);
+              }
+            });
+          }
+        })
+
+        data = tempData;
+        return;
+      }
+
+      tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
 
       var no = 1;
       // convert it into an array
