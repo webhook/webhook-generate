@@ -161,32 +161,7 @@ module.exports.swigFunctions = function(swig) {
       });
     }
 
-    relationshipFields.forEach(function(field) {
-      var desc = Object.getOwnPropertyDescriptor(item, field.name);
-      if(desc && desc.get) { // Don't double dip
-        return;
-      }
-
-      var val = item[field.name];
-
-      if(field.isSingle) {
-        Object.defineProperty(item, field.name, {
-          enumerable: true,
-          configurable: true,
-          get: function() {
-            return getItem(val);
-          }
-        });
-      } else {
-        Object.defineProperty(item, field.name, {
-          enumerable: true,
-          configurable: true,
-          get: function() {
-            return getItems(val);
-          }
-        });
-      }
-    });
+    item = adjustRelationshipFields(relationshipFields, item);
 
     item._type = type;
     return item;
@@ -237,6 +212,38 @@ module.exports.swigFunctions = function(swig) {
     return tmpSlug;
   }
 
+
+  var adjustRelationshipFields = function(fields, object) {
+    fields.forEach(function(field) {
+      var desc = Object.getOwnPropertyDescriptor(object, field.name);
+      if(desc && desc.get) { // Don't double dip
+        return;
+      }
+
+      var val = object[field.name];
+
+      if(field.isSingle) {
+        Object.defineProperty(object, field.name, {
+          enumerable: true,
+          configurable: true,
+          get: function() {
+            return getItem(val);
+          }
+        });
+      } else {
+        Object.defineProperty(object, field.name, {
+          enumerable: true,
+          configurable: true,
+          get: function() {
+            return getItems(val);
+          }
+        });
+      }
+    });
+
+    return object;
+  }
+
   /**
    * Returns all the data specified by the arguments
    * @param    {String} Name of type to retrieve data for
@@ -256,13 +263,6 @@ module.exports.swigFunctions = function(swig) {
     names.forEach(function(name) {
       var tempData = self.data[name] || {};
 
-      if(self.typeInfo[name] && self.typeInfo[name].oneOff) {
-        data = tempData;
-        return;
-      }
-
-      tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
-
       var relationshipFields = [];
 
       if(self.typeInfo[name] && self.typeInfo[name].controls) {
@@ -272,6 +272,14 @@ module.exports.swigFunctions = function(swig) {
           }
         });
       }
+
+      if(self.typeInfo[name] && self.typeInfo[name].oneOff) {
+        tempData = adjustRelationshipFields(relationshipFields, tempData);
+        data = tempData;
+        return;
+      }
+
+      tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
 
       var no = 1;
       // convert it into an array
@@ -285,32 +293,7 @@ module.exports.swigFunctions = function(swig) {
           value.slug = generateSlug(value); 
         }
 
-        relationshipFields.forEach(function(field) {
-          var desc = Object.getOwnPropertyDescriptor(value, field.name);
-          if(desc && desc.get) { // Don't double dip
-            return;
-          }
-
-          var val = value[field.name];
-
-          if(field.isSingle) {
-            Object.defineProperty(value, field.name, {
-              enumerable: true,
-              configurable: true,
-              get: function() {
-                return getItem(val);
-              }
-            });
-          } else {
-            Object.defineProperty(value, field.name, {
-              enumerable: true,
-              configurable: true,
-              get: function() {
-                return getItems(val);
-              }
-            });
-          }
-        })
+        value = adjustRelationshipFields(relationshipFields, value);
 
         return value;
       });
