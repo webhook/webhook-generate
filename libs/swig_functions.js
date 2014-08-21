@@ -162,10 +162,15 @@ module.exports.swigFunctions = function(swig) {
     }
 
     relationshipFields.forEach(function(field) {
-      var val = item[field];
+      var desc = Object.getOwnPropertyDescriptor(item, field.name);
+      if(desc && desc.get) { // Don't double dip
+        return;
+      }
+
+      var val = item[field.name];
 
       if(field.isSingle) {
-        Object.defineProperty(item, field, {
+        Object.defineProperty(item, field.name, {
           enumerable: true,
           configurable: true,
           get: function() {
@@ -173,7 +178,7 @@ module.exports.swigFunctions = function(swig) {
           }
         });
       } else {
-        Object.defineProperty(item, field, {
+        Object.defineProperty(item, field.name, {
           enumerable: true,
           configurable: true,
           get: function() {
@@ -281,6 +286,11 @@ module.exports.swigFunctions = function(swig) {
         }
 
         relationshipFields.forEach(function(field) {
+          var desc = Object.getOwnPropertyDescriptor(value, field.name);
+          if(desc && desc.get) { // Don't double dip
+            return;
+          }
+
           var val = value[field.name];
 
           if(field.isSingle) {
