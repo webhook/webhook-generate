@@ -26,12 +26,12 @@
   <p><a href="/cms/">Looking for the CMS?</a></p>
 
   {# If you have at least content page type, we show a list. #}
-  {% if types|size !== 0 %}
+  {% if cms_types|size !== 0 %}
 
     <h3>Content types you've created in the CMS so far.</h3>
 
     <ul>
-    {% for type in types %}
+    {% for type in cms_types %}
       <li><a href="{{ url(type) }}">{{ type.name }}</a></li>
     {% endfor %}
     </ul>

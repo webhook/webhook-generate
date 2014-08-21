@@ -542,7 +542,7 @@ module.exports.swigFunctions = function(swig) {
 
     functions['cms'] = cms;
 
-    Object.defineProperty(functions, 'types', {
+    Object.defineProperty(functions, 'cms_types', {
       get: function() { return getTypes() },
       enumerable: true,
       configurable: true
