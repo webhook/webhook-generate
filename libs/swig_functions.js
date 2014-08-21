@@ -528,16 +528,26 @@ module.exports.swigFunctions = function(swig) {
       types.push(type);
     }
 
+    var cms = {};
+
     types.forEach(function(type) {
 
-      Object.defineProperty(functions, type, {
+      Object.defineProperty(cms, type, {
         get: function() { return getCombined(type); },
-        set: function() { throw new Exception("You can not set " + type +  " there is a type with that name."); },
         enumerable: true,
         configurable: true
       })
 
     });
+
+    functions['cms'] = cms;
+
+    Object.defineProperty(function, 'types', {
+      get: function() { return getTypes() },
+      enumerable: true,
+      configurable: true
+    })
+
     return functions;
   };
 
