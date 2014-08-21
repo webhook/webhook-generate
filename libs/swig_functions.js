@@ -151,6 +151,38 @@ module.exports.swigFunctions = function(swig) {
       }
     }
 
+    var relationshipFields = [];
+
+    if(self.typeInfo[type] && self.typeInfo[type].controls) {
+      self.typeInfo[type].controls.forEach(function(control) {
+        if(control.controlType === "relation") {
+          relationshipFields.push({ name: control.name, isSingle: control.meta.isSingle });
+        }
+      });
+    }
+
+    relationshipFields.forEach(function(field) {
+      var val = item[field];
+
+      if(field.isSingle) {
+        Object.defineProperty(item, field, {
+          enumerable: true,
+          configurable: true,
+          get: function() {
+            return getItem(val);
+          }
+        });
+      } else {
+        Object.defineProperty(item, field, {
+          enumerable: true,
+          configurable: true,
+          get: function() {
+            return getItems(val);
+          }
+        });
+      }
+    });
+
     item._type = type;
     return item;
   };
@@ -165,6 +197,7 @@ module.exports.swigFunctions = function(swig) {
       return [];
     }
     var items = [];
+
     arr.forEach(function(itm) {
       var obj = getItem(itm);
       if(!_.isEmpty(obj)) {
@@ -213,8 +246,6 @@ module.exports.swigFunctions = function(swig) {
       return self.cachedData[names.join(',')];
     }
 
-    // TODO, SLUG NAME THE SAME WAS CMS DOES
-
     generatedSlugs = {};
     var data = [];
     names.forEach(function(name) {
@@ -227,6 +258,16 @@ module.exports.swigFunctions = function(swig) {
 
       tempData = _.omit(tempData, function(value, key) { return key.indexOf('_') === 0; });
 
+      var relationshipFields = [];
+
+      if(self.typeInfo[name] && self.typeInfo[name].controls) {
+        self.typeInfo[name].controls.forEach(function(control) {
+          if(control.controlType === "relation") {
+            relationshipFields.push({ name: control.name, isSingle: control.meta.isSingle });
+          }
+        });
+      }
+
       var no = 1;
       // convert it into an array
       tempData = _.map(tempData, function(value, key) { 
@@ -238,6 +279,28 @@ module.exports.swigFunctions = function(swig) {
         if(value.name)  {
           value.slug = generateSlug(value); 
         }
+
+        relationshipFields.forEach(function(field) {
+          var val = value[field.name];
+
+          if(field.isSingle) {
+            Object.defineProperty(value, field.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                return getItem(val);
+              }
+            });
+          } else {
+            Object.defineProperty(value, field.name, {
+              enumerable: true,
+              configurable: true,
+              get: function() {
+                return getItems(val);
+              }
+            });
+          }
+        })
 
         return value;
       });
@@ -424,10 +487,14 @@ module.exports.swigFunctions = function(swig) {
   };
 
   this.getFunctions = function() {
-    return {
+    var functions = {
       get: getCombined,
-      getItem: getItem,
-      getItems: getItems,
+      getItem: function(holder) {
+        return holder;
+      },
+      getItems: function(holder) {
+        return holder;
+      },
       getTypes: getTypes,
       paginate: paginate,
       getCurPage: getCurPage,
@@ -442,6 +509,23 @@ module.exports.swigFunctions = function(swig) {
       nextItem: nextItem,
       prevItem: prevItem
     };
+
+    var types = [];
+    for(var type in self.typeInfo) {
+      types.push(type);
+    }
+
+    types.forEach(function(type) {
+
+      Object.defineProperty(functions, type, {
+        get: function() { return getCombined(type); },
+        set: function() { throw new Exception("You can not set " + type +  " there is a type with that name."); },
+        enumerable: true,
+        configurable: true
+      })
+
+    });
+    return functions;
   };
 
 
