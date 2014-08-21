@@ -19,22 +19,20 @@
 
 {% block content %}
 
-  {# The first thing we do is call <%= typeName %> data from the CMS. #}
-  {% set data = cms.<%= typeName %> %}
-
-  {# Next we sort the data by publish_date. The true bit reverses it so it's newest first. Learn more: #}
+  {# Call data from the CMS on any page by saying cms.contentid. In this case it's cms.<%= typeName %> #}
+  {# While we're at it, let's sort it by publish date, newest first. #}
   {# http://www.webhook.com/docs/template-rules-and-filters/#sortproperty_reverseorder #}
-  {% set data = data|sort('publish_date', true) %}
+  {% set <%= typeName %> = cms.<%= typeName %>|sort('publish_date', true) %}
 
   {# This is how you set pagination. It's always important to do this after your sort. #}
-  {% set data = paginate(data, 5) %}
+  {% set <%= typeName %> = paginate(<%= typeName %>, 5) %}
 
   <h1>List of <%= typeName %></h1>
 
   {# This forloop can use any data from http:localhost:2000/cms/#/form/<%- typeName %>/ #}
   <ul>
-    {% for object in data %}
-      <li><a href="{{ url(object) }}">{{ object.name }}</a></li>
+    {% for item in <%= typeName %> %}
+      <li><a href="{{ url(item) }}">{{ item.name }}</a></li>
     {% endfor %}
   </ul>
 
