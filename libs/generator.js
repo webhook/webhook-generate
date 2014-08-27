@@ -953,6 +953,7 @@ module.exports.generator = function (config, logger, fileParser) {
           ]));
         } else if (message === 'generate_slug:') {
           var name = JSON.parse(message.replace('generate_slug:', ''));
+          console.log(JSON.stringify(slug(name).toLowerCase()));
           sock.send('done:' + JSON.stringify(slug(name).toLowerCase()));
         } else if (message === 'push') {
           pushSite(function(error) {
