@@ -952,7 +952,7 @@ module.exports.generator = function (config, logger, fileParser) {
             'push', 'build', 'preset', 'layouts', 'preset_localv2', 'generate_slug'
           ]));
         } else if (message === 'generate_slug:') {
-          var name = JSON.decode(message.replace('generate_slug:', ''));
+          var name = JSON.parse(message.replace('generate_slug:', ''));
           sock.send('done:' + JSON.stringify(slug(name).toLowerCase()));
         } else if (message === 'push') {
           pushSite(function(error) {
