@@ -364,7 +364,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
       entries.forEach(function(entry) {
         if(entry.entryName.indexOf('pages/') === 0
-           || entry.entryName.indexOf('templates/') === 0 
+           || entry.entryName.indexOf('templates/') === 0
            || entry.entryName.indexOf('static/') === 0) {
           zip.extractEntryTo(entry.entryName, '.', true, true);
         }
@@ -839,7 +839,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
         individualMD5 = md5(template);
         fs.writeFileSync(individual, template);
-        
+
         var lTemplate = _.template(listTemplate, { typeName: name });
 
         listMD5 = md5(lTemplate);
@@ -951,9 +951,8 @@ module.exports.generator = function (config, logger, fileParser) {
             'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
             'push', 'build', 'preset', 'layouts', 'preset_localv2', 'generate_slug'
           ]));
-        } else if (message === 'generate_slug:') {
+        } else if (message.indexOf('generate_slug:') === 0) {
           var name = JSON.parse(message.replace('generate_slug:', ''));
-          console.log(JSON.stringify(slug(name).toLowerCase()));
           sock.send('done:' + JSON.stringify(slug(name).toLowerCase()));
         } else if (message === 'push') {
           pushSite(function(error) {
