@@ -227,6 +227,8 @@ module.exports.swigFunctions = function(swig) {
           enumerable: true,
           configurable: true,
           get: function() {
+            if(!val) return val;
+
             return getItem(val);
           }
         });
@@ -235,6 +237,8 @@ module.exports.swigFunctions = function(swig) {
           enumerable: true,
           configurable: true,
           get: function() {
+            if(!val) return val;
+
             return getItems(val);
           }
         });
