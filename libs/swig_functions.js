@@ -36,18 +36,12 @@ module.exports.swigFunctions = function(swig) {
       object = { slug: object, name: object };
     }
 
-    var slug = object.slug ? object.slug : (object.name ? slugger(object.name).toLowerCase() : null);
-    var prefix = object._type ? object._type : '';
-
-    if(object._type) {
-      if(self.typeInfo[object._type] && self.typeInfo[object._type].customUrls &&  self.typeInfo[object._type].customUrls.individualUrl) {
-        prefix = utils.parseCustomUrl(self.typeInfo[object._type].customUrls.individualUrl, object);
-      }
-    } else {
-      if(self.typeInfo[object.slug] && self.typeInfo[object.slug].customUrls && self.typeInfo[object.slug].customUrls.listUrl) {
-        slug = self.typeInfo[object.slug].customUrls.listUrl;
-      }
+    if(object.slug) {
+      return '/' + object.slug + '/';
     }
+
+    var slug = object.name ? slugger(object.name).toLowerCase() : "";
+    var prefix = object._type ? object._type : '';
 
     var url = '';
     if(prefix) {
@@ -93,7 +87,14 @@ module.exports.swigFunctions = function(swig) {
 
     for(var key in self.typeInfo) {
       if(returnOneOffs || !self.typeInfo[key].oneOff) {
-        types.push({ slug: key, name: self.typeInfo[key].name });
+
+        var slug = key;
+
+        if(self.typeInfo[key] && self.typeInfo[key].customUrls && self.typeInfo[key].customUrls.listUrl) {
+          slug = self.typeInfo[key].customUrls.listUrl;
+        }
+
+        types.push({ slug: slug, name: self.typeInfo[key].name });
       }
     }
 
@@ -295,7 +296,24 @@ module.exports.swigFunctions = function(swig) {
         value._type = name; 
 
         if(value.name)  {
-          value.slug = generateSlug(value); 
+          if(!value.slug) {
+            var tmpSlug = generateSlug(value);
+            var prefix = '';
+
+            if(self.typeInfo[name] && self.typeInfo[name].customUrls && self.typeInfo[name].customUrls.listUrl) {
+              prefix = self.typeInfo[name].customUrls.listUrl + '/';
+            } else {
+              prefix = name + '/';
+            }
+
+            if(self.typeInfo[name] && self.typeInfo[name].customUrls && self.typeInfo[name].customUrls.individualUrl) {
+              prefix += utils.parseCustomUrl(self.typeInfo[name].customUrls.individualUrl, value) + '/';
+            }
+
+            prefix += tmpSlug;
+
+            value.slug = prefix;
+          }
         }
 
         value = adjustRelationshipFields(relationshipFields, value);

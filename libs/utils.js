@@ -91,21 +91,21 @@ module.exports.parseCustomUrl = function(url, object) {
 
     function replacer(match, timeIdent, offset, string){
       if(timeIdent === 'Y') {
-        return moment.format('YYYY').toLowerCase();
+        return publishDate.format('YYYY').toLowerCase();
       } else if (timeIdent === 'y') {
-        return moment.format('YY').toLowerCase();
+        return publishDate.format('YY').toLowerCase();
       } else if (timeIdent === 'm') {
-        return moment.format('MM').toLowerCase();
+        return publishDate.format('MM').toLowerCase();
       } else if (timeIdent === 'n') {
-        return moment.format('M').toLowerCase();
+        return publishDate.format('M').toLowerCase();
       } else if (timeIdent === 'F') {
-        return moment.format('MMMM').toLowerCase();
+        return publishDate.format('MMMM').toLowerCase();
       } else if (timeIdent === 'M') {
-        return moment.format('MMM').toLowerCase();
+        return publishDate.format('MMM').toLowerCase();
       } else if (timeIdent === 'd') {
-        return moment.format('DD').toLowerCase();
+        return publishDate.format('DD').toLowerCase();
       } else if (timeIdent === 'j') {
-        return moment.format('D').toLowerCase();
+        return publishDate.format('D').toLowerCase();
       } else if (timeIdent === 'T') {
         return object._type.toLowerCase();
       } else {

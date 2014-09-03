@@ -565,18 +565,19 @@ module.exports.generator = function (config, logger, fileParser) {
               });
             }
 
+            if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.listUrl) {
+              var customPathParts = newPath.split('/');
+
+              customPathParts[2] = typeInfo[objectName].customUrls.listUrl;
+
+              newPath = customPathParts.join('/');
+            }
+
+            var origNewPath = newPath;
+
             // TODO, DETECT IF FILE ALREADY EXISTS, IF IT DOES APPEND A NUMBER TO IT DUMMY
             if(baseName === 'list')
             {
-
-              if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.listUrl) {
-                var customPathParts = newPath.split('/');
-
-                customPathParts[2] = typeInfo[objectName].customUrls.listUrl;
-
-                newPath = customPathParts.join('/');
-              }
-
               newPath = newPath + '/index.html';
               writeTemplate(file, newPath);
 
@@ -595,19 +596,26 @@ module.exports.generator = function (config, logger, fileParser) {
                   overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
-                if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
-                  var customPathParts = baseNewPath.split('/');
-
-                  customPathParts[2] = utils.parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val);
-
-                  baseNewPath = customPathParts.join('/');
+                var addSlug = true;
+                if(val.slug) {
+                  baseNewPath = '.build/' + val.slug + '/';
+                  addSlug = false;
+                } else {
+                  if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
+                    baseNewPath = origNewPath + '/' + utils.parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val) + '/';
+                  }                  
                 }
 
                 var tmpSlug = generateSlug(val);
 
                 val.slug = tmpSlug;
 
-                newPath = baseNewPath + '/' + tmpSlug + '/index.html';
+                if(addSlug) {
+                  val.slug = baseNewPath.replace('./.build/', '') + tmpSlug;
+                  newPath = baseNewPath + '/' + tmpSlug + '/index.html';
+                } else {
+                  newPath = baseNewPath + '/index.html';
+                }
 
                 if(fs.existsSync(overrideFile)) {
                   writeTemplate(overrideFile, newPath, { item: val });
@@ -642,17 +650,23 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = publishedItems[key];
 
-                if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
-                  var customPathParts = baseNewPath.split('/');
-
-                  customPathParts[2] = utils.parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val);
-
-                  baseNewPath = customPathParts.join('/');
+                var addSlug = true;
+                if(val.slug) {
+                  baseNewPath = '.build/' + val.slug + '/';
+                  addSlug = false;
+                } else {
+                  if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
+                    baseNewPath = origNewPath + '/' + utils.parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val) + '/';
+                  }                  
                 }
 
                 var tmpSlug = generateSlug(val);
 
-                val.slug = tmpSlug;
+                if(addSlug) {
+                  newPath = baseNewPath + '/' + tmpSlug + '/index.html';
+                } else {
+                  newPath = baseNewPath + '/index.html';
+                }
 
                 newPath = baseNewPath + '/' + tmpSlug + '/' + middlePathName + '/index.html';
                 writeTemplate(file, newPath, { item: val });
