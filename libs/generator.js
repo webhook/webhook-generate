@@ -109,6 +109,19 @@ module.exports.generator = function (config, logger, fileParser) {
     return self.root.child('management/sites/' + config.get('webhook').siteName + '/dns');
   };
 
+
+  var getTypeData = function(type, callback) {
+    getBucket().child('contentType').child(type).once('value', function(data) {
+      callback(type);
+    });
+  }
+
+  var getItem = function(id, callback) {
+    getBucket().child('data').child(type).child(id).once('value', function(data) {
+      callback(type);
+    });
+  }
+
   /**
    * Retrieves snapshot of data from Firebase
    * @param  {Function}   callback   Callback function to run after data is retrieved, is sent the snapshot
@@ -963,11 +976,35 @@ module.exports.generator = function (config, logger, fileParser) {
         } else if (message === 'supported_messages') {
           sock.send('done:' + JSON.stringify([
             'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
-            'push', 'build', 'preset', 'layouts', 'preset_localv2', 'generate_slug'
+            'push', 'build', 'preset', 'layouts', 'preset_localv2', 'generate_slug_v2'
           ]));
-        } else if (message.indexOf('generate_slug:') === 0) {
-          var name = JSON.parse(message.replace('generate_slug:', ''));
-          sock.send('done:' + JSON.stringify(slug(name).toLowerCase()));
+        } else if (message.indexOf('generate_slug_v2:') === 0) {
+          var obj = JSON.parse(message.replace('generate_slug_v2:', ''));
+          var id = obj.id;
+          var type = obj.type;
+
+          getItem(id, type, function(item) {
+            getTypeData(type, function(typeInfo) {
+              var tmpSlug = '';
+              if(item.slug) {
+                tmpSlug = item.slug;
+              } else {
+                tmpSlug = slug(item.name).toLowerCase();
+
+                if(tmpSlug && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
+                  tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl) + '/' + tmpSlug;
+                } 
+
+                if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.listUrl) {
+                  tmpSlug = typeInfo.customUrls.listUrl + '/' + tmpSlug;
+                } else {
+                  tmpSlug = type + '/' + tmpSlug;
+                }
+              }
+                
+              sock.send('done:' + JSON.stringify(tmpSlug));
+            })
+          });
         } else if (message === 'push') {
           pushSite(function(error) {
             if(error) {
