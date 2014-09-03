@@ -116,7 +116,7 @@ module.exports.generator = function (config, logger, fileParser) {
     });
   }
 
-  var getItem = function(id, callback) {
+  var getItem = function(id, type, callback) {
     getBucket().child('data').child(type).child(id).once('value', function(data) {
       callback(type);
     });
