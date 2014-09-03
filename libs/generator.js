@@ -987,7 +987,7 @@ module.exports.generator = function (config, logger, fileParser) {
             var tmpSlug = '';
             tmpSlug = slug(name).toLowerCase();
 
-            if(tmpSlug && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
+            if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
               tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl) + '/' + tmpSlug;
             } 
 
