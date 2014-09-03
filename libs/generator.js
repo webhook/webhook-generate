@@ -111,13 +111,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
 
   var getTypeData = function(type, callback) {
-    getBucket().child('contentType').child(type).once('value', function(data) {
-      callback(type);
-    });
-  }
-
-  var getItem = function(id, type, callback) {
-    getBucket().child('data').child(type).child(id).once('value', function(data) {
+    getBucket().parent().('contentType').child(type).once('value', function(data) {
       callback(type);
     });
   }
