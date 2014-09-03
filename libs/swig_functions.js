@@ -106,7 +106,7 @@ module.exports.swigFunctions = function(swig) {
    * @param    {String} (OPTIONAL) If the first parameter was the type, this must be the ID of the item
    * @returns  {Object} The published item specified by the type/id or relation string passed in
    */
-  var getItem = function(type, key) {
+  var getItem = function(type, key, ignorePub) {
     if(!type) {
       return {};
     }
@@ -138,7 +138,7 @@ module.exports.swigFunctions = function(swig) {
       return {};
     }
 
-    if(!self.typeInfo[type].oneOff) {
+    if(!ignorePub && !self.typeInfo[type].oneOff) {
       if(!item.publish_date) {
         return {};
       }
@@ -164,6 +164,7 @@ module.exports.swigFunctions = function(swig) {
     item = adjustRelationshipFields(relationshipFields, item);
 
     item._type = type;
+
     return item;
   };
 
@@ -489,8 +490,8 @@ module.exports.swigFunctions = function(swig) {
       getItem: function(holder) {
         return holder;
       },
-      _realGetItem: function(type, key) {
-        return getItem(type, key);
+      _realGetItem: function(type, key, ignorePub) {
+        return getItem(type, key, ignorePub);
       },
       getItems: function(holder) {
         return holder;

@@ -208,7 +208,7 @@ module.exports.generator = function (config, logger, fileParser) {
     swigFunctions.setParams({ CURRENT_URL: outputUrl });
 
     if(params.item) {
-      params.item = params._realGetItem(params.item._type, params.item._id);
+      params.item = params._realGetItem(params.item._type, params.item._id, true);
     }
 
     try {
