@@ -89,7 +89,7 @@ module.exports.each = function(obj, cb) {
 module.exports.parseCustomUrl = function(url, object) {
   var publishDate = object.publish_date ? object.publish_date : object;
 
-  var publishDate = moment(publish_date);
+   publishDate = moment(publishDate);
 
   function replacer(match, timeIdent, offset, string){
     if(timeIdent === 'Y') {
