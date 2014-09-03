@@ -980,30 +980,24 @@ module.exports.generator = function (config, logger, fileParser) {
           ]));
         } else if (message.indexOf('generate_slug_v2:') === 0) {
           var obj = JSON.parse(message.replace('generate_slug_v2:', ''));
-          var id = obj.id;
           var type = obj.type;
+          var name = obj.name
 
-          getItem(id, type, function(item) {
-            getTypeData(type, function(typeInfo) {
-              var tmpSlug = '';
-              if(item.slug) {
-                tmpSlug = item.slug;
-              } else {
-                tmpSlug = slug(item.name).toLowerCase();
+          getTypeData(type, function(typeInfo) {
+            var tmpSlug = '';
+            tmpSlug = slug(name).toLowerCase();
 
-                if(tmpSlug && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
-                  tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl) + '/' + tmpSlug;
-                } 
+            if(tmpSlug && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
+              tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl) + '/' + tmpSlug;
+            } 
 
-                if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.listUrl) {
-                  tmpSlug = typeInfo.customUrls.listUrl + '/' + tmpSlug;
-                } else {
-                  tmpSlug = type + '/' + tmpSlug;
-                }
-              }
-                
-              sock.send('done:' + JSON.stringify(tmpSlug));
-            })
+            if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.listUrl) {
+              tmpSlug = typeInfo.customUrls.listUrl + '/' + tmpSlug;
+            } else {
+              tmpSlug = type + '/' + tmpSlug;
+            }
+              
+            sock.send('done:' + JSON.stringify(tmpSlug));
           });
         } else if (message === 'push') {
           pushSite(function(error) {
