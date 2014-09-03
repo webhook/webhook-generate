@@ -975,14 +975,15 @@ module.exports.generator = function (config, logger, fileParser) {
         } else if (message.indexOf('generate_slug_v2:') === 0) {
           var obj = JSON.parse(message.replace('generate_slug_v2:', ''));
           var type = obj.type;
-          var name = obj.name
+          var name = obj.name;
+          var date = obj.date;
 
           getTypeData(type, function(typeInfo) {
             var tmpSlug = '';
             tmpSlug = slug(name).toLowerCase();
 
             if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
-              tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl) + '/' + tmpSlug;
+              tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl, date) + '/' + tmpSlug;
             } 
 
             if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.listUrl) {

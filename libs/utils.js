@@ -87,33 +87,35 @@ module.exports.each = function(obj, cb) {
 // #j - Day, no leading zero
 // #T - The typename (e.g. articles)
 module.exports.parseCustomUrl = function(url, object) {
-    var publishDate = moment(object.publish_date);
+  var publishDate = object.publish_date ? object.publish_date : object;
 
-    function replacer(match, timeIdent, offset, string){
-      if(timeIdent === 'Y') {
-        return publishDate.format('YYYY').toLowerCase();
-      } else if (timeIdent === 'y') {
-        return publishDate.format('YY').toLowerCase();
-      } else if (timeIdent === 'm') {
-        return publishDate.format('MM').toLowerCase();
-      } else if (timeIdent === 'n') {
-        return publishDate.format('M').toLowerCase();
-      } else if (timeIdent === 'F') {
-        return publishDate.format('MMMM').toLowerCase();
-      } else if (timeIdent === 'M') {
-        return publishDate.format('MMM').toLowerCase();
-      } else if (timeIdent === 'd') {
-        return publishDate.format('DD').toLowerCase();
-      } else if (timeIdent === 'j') {
-        return publishDate.format('D').toLowerCase();
-      } else if (timeIdent === 'T') {
-        return object._type.toLowerCase();
-      } else {
-        return match;
-      }
+  var publishDate = moment(publish_date);
+
+  function replacer(match, timeIdent, offset, string){
+    if(timeIdent === 'Y') {
+      return publishDate.format('YYYY').toLowerCase();
+    } else if (timeIdent === 'y') {
+      return publishDate.format('YY').toLowerCase();
+    } else if (timeIdent === 'm') {
+      return publishDate.format('MM').toLowerCase();
+    } else if (timeIdent === 'n') {
+      return publishDate.format('M').toLowerCase();
+    } else if (timeIdent === 'F') {
+      return publishDate.format('MMMM').toLowerCase();
+    } else if (timeIdent === 'M') {
+      return publishDate.format('MMM').toLowerCase();
+    } else if (timeIdent === 'd') {
+      return publishDate.format('DD').toLowerCase();
+    } else if (timeIdent === 'j') {
+      return publishDate.format('D').toLowerCase();
+    } else if (timeIdent === 'T') {
+      return object._type.toLowerCase();
+    } else {
+      return match;
     }
-
-    url = url.replace(/#(\w)/, replacer);
-
-    return url;
   }
+
+  url = url.replace(/#(\w)/, replacer);
+
+  return url;
+}
