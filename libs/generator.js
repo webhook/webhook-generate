@@ -204,6 +204,7 @@ module.exports.generator = function (config, logger, fileParser) {
    */
   var writeTemplate = function(inFile, outFile, params) {
     params = params || {};
+    params['firebase_conf'] = config.get('webhook');
     var originalOutFile = outFile;
 
     // Merge functions in
@@ -308,6 +309,7 @@ module.exports.generator = function (config, logger, fileParser) {
         entry.entryName = newName;
       });
       zip.extractAllTo('.', true);
+
       fs.unlinkSync('.preset.zip');
       callback();
     });
@@ -382,6 +384,7 @@ module.exports.generator = function (config, logger, fileParser) {
       wrench.rmdirSyncRecursive('.static-old');
 
       fs.unlinkSync('.reset.zip');
+
       self.init(config.get('webhook').siteName, config.get('webhook').secretKey, true, config.get('webhook').firebase, function() {
         callback();
       });
