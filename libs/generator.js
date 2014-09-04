@@ -605,7 +605,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
                 var addSlug = true;
                 if(val.slug) {
-                  baseNewPath = '.build/' + val.slug + '/';
+                  baseNewPath = './.build/' + val.slug + '/';
                   addSlug = false;
                 } else {
                   if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
@@ -615,9 +615,12 @@ module.exports.generator = function (config, logger, fileParser) {
                   }                
                 }
 
-                var tmpSlug = generateSlug(val);
-
-                val.slug = tmpSlug;
+                var tmpSlug = '';
+                if(!val.slug) {
+                  tmpSlug = generateSlug(val);
+                } else {
+                  tmpSlug = val.slug;
+                }
 
                 if(addSlug) {
                   val.slug = baseNewPath.replace('./.build/', '') + tmpSlug;
@@ -661,23 +664,30 @@ module.exports.generator = function (config, logger, fileParser) {
 
                 var addSlug = true;
                 if(val.slug) {
-                  baseNewPath = '.build/' + val.slug + '/';
+                  baseNewPath = './.build/' + val.slug;
                   addSlug = false;
                 } else {
                   if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
                     baseNewPath = origNewPath + '/' + utils.parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val) + '/';
+                  }   else {
+                    baseNewPath = origNewPath + '/';
                   }                  
                 }
 
-                var tmpSlug = generateSlug(val);
-
-                if(addSlug) {
-                  newPath = baseNewPath + '/' + tmpSlug + '/index.html';
+                var tmpSlug = '';
+                if(!val.slug) {
+                  tmpSlug = generateSlug(val);
                 } else {
-                  newPath = baseNewPath + '/index.html';
+                  tmpSlug = val.slug;
                 }
 
-                newPath = baseNewPath + '/' + tmpSlug + '/' + middlePathName + '/index.html';
+                if(addSlug) {
+                  val.slug = baseNewPath.replace('./.build/', '') + tmpSlug;
+                  newPath = baseNewPath + '/' + tmpSlug + '/' + middlePathName + '/index.html';
+                } else {
+                  newPath = baseNewPath + '/' + middlePathName + '/index.html';
+                }
+
                 writeTemplate(file, newPath, { item: val });
               }
             }
