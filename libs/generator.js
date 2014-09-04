@@ -610,7 +610,9 @@ module.exports.generator = function (config, logger, fileParser) {
                 } else {
                   if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
                     baseNewPath = origNewPath + '/' + utils.parseCustomUrl(typeInfo[objectName].customUrls.individualUrl, val) + '/';
-                  }                  
+                  } else {
+                    baseNewPath = origNewPath + '/';
+                  }                
                 }
 
                 var tmpSlug = generateSlug(val);

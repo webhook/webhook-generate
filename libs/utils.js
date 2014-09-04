@@ -115,7 +115,7 @@ module.exports.parseCustomUrl = function(url, object) {
     }
   }
 
-  url = url.replace(/#(\w)/, replacer);
+  url = url.replace(/#(\w)/g, replacer);
 
   return url;
 }
