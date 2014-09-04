@@ -476,6 +476,11 @@ module.exports.generator = function (config, logger, fileParser) {
           fs.writeFileSync('./.build/robots.txt', fs.readFileSync('pages/robots.txt'));
         }
 
+        if(fs.existsSync('./libs/.supported.js')) {
+          mkdirp.sync('./.build/.wh/_supported');
+          fs.writeFileSync('./.build/.wh/_supported/index.html', fs.readFileSync('./libs/.supported.js'));
+        }
+
         logger.ok('Finished Rendering Pages\n');
 
         if(cb) cb(done);
