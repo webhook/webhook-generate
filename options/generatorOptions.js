@@ -54,11 +54,11 @@ module.exports = function(grunt) {
         proxies: [
             {
                 context: '/webhook-uploads',
-                host:  conf.custom ? unescapeSite(conf.siteName) : conf.siteName + '.webhook.org',
+                host:  conf.custom ? unescapeSite(conf.siteName) : (conf.siteName + '.webhook.org'),
                 port: 80,
                 changeOrigin: true,
                 headers: {
-                  host: conf.custom ? unescapeSite(conf.siteName) : conf.siteName + '.webhook.org'
+                  host: conf.custom ? unescapeSite(conf.siteName) : (conf.siteName + '.webhook.org')
                 }
             }
         ]
