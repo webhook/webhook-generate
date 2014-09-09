@@ -632,9 +632,9 @@ module.exports.generator = function (config, logger, fileParser) {
 
                 if(addSlug) {
                   val.slug = baseNewPath.replace('./.build/', '') + tmpSlug;
-                  newPath = baseNewPath + '/' + tmpSlug + '/index.html';
+                  newPath = baseNewPath + tmpSlug + '/index.html';
                 } else {
-                  newPath = baseNewPath + '/index.html';
+                  newPath = baseNewPath + 'index.html';
                 }
 
                 if(fs.existsSync(overrideFile)) {
@@ -691,9 +691,9 @@ module.exports.generator = function (config, logger, fileParser) {
 
                 if(addSlug) {
                   val.slug = baseNewPath.replace('./.build/', '') + tmpSlug;
-                  newPath = baseNewPath + '/' + tmpSlug + '/' + middlePathName + '/index.html';
+                  newPath = baseNewPath + tmpSlug + '/' + middlePathName + '/index.html';
                 } else {
-                  newPath = baseNewPath + '/' + middlePathName + '/index.html';
+                  newPath = baseNewPath + middlePathName + '/index.html';
                 }
 
                 writeTemplate(file, newPath, { item: val });
