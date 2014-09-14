@@ -696,8 +696,6 @@ module.exports.generator = function (config, logger, fileParser) {
                   newPath = baseNewPath + middlePathName + '/index.html';
                 }
 
-                console.log(newPath);
-
                 writeTemplate(file, newPath, { item: val });
               }
             }
