@@ -672,7 +672,7 @@ module.exports.generator = function (config, logger, fileParser) {
 
                 var addSlug = true;
                 if(val.slug) {
-                  baseNewPath = './.build/' + val.slug;
+                  baseNewPath = './.build/' + val.slug + '/';
                   addSlug = false;
                 } else {
                   if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.individualUrl) {
@@ -695,6 +695,8 @@ module.exports.generator = function (config, logger, fileParser) {
                 } else {
                   newPath = baseNewPath + middlePathName + '/index.html';
                 }
+
+                console.log(newPath);
 
                 writeTemplate(file, newPath, { item: val });
               }
