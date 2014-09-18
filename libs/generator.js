@@ -219,19 +219,23 @@ module.exports.generator = function (config, logger, fileParser) {
       params.item = params._realGetItem(params.item._type, params.item._id, true);
     }
 
+    var output = '';
     try {
-      var output = swig.renderFile(inFile, params);
+      output = swig.renderFile(inFile, params);
     } catch (e) {
       self.sendSockMessage(e.toString());
 
       if(strictMode) {
         throw e;
       } else {
-        console.log('Build Failed'.red);
+        console.log('Error while rendering template: ' + inFile);
         console.log(e.toString().red);
+        try {
+          output = swig.renderFile('./libs/debug500.html', { template: inFile, error: e.toString(), backtrace: e.stack.toString() })
+        } catch (e) {
+          return '';
+        }
       }
-
-      return '';
     }
 
     mkdirp.sync(path.dirname(outFile));
@@ -256,11 +260,14 @@ module.exports.generator = function (config, logger, fileParser) {
         if(strictMode) {
           throw e;
         } else {
-          console.log('Build Failed'.red);
+          console.log('Error while rendering template: ' + inFile);
           console.log(e.toString().red);
+          try {
+            output = swig.renderFile('./libs/debug500.html', { template: inFile, error: e.toString(), backtrace: e.stack.toString() })
+          } catch (e) {
+            return '';
+          }
         }
-
-        return '';
       }
 
       mkdirp.sync(path.dirname(outFile));
