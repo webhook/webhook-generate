@@ -136,3 +136,5 @@ module.exports = function(grunt) {
   });
 
 };
+
+module.exports.version = curVersion;
