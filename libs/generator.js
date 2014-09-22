@@ -614,7 +614,7 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = publishedItems[key];
 
-                if(templateWidgetName) {
+                if(templateWidgetName && val[templateWidgetName]) {
                   overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
@@ -655,7 +655,7 @@ module.exports.generator = function (config, logger, fileParser) {
               {
                 var val = items[key];
 
-                if(templateWidgetName) {
+                if(templateWidgetName && val[templateWidgetName]) {
                   overrideFile = 'templates/' + objectName + '/layouts/' + val[templateWidgetName];
                 }
 
