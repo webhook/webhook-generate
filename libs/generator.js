@@ -1085,6 +1085,8 @@ module.exports.generator = function (config, logger, fileParser) {
    * @param  {Function}  done      Callback to call when operation is done
    */
   this.init = function(sitename, secretkey, copyCms, firebase, done) {
+    var oldConf = config.get('webhook');
+
     var confFile = fs.readFileSync('./libs/.firebase.conf.jst');
 
     if(firebase) {
@@ -1092,7 +1094,7 @@ module.exports.generator = function (config, logger, fileParser) {
     }
 
     // TODO: Grab bucket information from server eventually, for now just use the site name
-    var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename, firebase: firebase });
+    var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename, firebase: firebase, embedlyKey: oldConf.embedly || 'your-embedly-key', serverAddr: oldConf.server || 'your-server-address' });
 
     fs.writeFileSync('./.firebase.conf', templated);
 
