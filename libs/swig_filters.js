@@ -24,6 +24,7 @@ if (typeof String.prototype.endsWith != 'function') {
 module.exports.init = function (swig) {
 
   var siteDns = '';
+  var firebaseConf = {};
 
   var upper = function(input) {
     return input.toUpperCase();
@@ -148,7 +149,13 @@ module.exports.init = function (swig) {
       }
 
       params.push('url=' + encodeURIComponent(input));
-      params.push('key=13dde81b8137446e89c7933edca679eb');
+
+      if(firebaseConf.embedly) {
+        params.push('key=' + firebaseConf.embedly);
+      } else {
+        params.push('key=13dde81b8137446e89c7933edca679eb');
+      }
+      
       imageSource = 'http://i.embed.ly/1/display/resize?' + params.join('&');
     }
 
@@ -189,7 +196,12 @@ module.exports.init = function (swig) {
       }
 
       params.push('url=' + encodeURIComponent(input));
-      params.push('key=13dde81b8137446e89c7933edca679eb');
+
+      if(firebaseConf.embedly) {
+        params.push('key=' + firebaseConf.embedly);
+      } else {
+        params.push('key=13dde81b8137446e89c7933edca679eb');
+      }
       imageSource = 'http://i.embed.ly/1/display/crop?' + params.join('&');
     }
     
@@ -222,6 +234,10 @@ module.exports.init = function (swig) {
 
   this.setSiteDns = function(dns) {
     siteDns = dns;
+  }
+
+  this.setFirebaseConf = function(conf) {
+    firebaseConf = conf;
   }
 
   var date = function(input, format, offset, abbr) {
