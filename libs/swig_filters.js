@@ -128,9 +128,9 @@ module.exports.init = function (swig) {
       imageSource = input.resize_url;
 
       imageSource = imageSource + '=s' + size;
-      
+
       if(imageSource.indexOf('http://') === 0) {
-        imageSource.replace('http://', 'https://');
+        imageSource = imageSource.replace('http://', 'https://');
       }
 
     } else if (typeof input === 'string') {
@@ -185,7 +185,7 @@ module.exports.init = function (swig) {
       imageSource = imageSource + '=s' + size + '-c';
 
       if(imageSource.indexOf('http://') === 0) {
-        imageSource.replace('http://', 'https://');
+        imageSource = imageSource.replace('http://', 'https://');
       }
       
     } else if (typeof input === 'string') {
