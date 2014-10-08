@@ -69,8 +69,7 @@ Function = wrap;
  * @param  {Object}   config     Configuration options from .firebase.conf
  * @param  {Object}   logger     Object to use for logging, defaults to no-ops
  */
-module.exports.generator = function (config, logger, fileParser) {
-
+module.exports.generator = function (config, options, logger, fileParser) {
   var self = this;
   var firebaseUrl = config.get('webhook').firebase || 'webhook';
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
@@ -932,30 +931,6 @@ module.exports.generator = function (config, logger, fileParser) {
     }
   };
 
-  /*
-    Runs 'wh push', used by web listener to give push button on CMS
-  */
-  var pushSite = function(callback) {
-    var command = spawn('wh', ['push'], {
-      stdio: 'inherit',
-      cwd: '.'
-    });
-
-    command.on('error', function() {
-      callback(true);
-    });
-
-    command.on('close', function(exit, signal) {
-
-      if(exit === 0) {
-        callback(null);
-      } else {
-        callback(exit);
-      }
-
-    });
-  }
-
   /**
    * Starts a websocket listener on 0.0.0.0 (for people who want to run wh serv over a network)
    * Accepts messages for generating scaffolding and downloading preset themes.
@@ -1025,14 +1000,6 @@ module.exports.generator = function (config, logger, fileParser) {
               
             sock.send('done:' + JSON.stringify(tmpSlug));
           });
-        } else if (message === 'push') {
-          pushSite(function(error) {
-            if(error) {
-              sock.send('done:' + JSON.stringify({ err: 'Error while pushing site.' }));
-            } else {
-              sock.send('done');
-            }
-          });
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
         } else if (message.indexOf('preset_local:') === 0) {
@@ -1044,7 +1011,8 @@ module.exports.generator = function (config, logger, fileParser) {
           }
 
           extractPresetLocal(fileData, function(data) {
-            var command = spawn('npm', ['install'], {
+            var args = ['install'];
+            var command = spawn(options.npm || 'npm', args, {
               stdio: 'inherit',
               cwd: '.'
             });
@@ -1060,8 +1028,7 @@ module.exports.generator = function (config, logger, fileParser) {
             return;
           }
           downloadPreset(url, function(data) {
-
-            var command = spawn('npm', ['install'], {
+            var command = spawn(options.npm || 'npm', ['install'], {
               stdio: 'inherit',
               cwd: '.'
             });

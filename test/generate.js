@@ -27,7 +27,7 @@ var fileParser = {
   }
 }
 
-var generator = require('../libs/generator.js').generator(config, null, fileParser);
+var generator = require('../libs/generator.js').generator(config, {}, null, fileParser);
 
 // Set up all the data here
 
