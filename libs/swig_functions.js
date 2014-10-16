@@ -33,11 +33,9 @@ module.exports.swigFunctions = function(swig) {
    */
   var url = function(object) {
     if(typeof object === 'string') {
-      //object = { slug: object, name: object };
-
       var types = getTypes();
 
-      object = _.find(types, { name: object });
+      object = _.find(types, function(type){ return type.name.toLowerCase() == object.toLowerCase() });
     }
   
     if(!object) {
