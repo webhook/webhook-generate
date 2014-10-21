@@ -464,13 +464,21 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
     getData(function(data) {
 
-      glob('pages/**/*.{html,xml,rss,xhtml,atom}', function(err, files) {
+      glob('pages/**/*', function(err, files) {
         files.forEach(function(file) {
+
+          console.log(file);
+
+          if(fs.lstatSync(file).isDirectory()) {
+            return true;
+          }
 
           var newFile = file.replace('pages', './.build');
 
           var dir = path.dirname(newFile);
           var filename = path.basename(newFile, path.extname(file));
+          var extension = path.extname(file);
+
 
           if(path.extname(file) === '.html' && filename !== 'index' && path.basename(newFile) !== '404.html') {
             dir = dir + '/' + filename;
@@ -479,13 +487,13 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
           newFile = dir + '/' + filename + path.extname(file);
 
-          var destFile = writeTemplate(file, newFile);
+          if(extension === '.html' || extension === '.xml' || extension === '.rss' || extension === '.xhtml' || extension === '.atom' || extension === '.txt') { 
+            writeTemplate(file, newFile);
+          } else {
+            mkdirp.sync(path.dirname(newFile));
+            fs.writeFileSync(newFile, file);
+          }
         });
-
-        if(fs.existsSync('pages/robots.txt'))
-        {
-          fs.writeFileSync('./.build/robots.txt', fs.readFileSync('pages/robots.txt'));
-        }
 
         if(fs.existsSync('./libs/.supported.js')) {
           mkdirp.sync('./.build/.wh/_supported');
