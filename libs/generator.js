@@ -467,8 +467,6 @@ module.exports.generator = function (config, options, logger, fileParser) {
       glob('pages/**/*', function(err, files) {
         files.forEach(function(file) {
 
-          console.log(file);
-
           if(fs.lstatSync(file).isDirectory()) {
             return true;
           }
@@ -491,7 +489,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
             writeTemplate(file, newFile);
           } else {
             mkdirp.sync(path.dirname(newFile));
-            fs.writeFileSync(newFile, file);
+            fs.writeFileSync(newFile, fs.readFileSync(file));
           }
         });
 
