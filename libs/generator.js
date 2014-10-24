@@ -352,6 +352,18 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
       var entries = zip.getEntries();
 
+      if(fs.existsSync('.pages-old')) {
+        wrench.rmdirSyncRecursive('.pages-old');
+      }
+
+      if(fs.existsSync('.templates-old')) {
+        wrench.rmdirSyncRecursive('.templates-old');
+      }
+
+      if(fs.existsSync('.static-old')) {
+        wrench.rmdirSyncRecursive('.static-old');
+      }
+
       try {
         fs.renameSync('pages', '.pages-old');
       } catch(error) {
