@@ -23,24 +23,20 @@ module.exports = function(grunt) {
   var mergeConfig = {
     webhook: conf,
 
-    open : {
-      'wh-open': {
-        path: 'http://localhost:' + port + '/'
-      }
-    },
-
     connect: {
       'wh-server': {
         options: {
+          open: true,
           port: port * 1,
           hostname: '*',
           base: '.build',
           livereload: 35730,
+          useAvailablePort: true,
           middleware: function(connect, options) {
             // Return array of whatever middlewares you want
             return [
               header({ 'X-Webhook-Local' : true }),
-              connect.static(options.base),
+              connect.static(options.base[0]),
               require('grunt-connect-proxy/lib/utils').proxyRequest,
               function(req, res, next) {
                 if ('GET' != req.method && 'HEAD' != req.method) return next();
@@ -77,7 +73,7 @@ module.exports = function(grunt) {
         logConcurrentOutput: true
       },
       "wh-concurrent": {
-        tasks: ["watch", "webListener-open"]
+        tasks: ["watch", "webListener"]
       }
     },
 

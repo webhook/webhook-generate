@@ -67,25 +67,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('webListener', 'Listens for commands from CMS through websocket', function() {
     var done = this.async();
-    generator.webListener(done);
-  });
-
-  grunt.registerTask('webListener-open', 'Listens for commands from CMS through websocket', function() {
-    var done = this.async();
-    generator.webListener(done);
-
-    grunt.util.spawn({
-      grunt: true,
-      args: ['open:wh-open'].concat(grunt.option.flags()),
-      opts: { stdio: 'inherit' }
-    }, function (err, result, code) {
-      if (err || code > 0) {
-        grunt.log.warn('A problem occured while trying to open a browser window to connect to the site.')
-        grunt.log.warn(result.stderr || result.stdout);
-        grunt.log.warn('In order to access the site, please navigate to \'localhost:2002\' in your web browser.')
-      }
-      grunt.log.writeln('\n' + result.stdout);
-    });
+    generator.webListener(6557, done);
   });
 
   grunt.registerTask('clean', 'Clean build files', function() {
@@ -135,9 +117,9 @@ module.exports = function(grunt) {
 
   // Check if initialized properly before running all these tasks
   grunt.registerTask('default',  'Clean, Build, Start Local Server, and Watch', function() {
-    grunt.task.run('configureProxies:wh-server')
-    grunt.task.run('connect:wh-server');
     grunt.task.run('build');
+    grunt.task.run('configureProxies:wh-server');
+    grunt.task.run('connect:wh-server');
     grunt.task.run('concurrent:wh-concurrent');
   });
 

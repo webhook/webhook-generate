@@ -953,8 +953,10 @@ module.exports.generator = function (config, options, logger, fileParser) {
    * Starts a websocket listener on 0.0.0.0 (for people who want to run wh serv over a network)
    * Accepts messages for generating scaffolding and downloading preset themes.
    */
-  this.webListener = function() {
-    var server = new ws({ host: '0.0.0.0', port: 6557 });
+  this.webListener = function(port) {
+
+    console.log(config.get('connect'));
+    var server = new ws({ host: '0.0.0.0', port: port });
 
     server.on('connection', function(sock) {
       websocket = sock;
