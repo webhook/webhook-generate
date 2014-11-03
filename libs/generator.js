@@ -606,10 +606,18 @@ module.exports.generator = function (config, options, logger, fileParser) {
               });
             }
 
+            var listPath = null;
+
             if(typeInfo[objectName] && typeInfo[objectName].customUrls && typeInfo[objectName].customUrls.listUrl) {
               var customPathParts = newPath.split('/');
 
-              customPathParts[2] = typeInfo[objectName].customUrls.listUrl;
+              if(typeInfo[objectName].customUrls.listUrl === '#') // Special remove syntax
+              {
+                listPath = customPathParts.join('/');
+                customPathParts.splice(2, 1);
+              } else {
+                customPathParts[2] = typeInfo[objectName].customUrls.listUrl;
+              }
 
               newPath = customPathParts.join('/');
             }
@@ -620,6 +628,11 @@ module.exports.generator = function (config, options, logger, fileParser) {
             if(baseName === 'list')
             {
               newPath = newPath + '/index.html';
+
+              if(listPath) {
+                newPath = listPath + '/index.html';
+              }
+
               writeTemplate(file, newPath);
 
             } else if (baseName === 'individual') {
@@ -1011,7 +1024,12 @@ module.exports.generator = function (config, options, logger, fileParser) {
             } 
 
             if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.listUrl) {
-              tmpSlug = typeInfo.customUrls.listUrl + '/' + tmpSlug;
+
+              if(typeInfo.customUrls.listUrl === '#') {
+                tmpSlug = tmpSlug;
+              } else {
+                tmpSlug = typeInfo.customUrls.listUrl + '/' + tmpSlug;
+              }
             } else {
               tmpSlug = type + '/' + tmpSlug;
             }
