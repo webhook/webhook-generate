@@ -33,9 +33,9 @@ module.exports.swigFunctions = function(swig) {
    */
   var url = function(object) {
     if(typeof object === 'string') {
-      var types = getTypes();
+      var types = getTypes(true);
 
-      object = _.find(types, function(type){ return type.name.toLowerCase() == object.toLowerCase() });
+      object = _.find(types, function(type){ return type.name.toLowerCase() == object.toLowerCase() || type.id.toLowerCase() == object.toLowerCase() });
     }
   
     if(!object) {
@@ -102,7 +102,7 @@ module.exports.swigFunctions = function(swig) {
           }
         }
 
-        types.push({ slug: slug, name: self.typeInfo[key].name });
+        types.push({ slug: slug, name: self.typeInfo[key].name, id: key });
       }
     }
 
