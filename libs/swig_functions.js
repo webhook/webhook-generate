@@ -515,8 +515,12 @@ module.exports.swigFunctions = function(swig) {
   this.getFunctions = function() {
     var functions = {
       get: getCombined,
-      getItem: function(holder) {
-        return holder;
+      getItem: function(type, key, ignorePub) {
+        if(typeof type === 'string' && key) {
+          return getItem(type, key, ignorePub);
+        }
+
+        return type;
       },
       _realGetItem: function(type, key, ignorePub) {
         return getItem(type, key, ignorePub);
