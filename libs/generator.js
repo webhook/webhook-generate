@@ -962,6 +962,50 @@ module.exports.generator = function (config, options, logger, fileParser) {
     }
   };
 
+  var runCommand = function(cmd, cwd, args, pipe, cb) {
+    if(typeof pipe == 'function') {
+      cb = pipe;
+      pipe = false;
+    }
+
+    var command = spawn(cmd, args, {
+      stdio: [process.stdin, pipe ? 'pipe' : process.stdout, process.stderr],
+      cwd: cwd
+    });
+
+    var output = '';
+
+    if(pipe) {
+      command.stdout.on('data', function(data) {
+        output += data;
+      });
+    }
+
+    command.on('close', function() {
+      cb(output);
+    })
+  }
+
+  var runNpm = function(cb) {
+    if(options.npmCache) {
+      runCommand(options.npm || 'npm', '.', ['config', 'get', 'cache'], true, function(diroutput) {
+        var oldCacheDir = diroutput.trim();
+        runCommand(options.npm || 'npm', '.', ['config', 'set', 'cache', options.npmCache], function() {
+          runCommand(options.npm || 'npm', '.', ['install'], function() {
+            runCommand(options.npm || 'npm', '.', ['config', 'set', 'cache', oldCacheDir], function() {
+              cb();
+            });
+          });
+        });
+      });
+    } else {
+      runCommand(options.npm || 'npm', '.', ['install'], function() {
+        console.log('NPM done');
+        cb();
+      }); 
+    }
+  };
+
   /**
    * Starts a websocket listener on 0.0.0.0 (for people who want to run wh serv over a network)
    * Accepts messages for generating scaffolding and downloading preset themes.
@@ -1047,13 +1091,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
           }
 
           extractPresetLocal(fileData, function(data) {
-            var args = ['install'];
-            var command = spawn(options.npm || 'npm', args, {
-              stdio: 'inherit',
-              cwd: '.'
-            });
-
-            command.on('close', function() {
+            runNpm(function() {
               sock.send('done:' + JSON.stringify(data));
             });
           });
@@ -1064,12 +1102,8 @@ module.exports.generator = function (config, options, logger, fileParser) {
             return;
           }
           downloadPreset(url, function(data) {
-            var command = spawn(options.npm || 'npm', ['install'], {
-              stdio: 'inherit',
-              cwd: '.'
-            });
-
-            command.on('close', function() {
+            runNpm(function() {
+              console.log('DONE RUNNING?')
               sock.send('done:' + JSON.stringify(data));
             });
           });
