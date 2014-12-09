@@ -13,32 +13,31 @@
 {% extends "templates/partials/base.html" %}
 
 {% block content %}
-  <div class="wh-search-results">
-    <dl>
 
-      {# HEAD #}
-      <dt>
-        <span class="wh-search-results-total">102 results for <span class="wh-search-term">search term</span>.</span>
-        <span class="wh-search-instead">Search instead for <a href="">term</a>?</span>
-      </dt>
+  <div><input type="text" id="tipue_search_input"></div>
 
-      {# RESULTS #}
-      <dd>
-        <a href="">
-          <h2>This is a <span class="wh-search-term">result</span></h2>
-          <p class="wh-search-url">http://www.mysite.com/whatever/ <span class="wh-search-term-in-page">(47 appearances)</span></p>
-          <p class="wh-search-body">&hellip;Here is the content that was hit. Notice the <span class="wh-search-term">html</span> ellipsis.&hellip;</p>
-        </a>
-      </dd>
+  <div id="tipue_search_content">
 
-    </dl>
 
-    {# PAGINATION #}
-    <ul class="wh-search-paginate">
-      <li><a href="">1</a></li>
-      <li class="active"><a href="">2</a></li>
-      <li><a href="">3</a></li>
-    </ul>
   </div>
+  
+{% endblock %}
+
+{% block more_scripts %}
+
+
+    <!-- build:js /static/javascript/tipuesearch.min.js -->
+    <script src="/.wh/searchjson.js"></script>
+    <script src="/static/javascript/tipuesearch_set.js"></script>
+    <script src="/static/javascript/tipuesearch.js"></script>
+    <!-- endbuild -->
+
+    <script>
+    $(document).ready(function() {
+         $('#tipue_search_input').tipuesearch({
+            highlightEveryTerm: true
+         });
+    });
+    </script>
 {% endblock %}
 

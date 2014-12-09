@@ -201,28 +201,27 @@ module.exports.generator = function (config, options, logger, fileParser) {
   var searchEntryStream = null;
 
   this.openSearchEntryStream = function(callback) {
-
-  /*  if(!fs.existsSync('./.build/.wh/')) {
+    if(!fs.existsSync('./.build/.wh/')) {
       mkdirp.sync('./.build/.wh/');
     }
 
     searchEntryStream = fs.createWriteStream('./.build/.wh/searchjson.js');
 
-    searchEntryStream.write('var tipuesearch = {"pages": [\n');*/
+    searchEntryStream.write('var tipuesearch = {"pages": [\n');
 
     callback();
   };
 
   this.closeSearchEntryStream = function(callback) {
-  /*  if(searchEntryStream) {
+    if(searchEntryStream) {
       searchEntryStream.end(']}');
-    } */
+    }
 
     callback();
   };
 
   var writeSearchEntry = function(outFile, output) {
-  /*  var endUrl = outFile.replace('./.build', '');
+    var endUrl = outFile.replace('./.build', '');
 
     if(path.extname(endUrl) !== '.html' || endUrl === '/404.html' || endUrl.indexOf('/_wh_previews') === 0) {
       return;
@@ -249,7 +248,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
     }
 
     title = '';
-    body = '';*/
+    body = '';
   }
 
   /**
