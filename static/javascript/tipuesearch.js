@@ -462,18 +462,18 @@ http://www.tipue.com/search
                     {
                          if (show_stop)
                          {
-                              out += '<span class="wh-search-results-total">Nothing found</span><span class="wh-search-results-total">Common words are largely ignored</span>';     
+                              out += '<span class="wh-search-error">Nothing found. Common words are largely ignored</span>';     
                          }
                          else
                          {
-                              out += '<span class="wh-search-results-total">Search too short</span>';
+                              out += '<span class="wh-search-error">Search too short</span>';
                               if (set.minimumLength == 1)
                               {
-                                   out += '<span class="wh-search-results-total">Should be one character or more</span>';
+                                   out += '<span class="wh-search-error">Should be one character or more</span>';
                               }
                               else
                               {
-                                   out += '<span class="wh-search-results-total">Should be ' + set.minimumLength + ' characters or more</span>';
+                                   out += '<span class="wh-search-error">Should be ' + set.minimumLength + ' characters or more</span>';
                               }
                          }
                     }
