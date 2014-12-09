@@ -1,0 +1,43 @@
+{# ------------------------------------------------------- #}
+
+{# SEARCH RESULTS #}
+
+{# Webhook provides built in JS powerd search based upon your build directory #}
+{# The input form is in templates/partials/base.html #}
+{# This page outputs the actual results. #}
+
+{# ------------------------------------------------------- #}
+
+{# Confused what extends and blocks do? Watch a primer: #}
+{# http://www.webhook.com/docs/template-inheritance-blocks/ #}
+{% extends "templates/partials/base.html" %}
+
+{% block content %}
+
+  <dl class="wh-search-results">
+
+    {# HEAD #}
+    <dl>
+      102 results for "search term".
+    </dl>
+
+    {# RESULTS #}
+    <dd>
+      <a href="">
+        <h2>This is a <span class="wh-search-hit">result</span></h2>
+        <p class="wh-search-url">http://www.mysite.com/whatever/ <span class="wh-search-hit-total">(47 appearances)</span></p>
+        <p class="wh-search-body">&hellip;Here is the content that was hit. Notice the <span class="wh-search-hit">html</span> ellipsis.&hellip;</p>
+      </a>
+    </dd>
+
+  </dl>
+
+  {# PAGINATION #}
+  <ul class="wh-search-paginate">
+    <li><a href="">1</a></li>
+    <li class="active"><a href="">2</a></li>
+    <li><a href="">3</a></li>
+  </ul>
+
+{% endblock %}
+
