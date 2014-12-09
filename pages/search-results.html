@@ -6,26 +6,25 @@
 {# The input form is in templates/partials/base.html #}
 {# This page outputs the actual results. #}
 
-{# ------------------------------------------------------- #}
+{# Dcoumentation for search can be found at: #}
+{# http://www.webhook.com/docs/search/ #}
 
-{# Confused what extends and blocks do? Watch a primer: #}
-{# http://www.webhook.com/docs/template-inheritance-blocks/ #}
+{# BASED ON TIPUE SEARCH #}
+{# This search is based on Tipue Search, which is MIT OS software. #}
+{# https://github.com/Tipue/Tipue-Search #}
+
+{# ------------------------------------------------------- #}
 {% extends "templates/partials/base.html" %}
 
 {% block content %}
 
   <div><input type="text" id="tipue_search_input"></div>
 
-  <div id="tipue_search_content">
+  <div id="tipue_search_content"></div>
 
-
-  </div>
-  
 {% endblock %}
 
-{% block more_scripts %}
-
-
+{% block scripts_extra %}
     <!-- build:js /static/javascript/tipuesearch.min.js -->
     <script src="/.wh/searchjson.js"></script>
     <script src="/static/javascript/tipuesearch_set.js"></script>
