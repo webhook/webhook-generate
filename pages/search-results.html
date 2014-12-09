@@ -13,32 +13,32 @@
 {% extends "templates/partials/base.html" %}
 
 {% block content %}
-
-  <dl class="wh-search-results">
-
-    {# HEAD #}
+  <div class="wh-search-results">
     <dl>
-      <span class="wh-search-results-total">102 results for <span class="wh-search-term">search term</span>.</span>
-      <span class="wh-search-instead">Search instead for <a href="">term</a>?</span>
+
+      {# HEAD #}
+      <dl>
+        <span class="wh-search-results-total">102 results for <span class="wh-search-term">search term</span>.</span>
+        <span class="wh-search-instead">Search instead for <a href="">term</a>?</span>
+      </dl>
+
+      {# RESULTS #}
+      <dd>
+        <a href="">
+          <h2>This is a <span class="wh-search-term">result</span></h2>
+          <p class="wh-search-url">http://www.mysite.com/whatever/ <span class="wh-search-term-in-page">(47 appearances)</span></p>
+          <p class="wh-search-body">&hellip;Here is the content that was hit. Notice the <span class="wh-search-term">html</span> ellipsis.&hellip;</p>
+        </a>
+      </dd>
+
     </dl>
 
-    {# RESULTS #}
-    <dd>
-      <a href="">
-        <h2>This is a <span class="wh-search-term">result</span></h2>
-        <p class="wh-search-url">http://www.mysite.com/whatever/ <span class="wh-search-term-in-page">(47 appearances)</span></p>
-        <p class="wh-search-body">&hellip;Here is the content that was hit. Notice the <span class="wh-search-term">html</span> ellipsis.&hellip;</p>
-      </a>
-    </dd>
-
-  </dl>
-
-  {# PAGINATION #}
-  <ul class="wh-search-paginate">
-    <li><a href="">1</a></li>
-    <li class="active"><a href="">2</a></li>
-    <li><a href="">3</a></li>
-  </ul>
-
+    {# PAGINATION #}
+    <ul class="wh-search-paginate">
+      <li><a href="">1</a></li>
+      <li class="active"><a href="">2</a></li>
+      <li><a href="">3</a></li>
+    </ul>
+  </div>
 {% endblock %}
 
