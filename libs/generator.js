@@ -17,6 +17,7 @@ var slug = require('uslug');
 var async = require('async');
 var spawn = require('win-spawn');
 var md5 = require('MD5');
+var $ = require('cheerio');
 
 require('colors');
 
@@ -197,6 +198,60 @@ module.exports.generator = function (config, options, logger, fileParser) {
     });
   };
 
+  var searchEntryStream = null;
+
+  this.openSearchEntryStream = function(callback) {
+
+  /*  if(!fs.existsSync('./.build/.wh/')) {
+      mkdirp.sync('./.build/.wh/');
+    }
+
+    searchEntryStream = fs.createWriteStream('./.build/.wh/searchjson.js');
+
+    searchEntryStream.write('var tipuesearch = {"pages": [\n');*/
+
+    callback();
+  };
+
+  this.closeSearchEntryStream = function(callback) {
+  /*  if(searchEntryStream) {
+      searchEntryStream.end(']}');
+    } */
+
+    callback();
+  };
+
+  var writeSearchEntry = function(outFile, output) {
+  /*  var endUrl = outFile.replace('./.build', '');
+
+    if(path.extname(endUrl) !== '.html' || endUrl === '/404.html' || endUrl.indexOf('/_wh_previews') === 0) {
+      return;
+    }
+
+    endUrl = endUrl.replace('index.html', '');
+
+    var content = $.load(output);
+
+    var title = content('title').text();
+    var body = content('body').text().trim();//.replace(/(\r\n|\n|\r)/gm, "").trim();
+
+    if(searchEntryStream) {
+      var searchObj = {
+        title: title,
+        text: body,
+        tags: '',
+        loc: endUrl
+      };
+
+      searchEntryStream.write(JSON.stringify(searchObj) + ',\n');
+
+      searchObj = null;
+    }
+
+    title = '';
+    body = '';*/
+  }
+
   /**
    * Writes an instance of a template to the build directory
    * @param  {string}   inFile     Template to read
@@ -241,6 +296,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
     mkdirp.sync(path.dirname(outFile));
     fs.writeFileSync(outFile, output);
+    writeSearchEntry(outFile, output);
 
     // Haha this crazy nonsense is to handle pagination, the swig function "paginate" makes
     // shouldPaginate return true if there are more pages left, so we enter a while loop to
@@ -273,6 +329,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
       mkdirp.sync(path.dirname(outFile));
       fs.writeFileSync(outFile, output);
+      writeSearchEntry(outFile, output);
 
       swigFunctions.increasePage();
     }
@@ -790,11 +847,17 @@ module.exports.generator = function (config, options, logger, fileParser) {
     // clean files
     self.cachedData = null;
     self.cleanFiles(null, function() {
-      self.renderTemplates(null, function() {
-        self.copyStatic(function() {
-          self.renderPages(done, cb);
+      self.openSearchEntryStream(function() {
+        self.renderTemplates(null, function() {
+          self.copyStatic(function() {
+            self.renderPages(function() {}, function() {
+              self.closeSearchEntryStream(function() {
+                cb(done);
+              });
+            });
+          });
         });
-      });
+      })
     });
   };
 
