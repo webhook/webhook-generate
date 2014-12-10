@@ -260,6 +260,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
     bodyObj.find('script').remove();
     bodyObj.find('iframe').remove();
+    bodyObj.find('object').remove();
     bodyObj.find('[data-search-index="false"]').remove();
 
     var body = bodyObj.text().trim();
