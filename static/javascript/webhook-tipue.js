@@ -586,15 +586,17 @@ var tipuesearch_stem = {"words": [
                          }
                          else
                          {
-                              out += '<span class="wh-search-error">Search too short</span>';
+                              out += '<span class="wh-search-error">Search too short.';
                               if (set.minimumLength == 1)
                               {
-                                   out += '<span class="wh-search-error">Should be one character or more</span>';
+                                   out += ' Should be one character or more.';
                               }
                               else
                               {
-                                   out += '<span class="wh-search-error">Should be ' + set.minimumLength + ' characters or more</span>';
+                                   out += ' Should be ' + set.minimumLength + ' characters or more.';
                               }
+
+                              out += "</span>";
                          }
                     }
                
