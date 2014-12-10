@@ -45,18 +45,22 @@
     {# Useful block for loading outside scripts in other pages. #}
     {% block head_extra %}{% endblock %}
   </head>
-  <body>
+  <body {% block body_attributes %}{% endblock %}>
     {% block body %}
       <!--[if lt IE 7]>
         <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
       <![endif]-->
 
-      {% include "templates/partials/header.html" %}
+      {% block header %}
+        {% include "templates/partials/header.html" %}
+      {% endblock %}
 
       {# By default, your inner pages will load into this block. #}
       {% block content %}{% endblock %}
 
-      {% include "templates/partials/footer.html" %}
+      {% block footer %}
+        {% include "templates/partials/footer.html" %}
+      {% endblock %}
 
       <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 

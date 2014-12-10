@@ -16,6 +16,11 @@
 {# ------------------------------------------------------- #}
 {% extends "templates/partials/base.html" %}
 
+{# We use this to disable this page from search #}
+{% block body_attributes %}data-search-index="false"{% endblock %}
+
+{% block header %} {% endblock %}
+
 {% block content %}
 
   <div><input type="text" id="tipue_search_input"></div>
