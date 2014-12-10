@@ -201,6 +201,11 @@ module.exports.generator = function (config, options, logger, fileParser) {
   var searchEntryStream = null;
 
   this.openSearchEntryStream = function(callback) {
+    if(config.get('webhook').noSearch === true) {
+      callback();
+      return;
+    }
+
     if(!fs.existsSync('./.build/.wh/')) {
       mkdirp.sync('./.build/.wh/');
     }
@@ -213,6 +218,11 @@ module.exports.generator = function (config, options, logger, fileParser) {
   };
 
   this.closeSearchEntryStream = function(callback) {
+    if(config.get('webhook').noSearch === true) {
+      callback();
+      return;
+    }
+
     if(searchEntryStream) {
       searchEntryStream.end(']}');
     }
@@ -221,6 +231,10 @@ module.exports.generator = function (config, options, logger, fileParser) {
   };
 
   var writeSearchEntry = function(outFile, output) {
+    if(config.get('webhook').noSearch === true) {
+      return;
+    }
+
     var endUrl = outFile.replace('./.build', '');
 
     if(path.extname(endUrl) !== '.html' || endUrl === '/404.html' || endUrl.indexOf('/_wh_previews') === 0) {
@@ -232,13 +246,28 @@ module.exports.generator = function (config, options, logger, fileParser) {
     var content = $.load(output);
 
     var title = content('title').text();
-    var body = content('body').text().trim();//.replace(/(\r\n|\n|\r)/gm, "").trim();
+    var bodyObj = content('body');
+
+    if(bodyObj.attr('data-search-index') == false) {
+      return;
+    }
+
+    bodyObj.find('script').remove();
+    bodyObj.find('iframe').remove();
+    bodyObj.find('[data-search-index="false"]').remove();
+
+    var body = bodyObj.text().trim();
+    var tags = "";
+
+    if(content('meta[name="keywords"]').length > 0) {
+      tags = content('meta[name="keywords"]').attr('content');
+    }
 
     if(searchEntryStream) {
       var searchObj = {
         title: title,
         text: body,
-        tags: '',
+        tags: tags,
         loc: endUrl
       };
 
@@ -1192,8 +1221,14 @@ module.exports.generator = function (config, options, logger, fileParser) {
       confFile = fs.readFileSync('./libs/.firebase-custom.conf.jst');
     }
 
+    var noSearch = null;
+
+    if(oldConf.noSearch !== null && typeof oldConf.noSearch !== 'undefined') {
+      noSearch = oldConf.noSearch;
+    }
+
     // TODO: Grab bucket information from server eventually, for now just use the site name
-    var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename, firebase: firebase, embedlyKey: oldConf.embedly || 'your-embedly-key', serverAddr: oldConf.server || 'your-server-address' });
+    var templated = _.template(confFile, { secretKey: secretkey, siteName: sitename, firebase: firebase, embedlyKey: oldConf.embedly || 'your-embedly-key', serverAddr: oldConf.server || 'your-server-address', noSearch: noSearch });
 
     fs.writeFileSync('./.firebase.conf', templated);
 

@@ -4,5 +4,6 @@
   "firebase"   : "<%= firebase %>",
   "embedly"    : "<%= embedlyKey %>",
   "server"     : "<%= serverAddr %>",
-  "custom"     : true
+  "custom"     : true<% if (noSearch) { %>,
+  "noSearch"   : <%= noSearch %><% } %>
 }

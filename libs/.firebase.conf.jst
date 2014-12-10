@@ -1,4 +1,5 @@
 {
   "secretKey"   : "<%= secretKey %>",
-  "siteName"   : "<%= siteName %>"
+  "siteName"    : "<%= siteName %>"<% if (noSearch) { %>,
+  "noSearch"   : <%= noSearch %><% } %>
 }
