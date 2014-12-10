@@ -16,6 +16,10 @@
 {# ------------------------------------------------------- #}
 {% extends "templates/partials/base.html" %}
 
+{% block body_attributes %}data-search-index="false"{% endblock %}
+
+{% block header %}{% endblock %}
+
 {% block head_extra %}
 
   {# STYLES FOR THE SEARCH RESULTS. #}
@@ -57,7 +61,7 @@
 
 {% block content %}
 
-  <div><input type="text" id="tipue_search_input"></div>
+  <div>Search: <input type="text" id="tipue_search_input"></div>
 
   {# SEARCH RESULTS WILL GO IN HERE. #}
 
