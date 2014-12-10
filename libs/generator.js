@@ -252,6 +252,12 @@ module.exports.generator = function (config, options, logger, fileParser) {
       return;
     }
 
+    var specialChild = bodyObj.find('[data-search-index="true"]');
+
+    if(specialChild.length > 0) {
+      bodyObj = specialChild.first();
+    }
+
     bodyObj.find('script').remove();
     bodyObj.find('iframe').remove();
     bodyObj.find('[data-search-index="false"]').remove();
