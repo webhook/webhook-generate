@@ -155,6 +155,10 @@ var tipuesearch_stem = {"words": [
                     }
                });
 
+               $(this).parents('form').on('submit', function(e) {
+                    e.preventDefault();
+               });
+
                if(window.history.pushState) {     
                     window.onpopstate = function(event) {
                       var state = event.state;
