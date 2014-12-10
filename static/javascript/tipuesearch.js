@@ -247,7 +247,13 @@ http://www.tipue.com/search
                                    
                                    if (score < 1000000000)
                                    {
-                                        found[c++] = score + '^' + title + '^' + s_t + '^' + tipuesearch_in.pages[i].loc + (matches === null ? '' : ('^' + matches));  
+                                        found[c++] =[
+                                             score,
+                                             title,
+                                             s_t,
+                                             tipuesearch_in.pages[i].loc,
+                                             matches === null ? 0 : (matches)
+                                        ];  
                                    }
                               }
                          }
@@ -295,7 +301,13 @@ http://www.tipue.com/search
                               
                                    if (score < 1000000000)
                                    {
-                                        found[c++] = score + '^' + title + '^' + s_t + '^' + tipuesearch_in.pages[i].loc + (matches === null ? '' : ('^' + matches));                                                                   
+                                        found[c++] = [
+                                             score,
+                                             title,
+                                             s_t,
+                                             tipuesearch_in.pages[i].loc,
+                                             matches === null ? 0 : (matches)
+                                        ];                                                                
                                    }                              
                               }
                          }                         
@@ -323,11 +335,44 @@ http://www.tipue.com/search
 
                               out += '</dt>'
                               
-                              found.sort();
+                              found.sort(function(a, b) {
+                                   if(a[0] < b[0]) {
+                                        return -1; // Lower score
+                                   } else if(a[0] > b[0]) {
+                                        return 1; // higher score
+                                   } else {
+                                        if(a[4] > b[4]) {
+                                             return -1; // Higher hits, lower in list
+                                        } else if(a[4] < b[4]) {
+                                             return 1; // Lower hits, higher in list
+                                        } else {
+                                             if(a[1] > b[1]) {
+                                                  return 1; // Alphabetical body
+                                             } else if(a[1] < b[1]) {
+                                                  return -1;
+                                             } else {
+                                                  if(a[2] > b[2]) {
+                                                       return 1; // Alphabetical url
+                                                  } else if(a[2] < b[2]) {
+                                                       return -1;
+                                                  } else {
+                                                       if(a[3] > b[3]) {
+                                                            return 1;
+                                                       } else if(a[3] < b[3]) {
+                                                            return -1;
+                                                       } else {
+                                                            return 0;
+                                                       }
+                                                  }
+                                             }
+                                        }
+                                   }
+                              });
+
                               var l_o = 0;
                               for (var i = 0; i < found.length; i++)
                               {
-                                   var fo = found[i].split('^');
+                                   var fo = found[i];
                                    var dontElipse = false;
                                    if (l_o >= start && l_o < set.show + start)
                                    {                  
