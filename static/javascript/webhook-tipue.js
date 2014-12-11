@@ -334,7 +334,7 @@ var tipuesearch_stem = {"words": [
                                         found[c++] =[
                                              score,
                                              title,
-                                             s_t,
+                                             $('<div></div').text(s_t).html(),
                                              tipuesearch_in.pages[i].loc,
                                              matches === null ? 0 : (matches)
                                         ];  
@@ -388,7 +388,7 @@ var tipuesearch_stem = {"words": [
                                         found[c++] = [
                                              score,
                                              title,
-                                             s_t,
+                                             $('<div></div').text(s_t).html(),
                                              tipuesearch_in.pages[i].loc,
                                              matches === null ? 0 : (matches)
                                         ];                                                                
