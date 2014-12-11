@@ -139,10 +139,13 @@ var tipuesearch_stem = {"words": [
                {
                     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20')) || null;
                }
+
+               var curPage = getURLP('page') || 1;
+
                if (getURLP('q'))
                {
                     $('#tipue_search_input').val(getURLP('q'));
-                    getTipueSearch(0, true);
+                    getTipueSearch((curPage - 1) * set.show, true);
                }               
                
                var hadFirstSearch = false;
@@ -151,6 +154,7 @@ var tipuesearch_stem = {"words": [
                {
                     if(event.keyCode == '13')
                     {
+                         curPage = 1;
                          getTipueSearch(0, true);
                     }
                });
@@ -165,7 +169,9 @@ var tipuesearch_stem = {"words": [
 
                       if(state.event === 'tipue') {
                          $('#tipue_search_input').val(state.query);
-                         getTipueSearch(0, true, true);
+
+                         curPage = state.page;
+                         getTipueSearch((state.page - 1) * set.show, true, true);
 
                          event.stopPropagation();
                          event.preventDefault();
@@ -189,10 +195,13 @@ var tipuesearch_stem = {"words": [
 
                     if(!noPushState && window.history.pushState) {
                          var url = UpdateQueryString('q', d);
+                         url = UpdateQueryString('page', curPage, url);
+
+                         console.log(curPage);
                          if(!hadFirstSearch) {
-                              window.history.replaceState({ event: 'tipue', query: d }, document.title, url);
+                              window.history.replaceState({ event: 'tipue', query: d, page: curPage }, document.title, url);
                          } else {
-                              window.history.pushState({ event: 'tipue', query: d }, document.title, url);
+                              window.history.pushState({ event: 'tipue', query: d, page: curPage }, document.title, url);
                          }
                     }
                     
@@ -605,6 +614,7 @@ var tipuesearch_stem = {"words": [
                     
                     $('#tipue_search_replaced').click(function()
                     {
+                         curPage = 1;
                          getTipueSearch(0, false);
                     });                
                
@@ -613,6 +623,7 @@ var tipuesearch_stem = {"words": [
                          var id_v = $(this).attr('id');
                          var id_a = id_v.split('_');
                     
+                         curPage = (id_a[0] / set.show) + 1;
                          getTipueSearch(parseInt(id_a[0]), id_a[1]);
                     });                                                       
                }          
