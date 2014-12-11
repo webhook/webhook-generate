@@ -311,7 +311,9 @@ var tipuesearch_stem = {"words": [
                                              matches = (s_t.match(globalPatr) || []).length;
                                              matches += (title.match(globalPatr) || []).length;
 
+                                             title = $('<div></div>').text(title).html();
                                              title = title.replace(globalPatr, "<span class=\"wh-search-term\">$1</span>");
+                                             s_t = $('<div></div>').text(s_t).html();
                                              s_t = s_t.replace(patr, "<span class=\"wh-search-term\">$1</span>");
                                         }
                                         if (tipuesearch_in.pages[i].tags.search(pat) != -1)
@@ -334,7 +336,7 @@ var tipuesearch_stem = {"words": [
                                         found[c++] =[
                                              score,
                                              title,
-                                             $('<div></div').text(s_t).html(),
+                                             s_t,
                                              tipuesearch_in.pages[i].loc,
                                              matches === null ? 0 : (matches)
                                         ];  
@@ -375,7 +377,9 @@ var tipuesearch_stem = {"words": [
                                         matches = (s_t.match(globalPatr) || []).length;
                                         matches += (title.match(globalPatr) || []).length;
 
+                                        title = $('<div></div>').text(title).html();
                                         title = title.replace(globalPatr, "<span class=\"wh-search-term\">$1</span>");
+                                        s_t = $('<div></div>').text(s_t).html();
                                         s_t = s_t.replace(patr, "<span class=\"wh-search-term\">$1</span>");
                                    }
                                    if (tipuesearch_in.pages[i].tags.search(pat) != -1)
@@ -388,7 +392,7 @@ var tipuesearch_stem = {"words": [
                                         found[c++] = [
                                              score,
                                              title,
-                                             $('<div></div').text(s_t).html(),
+                                             s_t,
                                              tipuesearch_in.pages[i].loc,
                                              matches === null ? 0 : (matches)
                                         ];                                                                
