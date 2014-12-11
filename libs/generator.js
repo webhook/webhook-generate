@@ -235,6 +235,10 @@ module.exports.generator = function (config, options, logger, fileParser) {
       return;
     }
 
+    if(!searchEntryStream) {
+      return;
+    }
+
     var endUrl = outFile.replace('./.build', '');
 
     if(path.extname(endUrl) !== '.html' || endUrl === '/404.html' || endUrl.indexOf('/_wh_previews') === 0) {
