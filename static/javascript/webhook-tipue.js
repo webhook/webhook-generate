@@ -539,65 +539,65 @@ var tipuesearch_stem = {"words": [
                                    l_o++;     
                               }
 
-                              out += '</dl>';
+                              out += '</dl>\n';
                               if (c > set.show)
                               {
                                    var pages = Math.ceil(c / set.show);
                                    var page = (start / set.show) + 1;
 
-                                   out += '<ul class="wh-search-paginate">';
+                                   out += '<ul class="wh-search-paginate">\n';
                                    
                                    if (page > 1)
                                    {
-                                       out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start - set.show) + '_' + replace + '">&laquo;</a></li>'; 
+                                       out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start - set.show) + '_' + replace + '">&laquo;</a></li>\n'; 
                                    }
 
                                    if(page != 1) {
-                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + 0 + '_' + replace + '">' + 1 + '</a></li>';
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + 0 + '_' + replace + '">' + 1 + '</a></li>\n';
                                    } else {
-                                        out += '<li class="active"><a href="javascript:void(0)">' + page + '</a></li>'; //Current page
+                                        out += '<li class="active"><a href="javascript:void(0)">' + page + '</a></li>\n'; //Current page
                                    }
 
                                    if(page > 4) {
-                                        out += '<li class="dots"><a href="">..</a></li>';
+                                        out += '<li class="dots"><a href="">..</a></li>\n';
                                    }
 
                                    if(page > 3) {
-                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page - 3) * set.show) + '_' + replace + '">' + (page - 2) + '</a></li>';
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page - 3) * set.show) + '_' + replace + '">' + (page - 2) + '</a></li>\n';
                                    }
 
                                    if(page > 2) {
-                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page - 2) * set.show) + '_' + replace + '">' + (page - 1) + '</a></li>';
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page - 2) * set.show) + '_' + replace + '">' + (page - 1) + '</a></li>\n';
                                    }
 
                                    if(page !== 1 && page !== pages) {
-                                        out += '<li class="active"><a href="javascript:void(0)">' + page + '</a></li>'; //Current page
+                                        out += '<li class="active"><a href="javascript:void(0)">' + page + '</a></li>\n'; //Current page
                                    }
 
                                    if(page < pages - 1) {
-                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (page * set.show) + '_' + replace + '">' + (page + 1) + '</a></li>';
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (page * set.show) + '_' + replace + '">' + (page + 1) + '</a></li>\n';
                                    }
 
                                    if(page < pages - 2) {
-                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page + 1) * set.show) + '_' + replace + '">' + (page + 2) + '</a></li>';
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page + 1) * set.show) + '_' + replace + '">' + (page + 2) + '</a></li>\n';
                                    }
 
                                    if(page < pages - 3) {
-                                        out += '<li class="dots"><a href="">..</a></li>';
+                                        out += '<li class="dots"><a href="">..</a></li>\n';
                                    }
 
                                    if(page != pages) {
-                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((pages - 1) * set.show) + '_' + replace + '">' + pages+ '</a></li>';
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((pages - 1) * set.show) + '_' + replace + '">' + pages+ '</a></li>\n';
                                    } else {
-                                        out += '<li class="active"><a href="javascript:void(0)">' + pages + '</a></li>'; //Current page
+                                        out += '<li class="active"><a href="javascript:void(0)">' + pages + '</a></li>\n'; //Current page
                                    }         
                                                     
                                    if (page != pages)
                                    {
-                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start + set.show) + '_' + replace + '">&raquo;</a></li>'; 
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start + set.show) + '_' + replace + '">&raquo;</a></li>\n'; 
                                    }           
                                    
-                                   out += '</ul>';
+                                   out += '</ul>\n';
                               }                        
                          }
                          else
