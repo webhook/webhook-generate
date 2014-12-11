@@ -197,7 +197,6 @@ var tipuesearch_stem = {"words": [
                          var url = UpdateQueryString('q', d);
                          url = UpdateQueryString('page', curPage, url);
 
-                         console.log(curPage);
                          if(!hadFirstSearch) {
                               window.history.replaceState({ event: 'tipue', query: d, page: curPage }, document.title, url);
                          } else {
@@ -286,6 +285,8 @@ var tipuesearch_stem = {"words": [
                                    title = $('<div></div>').text(title).html();
                                    s_t = $('<div></div>').text(s_t).html();
 
+                                   var matches = null;
+
                                    for (var f = 0; f < d_w.length; f++)
                                    {
                                         var pat = new RegExp(d_w[f], 'i');
@@ -298,7 +299,6 @@ var tipuesearch_stem = {"words": [
                                              score -= (150000 - i);
                                         }
                                         
-                                        var matches = null;
                                         if (set.highlightTerms)
                                         {
                                              var globalPatr =  new RegExp('(' + d_w[f] + ')', 'gi');
@@ -311,7 +311,12 @@ var tipuesearch_stem = {"words": [
                                              {
                                                   var patr = new RegExp('(' + d_w[f] + ')', 'i');
                                              }
-                                             matches = (s_t.match(globalPatr) || []).length;
+
+                                             if(matches === null) {
+                                                  matches = 0;
+                                             }
+
+                                             matches += (s_t.match(globalPatr) || []).length;
                                              matches += (title.match(globalPatr) || []).length;
 
                                              title = title.replace(globalPatr, "<span class=\"wh-search-term\">$1</span>");
@@ -339,7 +344,7 @@ var tipuesearch_stem = {"words": [
                                              title,
                                              s_t,
                                              tipuesearch_in.pages[i].loc,
-                                             matches === null ? 0 : (matches)
+                                             matches === null ? null : (matches)
                                         ];  
                                    }
                               }
@@ -379,7 +384,11 @@ var tipuesearch_stem = {"words": [
                                              var patr = new RegExp('(' + d + ')', 'i');
                                         }
 
-                                        matches = (s_t.match(globalPatr) || []).length;
+                                        if(matches === null) {
+                                             matches = 0;
+                                        }
+
+                                        matches += (s_t.match(globalPatr) || []).length;
                                         matches += (title.match(globalPatr) || []).length;
 
                                         title = title.replace(globalPatr, "<span class=\"wh-search-term\">$1</span>");
@@ -397,12 +406,12 @@ var tipuesearch_stem = {"words": [
                                              title,
                                              s_t,
                                              tipuesearch_in.pages[i].loc,
-                                             matches === null ? 0 : (matches)
+                                             matches === null ? null : (matches)
                                         ];                                                                
                                    }                              
                               }
                          }                         
-                         
+
                          if (c != 0)
                          {
                               out += '<dl class="wh-search-results">';
@@ -529,62 +538,64 @@ var tipuesearch_stem = {"words": [
                                    }
                                    l_o++;     
                               }
-                              
+
                               out += '</dl>';
                               if (c > set.show)
                               {
                                    var pages = Math.ceil(c / set.show);
-                                   var page = (start / set.show);
+                                   var page = (start / set.show) + 1;
+
                                    out += '<ul class="wh-search-paginate">';
                                    
-                                   if (start > 0)
+                                   if (page > 1)
                                    {
-                                       out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start - set.show) + '_' + replace + '">Prev</a></li>'; 
+                                       out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start - set.show) + '_' + replace + '">&laquo;</a></li>'; 
                                    }
-                                                       
-                                   if (page <= 2)
-                                   {
-                                        var p_b = pages;
-                                        if (pages > 3)
-                                        {
-                                             p_b = 3;
-                                        }                    
-                                        for (var f = 0; f < p_b; f++)
-                                        {
-                                             if (f == page)
-                                             {
-                                                  out += '<li class="active"><a href="javascript:void(0)">' + (f + 1) + '</a></li>';
-                                             }
-                                             else
-                                             {
-                                                  out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (f * set.show) + '_' + replace + '">' + (f + 1) + '</a></li>';
-                                             }
-                                        }
+
+                                   if(page != 1) {
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + 0 + '_' + replace + '">' + 1 + '</a></li>';
+                                   } else {
+                                        out += '<li class="active"><a href="javascript:void(0)">' + page + '</a></li>'; //Current page
                                    }
-                                   else
+
+                                   if(page > 4) {
+                                        out += '<li class="dots"><a href="">..</a></li>';
+                                   }
+
+                                   if(page > 3) {
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page - 3) * set.show) + '_' + replace + '">' + (page - 2) + '</a></li>';
+                                   }
+
+                                   if(page > 2) {
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page - 2) * set.show) + '_' + replace + '">' + (page - 1) + '</a></li>';
+                                   }
+
+                                   if(page !== 1 && page !== pages) {
+                                        out += '<li class="active"><a href="javascript:void(0)">' + page + '</a></li>'; //Current page
+                                   }
+
+                                   if(page < pages - 1) {
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (page * set.show) + '_' + replace + '">' + (page + 1) + '</a></li>';
+                                   }
+
+                                   if(page < pages - 2) {
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((page + 1) * set.show) + '_' + replace + '">' + (page + 2) + '</a></li>';
+                                   }
+
+                                   if(page < pages - 3) {
+                                        out += '<li class="dots"><a href="">..</a></li>';
+                                   }
+
+                                   if(page != pages) {
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + ((pages - 1) * set.show) + '_' + replace + '">' + pages+ '</a></li>';
+                                   } else {
+                                        out += '<li class="active"><a href="javascript:void(0)">' + pages + '</a></li>'; //Current page
+                                   }         
+                                                    
+                                   if (page != pages)
                                    {
-                                        var p_b = page + 2;
-                                        if (p_b > pages)
-                                        {
-                                             p_b = pages; 
-                                        }
-                                        for (var f = page - 1; f < p_b; f++)
-                                        {
-                                             if (f == page)
-                                             {
-                                                  out += '<li class="active"><a href="javascript:void(0)">' + (f + 1) + '</a></li>';
-                                             }
-                                             else
-                                             {
-                                                  out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (f * set.show) + '_' + replace + '">' + (f + 1) + '</a></li>';
-                                             }
-                                        }
-                                   }                         
-                                                      
-                                   if (page + 1 != pages)
-                                   {
-                                       out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start + set.show) + '_' + replace + '">Next</a></li>'; 
-                                   }                    
+                                        out += '<li><a href="javascript:void(0)" class="tipue_search_foot_box" id="' + (start + set.show) + '_' + replace + '">&raquo;</a></li>'; 
+                                   }           
                                    
                                    out += '</ul>';
                               }                        

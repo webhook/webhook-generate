@@ -217,25 +217,22 @@ module.exports.generator = function (config, options, logger, fileParser) {
     callback();
   };
 
+
   this.closeSearchEntryStream = function(callback) {
-    if(config.get('webhook').noSearch === true) {
+    if(config.get('webhook').noSearch === true || !searchEntryStream) {
       callback();
       return;
     }
 
-    if(searchEntryStream) {
-      searchEntryStream.end(']}');
-    }
+    searchEntryStream.end(']}');
 
-    callback();
+    searchEntryStream.on('close', function() {
+      callback();
+    });
   };
 
   var writeSearchEntry = function(outFile, output) {
-    if(config.get('webhook').noSearch === true) {
-      return;
-    }
-
-    if(!searchEntryStream) {
+    if(config.get('webhook').noSearch === true || !searchEntryStream) {
       return;
     }
 
@@ -252,7 +249,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
     var title = content('title').text();
     var bodyObj = content('body');
 
-    if(bodyObj.attr('data-search-index') == false) {
+    if(bodyObj.attr('data-search-index') === "false") {
       return;
     }
 
@@ -289,7 +286,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
     title = '';
     body = '';
-  }
+  };
 
   /**
    * Writes an instance of a template to the build directory
