@@ -537,7 +537,7 @@ var tipuesearch_stem = {"words": [
                                         {
                                              if (f == page)
                                              {
-                                                  out += '<li class="active">' + (f + 1) + '</li>';
+                                                  out += '<li class="active"><a href="javascript:void(0)">' + (f + 1) + '</a></li>';
                                              }
                                              else
                                              {
@@ -556,7 +556,7 @@ var tipuesearch_stem = {"words": [
                                         {
                                              if (f == page)
                                              {
-                                                  out += '<li class="current">' + (f + 1) + '</li>';
+                                                  out += '<li class="active"><a href="javascript:void(0)">' + (f + 1) + '</a></li>';
                                              }
                                              else
                                              {
