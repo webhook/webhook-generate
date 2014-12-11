@@ -283,6 +283,9 @@ var tipuesearch_stem = {"words": [
 
                                    var title = tipuesearch_in.pages[i].title;
 
+                                   title = $('<div></div>').text(title).html();
+                                   s_t = $('<div></div>').text(s_t).html();
+
                                    for (var f = 0; f < d_w.length; f++)
                                    {
                                         var pat = new RegExp(d_w[f], 'i');
@@ -311,9 +314,7 @@ var tipuesearch_stem = {"words": [
                                              matches = (s_t.match(globalPatr) || []).length;
                                              matches += (title.match(globalPatr) || []).length;
 
-                                             title = $('<div></div>').text(title).html();
                                              title = title.replace(globalPatr, "<span class=\"wh-search-term\">$1</span>");
-                                             s_t = $('<div></div>').text(s_t).html();
                                              s_t = s_t.replace(patr, "<span class=\"wh-search-term\">$1</span>");
                                         }
                                         if (tipuesearch_in.pages[i].tags.search(pat) != -1)
@@ -351,6 +352,10 @@ var tipuesearch_stem = {"words": [
                               {
                                    var score = 1000000000;
                                    var s_t = tipuesearch_in.pages[i].text;
+
+                                   title = $('<div></div>').text(title).html();
+                                   s_t = $('<div></div>').text(s_t).html();
+                                   
                                    var pat = new RegExp(d, 'i');
                                    if (tipuesearch_in.pages[i].title.search(pat) != -1)
                                    {
@@ -377,9 +382,7 @@ var tipuesearch_stem = {"words": [
                                         matches = (s_t.match(globalPatr) || []).length;
                                         matches += (title.match(globalPatr) || []).length;
 
-                                        title = $('<div></div>').text(title).html();
                                         title = title.replace(globalPatr, "<span class=\"wh-search-term\">$1</span>");
-                                        s_t = $('<div></div>').text(s_t).html();
                                         s_t = s_t.replace(patr, "<span class=\"wh-search-term\">$1</span>");
                                    }
                                    if (tipuesearch_in.pages[i].tags.search(pat) != -1)
