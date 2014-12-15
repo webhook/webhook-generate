@@ -44,11 +44,25 @@ module.exports = function(grunt) {
 
   grunt.registerTask('buildTemplates', 'Generate static files from templates directory', function() {
     var done = this.async();
+
+    var production = grunt.option('production');
+
+    if(production === true) {
+      generator.enableProduction();
+    }
+
     generator.renderTemplates(done, generator.reloadFiles);
   });
 
   grunt.registerTask('buildPages', 'Generate static files from pages directory', function() {
     var done = this.async();
+
+    var production = grunt.option('production');
+
+    if(production === true) {
+      generator.enableProduction();
+    }
+
     generator.renderPages(done, generator.reloadFiles);
   });
 
@@ -102,6 +116,12 @@ module.exports = function(grunt) {
 
     if(strict === true) {
       generator.enableStrictMode();
+    }
+
+    var production = grunt.option('production');
+
+    if(production === true) {
+      generator.enableProduction();
     }
 
     checkVersion(function() {

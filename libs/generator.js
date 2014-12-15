@@ -76,6 +76,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
   var websocket = null;
   var strictMode = false;
+  var productionFlag = false;
 
   this.versionString = null;
   this.cachedData = null;
@@ -310,6 +311,8 @@ module.exports.generator = function (config, options, logger, fileParser) {
     if(params.item) {
       params.item = params._realGetItem(params.item._type, params.item._id, true);
     }
+
+    params.production = productionFlag;
 
     var output = '';
     try {
@@ -1399,6 +1402,9 @@ module.exports.generator = function (config, options, logger, fileParser) {
     strictMode = true;
   }
 
+  this.enableProduction = function() {
+    productionFlag = true;
+  }
 
   return this;
 };
