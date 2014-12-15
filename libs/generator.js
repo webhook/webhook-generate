@@ -18,6 +18,7 @@ var async = require('async');
 var spawn = require('win-spawn');
 var md5 = require('MD5');
 var $ = require('cheerio');
+var exec = require('child_process').exec;
 
 require('colors');
 
