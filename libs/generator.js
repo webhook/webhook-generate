@@ -862,7 +862,13 @@ module.exports.generator = function (config, options, logger, fileParser) {
     var isWin = /^win/.test(process.platform);
 
     if(isWin) {
-      exec('rmdir /s /q ' + directory, function() {
+      exec('rmdir /s /q ' + directory, function(err) {
+
+        if(err) {
+          if(fs.existsSync(directory)) {
+            wrench.rmdirSyncRecursive(directory);
+          }
+        }
         callback();
       });
     } else {
