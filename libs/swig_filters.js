@@ -371,9 +371,18 @@ module.exports.init = function (swig) {
           filtered.push(item);
       } else {
         filters.forEach(function(filter) {
-          if(item[property] === filter) {
-            addIn = false;
-            return false;
+          if(Array.isArray(filter)) {
+            filter.forEach(function(checkItem) {
+              if(item[property] === checkItem[property]) {
+                addIn = false;
+                return false;
+              }
+            })
+          } else {
+            if(item[property] === filter) {
+              addIn = false;
+              return false;
+            }
           }
         })
 
