@@ -267,9 +267,21 @@ module.exports.swigFunctions = function(swig) {
   var getCombined = function() {
     var names = [].slice.call(arguments, 0);
 
-    if(self.cachedData[names.join(',')])
+    if(names.length === 0) {
+      return [];
+    }
+
+    var lastName = names[names.length - 1];
+    var includeAll = false;
+
+    if(typeof lastName === 'boolean') {
+      includeAll = lastName;
+      names.pop();
+    }
+
+    if(self.cachedData[names.join(',') + ',' + includeAll])
     {
-      return self.cachedData[names.join(',')];
+      return self.cachedData[names.join(',') + ',' + includeAll];
     }
 
     generatedSlugs = {};
@@ -331,7 +343,7 @@ module.exports.swigFunctions = function(swig) {
         return value;
       });
       tempData = _.filter(tempData, function(item) { 
-        if(!item.publish_date) {
+        if(!includeAll && !item.publish_date) {
           return false;
         }
 
@@ -349,7 +361,7 @@ module.exports.swigFunctions = function(swig) {
     });
 
     
-    self.cachedData[names.join(',')] = data;
+    self.cachedData[names.join(',') + ',' + includeAll] = data;
 
     return data;
   };
