@@ -182,16 +182,16 @@ module.exports.swigFunctions = function(swig) {
    * @param    {Array}  An array of relation strings from the CMS
    * @returns  {Array}  All published items specified by relation strings
    */
-  var getItems = function(arr) {
+  var getItems = function(arr, ignorePub) {
     if(!arr) {
       return [];
     }
     var items = [];
 
     arr.forEach(function(itm) {
-      var obj = getItem(itm);
+      var obj = getItem(itm, null, ignorePub);
       if(!_.isEmpty(obj)) {
-        items.push(getItem(itm));
+        items.push(obj);
       }
     });
 
@@ -250,6 +250,16 @@ module.exports.swigFunctions = function(swig) {
             if(!val) return val;
 
             return getItems(val);
+          }
+        });
+
+        Object.defineProperty(object, '_' + field.name, {
+          enumerable: true,
+          configurable: true,
+          get: function() {
+            if(!val) return val;
+
+            return getItems(val, true);
           }
         });
       }
