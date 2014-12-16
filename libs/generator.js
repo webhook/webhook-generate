@@ -981,8 +981,18 @@ module.exports.generator = function (config, options, logger, fileParser) {
       widgetFiles[(path.dirname(item) + '/' + path.basename(item, '.html')).replace('./', '')] = true;
     });
 
-    var renderWidget = function(controlType, fieldName, controlInfo) {
-      var widgetString = _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: 'item.' + fieldName, controlInfo: controlInfo });
+    var renderWidget = function(controlType, fieldName, controlInfo, overridePrefix) {
+      var controls = [];
+
+      if(controlInfo.controls) {
+        _.each(controlInfo.controls, function(item) {
+          controls[item.name] = item;
+        });
+      }
+
+      var prefix = overridePrefix || 'item.';
+
+      var widgetString = _.template(fs.readFileSync('./libs/widgets/' + controlType + '.html'), { value: prefix + fieldName, controlInfo: controlInfo, renderWidget: renderWidget, controls: controls, widgetFiles: widgetFiles });
 
       var lines = widgetString.split('\n');
       var newLines = [];
