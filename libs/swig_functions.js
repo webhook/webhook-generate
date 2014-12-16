@@ -242,6 +242,15 @@ module.exports.swigFunctions = function(swig) {
             return getItem(val);
           }
         });
+        Object.defineProperty(object, '_' + field.name, {
+          enumerable: true,
+          configurable: true,
+          get: function() {
+            if(!val) return val;
+
+            return getItem(val, null, true);
+          }
+        });
       } else {
         Object.defineProperty(object, field.name, {
           enumerable: true,
