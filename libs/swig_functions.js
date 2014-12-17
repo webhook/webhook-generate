@@ -231,12 +231,7 @@ module.exports.swigFunctions = function(swig) {
 
   var adjustRelationshipFields = function(fields, object) {
     // If owner field, then name is a sub field on another object and we need to iterate through its
-
-    fields.forEach(function(field) {
-      var desc = Object.getOwnPropertyDescriptor(object, field.name);
-      if(desc && desc.get) { // Don't double dip
-        return;
-      }
+    var adjustField = function(object, field) {
 
       var val = object[field.name];
 
@@ -280,6 +275,34 @@ module.exports.swigFunctions = function(swig) {
           }
         });
       }
+    }
+
+    fields.forEach(function(field) {
+      if(field.ownerField) {
+        // This is a grid
+        var gridArray = object[field.ownerField];
+
+        if(!gridArray) {
+          return;
+        }
+
+        gridArray.forEach(function(gridItem) {
+          var desc = Object.getOwnPropertyDescriptor(gridItem, field.name);
+          if(desc && desc.get) { // Don't double dip
+            return;
+          }
+
+          adjustField(gridItem, field);
+        });
+      } else {
+        var desc = Object.getOwnPropertyDescriptor(object, field.name);
+        if(desc && desc.get) { // Don't double dip
+          return;
+        }
+
+        adjustField(object, field);
+      }
+
     });
 
     return object;
