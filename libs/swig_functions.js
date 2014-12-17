@@ -260,7 +260,6 @@ module.exports.swigFunctions = function(swig) {
           configurable: true,
           get: function() {
             if(!val) return val;
-
             return getItems(val);
           }
         });
