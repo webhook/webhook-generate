@@ -165,7 +165,13 @@ module.exports.swigFunctions = function(swig) {
     if(self.typeInfo[type] && self.typeInfo[type].controls) {
       self.typeInfo[type].controls.forEach(function(control) {
         if(control.controlType === "relation") {
-          relationshipFields.push({ name: control.name, isSingle: control.meta.isSingle });
+          relationshipFields.push({ ownerField: null, name: control.name, isSingle: control.meta.isSingle });
+        } else if (control.controlType === "grid" && control.controls) {
+          control.controls.forEach(function(otherControl) {
+            if(otherControl.controlType === "relation") {
+              relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: otherControl.meta.isSingle })
+            }
+          });
         }
       });
     }
@@ -224,6 +230,8 @@ module.exports.swigFunctions = function(swig) {
 
 
   var adjustRelationshipFields = function(fields, object) {
+    // If owner field, then name is a sub field on another object and we need to iterate through its
+
     fields.forEach(function(field) {
       var desc = Object.getOwnPropertyDescriptor(object, field.name);
       if(desc && desc.get) { // Don't double dip
@@ -304,7 +312,13 @@ module.exports.swigFunctions = function(swig) {
       if(self.typeInfo[name] && self.typeInfo[name].controls) {
         self.typeInfo[name].controls.forEach(function(control) {
           if(control.controlType === "relation") {
-            relationshipFields.push({ name: control.name, isSingle: control.meta.isSingle });
+            relationshipFields.push({ ownerField: null, name: control.name, isSingle: control.meta.isSingle });
+          } else if (control.controlType === "grid" && control.controls) {
+            control.controls.forEach(function(otherControl) {
+              if(otherControl.controlType === "relation") {
+                relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: otherControl.meta.isSingle })
+              }
+            });
           }
         });
       }
