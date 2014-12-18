@@ -16,15 +16,12 @@
 {# http://www.webhook.com/docs/template-inheritance-blocks/ #}
 {% extends "templates/partials/base.html" %}
 
-{# You can copy/paste this line to any page on your site to access the <%- typeName %> data. #}
-{% set item = cms.<%- typeName %> %}
-
 {# This sets our page <title>. It will append this <%- typeName %>'s name to the site title defined in base.html #}
-{% block title %}{% parent %} - {{ item.name }}{% endblock %}
+{% block title %}{% parent %} - {{ cms.<%- typeName %>.name }}{% endblock %}
 
 {% block content %}
 
-  <h1>{{ item.name }}</h1>
+  <h1>{{ cms.<%- typeName %>.name }}</h1>
 
   <ul>
     <% _.forEach(typeInfo.controls || [], function(fieldInfo) { %>
@@ -32,9 +29,9 @@
       <li>
         <strong><%- fieldInfo.label %>: </strong>
         <% if(widgetFiles[fieldInfo.controlType]) { %>
-        <% print(renderWidget(fieldInfo.controlType, fieldInfo.name, controls[fieldInfo.name])) %>
+        <% print(renderWidget(fieldInfo.controlType, fieldInfo.name, controls[fieldInfo.name], 'cms.' + typeName + '.' )) %>
         <% } else { %>
-        {{ item.<%- fieldInfo.name %> }}
+        {{ cms.<%- typeName %>.<%- fieldInfo.name %> }}
         <% } %>
       </li>
     <% } %>
