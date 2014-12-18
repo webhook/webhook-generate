@@ -1,5 +1,4 @@
-{# Relations require some special code. More info about relations here: #}
-{# http://www.webhook.com/docs/template-rules-and-filters/#getitem #}
+{# Relationship. Note that use the label you set for the relation, not the content-type name. #}
 <% if(controlInfo.meta ? controlInfo.meta.isSingle : false) { %>
 {# You can ouput more than just the name. Feel free to output more fields from the CMS. #}
 <a href="{{ url(<%- value %>) }}">{{ <%- value %>.name }}</a>
