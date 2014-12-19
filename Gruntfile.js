@@ -11,7 +11,7 @@ module.exports = function(grunt) {
   // Sass, less or coffescript files, not for reading things
   // from your templates and making dynamic changes during
   // the build process. Doing so will cause your live site
-  // not to regerate.
+  // not to regenerate.
   //
   // You have been warned!
   grunt.initConfig({
