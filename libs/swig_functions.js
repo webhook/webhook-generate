@@ -169,7 +169,7 @@ module.exports.swigFunctions = function(swig) {
         } else if (control.controlType === "grid" && control.controls) {
           control.controls.forEach(function(otherControl) {
             if(otherControl.controlType === "relation") {
-              relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: control.meta ? otherControl.meta.isSingle : false })
+              relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: otherControl.meta ? otherControl.meta.isSingle : false })
             }
           });
         }
@@ -347,7 +347,7 @@ module.exports.swigFunctions = function(swig) {
           } else if (control.controlType === "grid" && control.controls) {
             control.controls.forEach(function(otherControl) {
               if(otherControl.controlType === "relation") {
-                relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: control.meta ?  otherControl.meta.isSingle : false })
+                relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: otherControl.meta ?  otherControl.meta.isSingle : false })
               }
             });
           }
