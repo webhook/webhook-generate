@@ -958,7 +958,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
    * @param  {Boolean}   force    If true, forcibly overwrites old scaffolding
    */
   this.makeScaffolding = function(name, done, force) {
-    logger.ok('Creating Scaffolding\n');
+    logger.ok('Creating Scaffolding for ' + name + '\n');
     var directory = 'templates/' + name + '/';
 
     var list = directory + 'list.html';
