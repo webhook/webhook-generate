@@ -165,11 +165,11 @@ module.exports.swigFunctions = function(swig) {
     if(self.typeInfo[type] && self.typeInfo[type].controls) {
       self.typeInfo[type].controls.forEach(function(control) {
         if(control.controlType === "relation") {
-          relationshipFields.push({ ownerField: null, name: control.name, isSingle: control.meta.isSingle });
+          relationshipFields.push({ ownerField: null, name: control.name, isSingle: control.meta ? control.meta.isSingle : false });
         } else if (control.controlType === "grid" && control.controls) {
           control.controls.forEach(function(otherControl) {
             if(otherControl.controlType === "relation") {
-              relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: otherControl.meta.isSingle })
+              relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: control.meta ? otherControl.meta.isSingle : false })
             }
           });
         }
@@ -343,11 +343,11 @@ module.exports.swigFunctions = function(swig) {
       if(self.typeInfo[name] && self.typeInfo[name].controls) {
         self.typeInfo[name].controls.forEach(function(control) {
           if(control.controlType === "relation") {
-            relationshipFields.push({ ownerField: null, name: control.name, isSingle: control.meta.isSingle });
+            relationshipFields.push({ ownerField: null, name: control.name, isSingle: control.meta ? control.meta.isSingle : false });
           } else if (control.controlType === "grid" && control.controls) {
             control.controls.forEach(function(otherControl) {
               if(otherControl.controlType === "relation") {
-                relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: otherControl.meta.isSingle })
+                relationshipFields.push({ ownerField: control.name, name: otherControl.name, isSingle: control.meta ?  otherControl.meta.isSingle : false })
               }
             });
           }
