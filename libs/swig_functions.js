@@ -141,7 +141,13 @@ module.exports.swigFunctions = function(swig) {
       return {};
     }
 
-    var item = self.data[type][key];
+    var item = null;
+
+    if(self.typeInfo[type].oneOff) {
+      item = self.data[type];
+    } else {
+      item = self.data[type][key];
+    }
 
     if(!item) {
       return {};
