@@ -16,7 +16,6 @@
     "grunt": "~0.4.2",
     "firebase": "1.0.2",
     "mkdirp": "~0.3.5",
-    "grunt-contrib-connect": "~0.6.0",
     "grunt-open": "~0.2.2",
     "grunt-concurrent": "~0.4.2",
     "request": "~2.31.0",
@@ -37,12 +36,13 @@
     "proxy-middleware": "~0.5.0",
     "connect-header": "0.0.5",
     "uslug": "~1.0.3",
-    "grunt-connect-proxy": "~0.1.10",
     "colors": "~0.6.2",
     "MD5": "~1.2.1",
     "swig": "~1.4.1",
     "moment": "~2.8.1",
     "tiny-lr": "~0.1.0",
-    "cheerio": "~0.18.0"
+    "cheerio": "~0.18.0",
+    "grunt-contrib-connect": "~0.9.0",
+    "grunt-connect-proxy": "~0.1.11"
   }
 }
