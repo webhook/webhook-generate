@@ -555,7 +555,8 @@ module.exports.swigFunctions = function(swig) {
     var newArr = [];
 
     arrs.forEach(function(arr) {
-      newArr = newArr.concat(arr);
+      if(arr !== null)
+        newArr = newArr.concat(arr);
     })
 
     return newArr;
