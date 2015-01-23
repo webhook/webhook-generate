@@ -409,11 +409,30 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
       var entries = zip.getEntries();
 
+      if(fs.existsSync('package.json')) {
+        fs.renameSync('package.json', 'old.package.json');
+      }
+
       entries.forEach(function(entry) {
         var newName = entry.entryName.split('/').slice(1).join('/');
         entry.entryName = newName;
       });
       zip.extractAllTo('.', true);
+
+      if(fs.existsSync('old.package.json')) {
+        var packageJson = JSON.parse(fs.readFileSync('package.json'));
+        var oldPackageJson = JSON.parse(fs.readFileSync('old.package.json'));
+
+        var depends = packageJson.dependencies;
+        var oldDepends = oldPackageJson.dependencies;
+
+        _.assign(depends, oldDepends);
+
+        packageJson.dependencies = depends;
+
+        fs.writeFileSync('package.json', JSON.stringify(packageJson, null, "  "));
+        fs.unlinkSync('old.package.json');
+      }
 
       fs.unlinkSync('.preset.zip');
       callback();
@@ -519,11 +538,30 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
     var entries = zip.getEntries();
 
+    if(fs.existsSync('package.json')) {
+      fs.renameSync('package.json', 'old.package.json');
+    }
+
     entries.forEach(function(entry) {
       var newName = entry.entryName.split('/').slice(1).join('/');
       entry.entryName = newName;
     });
     zip.extractAllTo('.', true);
+
+    if(fs.existsSync('old.package.json')) {
+      var packageJson = JSON.parse(fs.readFileSync('package.json'));
+      var oldPackageJson = JSON.parse(fs.readFileSync('old.package.json'));
+
+      var depends = packageJson.dependencies;
+      var oldDepends = oldPackageJson.dependencies;
+
+      _.assign(depends, oldDepends);
+
+      packageJson.dependencies = depends;
+
+      fs.writeFileSync('package.json', JSON.stringify(packageJson, null, "  "));
+      fs.unlinkSync('old.package.json');
+    }
 
     fs.unlinkSync('.preset.zip');
 
