@@ -1271,7 +1271,6 @@ module.exports.generator = function (config, options, logger, fileParser) {
           }
           downloadPreset(url, function(data) {
             runNpm(function() {
-              console.log('DONE RUNNING?')
               sock.send('done:' + JSON.stringify(data));
             });
           });
