@@ -419,7 +419,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
       });
       zip.extractAllTo('.', true);
 
-      if(fs.existsSync('old.package.json')) {
+      if(fs.existsSync('old.package.json') && fs.existsSync('package.json')) {
         var packageJson = JSON.parse(fs.readFileSync('package.json'));
         var oldPackageJson = JSON.parse(fs.readFileSync('old.package.json'));
 
@@ -432,6 +432,8 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
         fs.writeFileSync('package.json', JSON.stringify(packageJson, null, "  "));
         fs.unlinkSync('old.package.json');
+      } else if(fs.existsSync('old.package.json')) {
+        fs.renameSync('old.package.json', 'package.json');
       }
 
       fs.unlinkSync('.preset.zip');
@@ -548,7 +550,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
     });
     zip.extractAllTo('.', true);
 
-    if(fs.existsSync('old.package.json')) {
+    if(fs.existsSync('old.package.json') && fs.existsSync('package.json')) {
       var packageJson = JSON.parse(fs.readFileSync('package.json'));
       var oldPackageJson = JSON.parse(fs.readFileSync('old.package.json'));
 
@@ -561,6 +563,8 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
       fs.writeFileSync('package.json', JSON.stringify(packageJson, null, "  "));
       fs.unlinkSync('old.package.json');
+    } else if(fs.existsSync('old.package.json')) {
+      fs.renameSync('old.package.json', 'package.json');
     }
 
     fs.unlinkSync('.preset.zip');
