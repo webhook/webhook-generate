@@ -66,6 +66,8 @@ Function = wrap;
 // Disable console log in various things
 //console.log = function () {};
 
+var cmsSocketPort = 6557;
+
 /**
  * Generator that handles various commands
  * @param  {Object}   config     Configuration options from .firebase.conf
@@ -75,6 +77,11 @@ module.exports.generator = function (config, options, logger, fileParser) {
   var self = this;
   var firebaseUrl = config.get('webhook').firebase || 'webhook';
   var liveReloadPort = config.get('connect')['wh-server'].options.livereload;
+
+  if(liveReloadPort !== 35730) {
+    cmsSocketPort = liveReloadPort + 1; 
+  }
+
   var websocket = null;
   var strictMode = false;
   var productionFlag = false;
@@ -303,6 +310,8 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
     // Merge functions in
     params = utils.extend(params, swigFunctions.getFunctions());
+
+    params.cmsSocketPort = cmsSocketPort;
 
     swigFunctions.init();
 
@@ -1289,7 +1298,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
           sock.sendText('done');
         }
       });
-    }).listen(6557, '0.0.0.0');
+    }).listen(cmsSocketPort, '0.0.0.0');
   };
 
   /**

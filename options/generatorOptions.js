@@ -20,6 +20,12 @@ module.exports = function(grunt) {
   
   var port = grunt.option('port') || '2002';
 
+
+  livereloadPort = 35730;
+  if(port !== '2002') {
+    livereloadPort = port + 1;
+  }
+
   var mergeConfig = {
     webhook: conf,
 
@@ -35,7 +41,7 @@ module.exports = function(grunt) {
           port: port * 1,
           hostname: '*',
           base: '.build',
-          livereload: 35730,
+          livereload: livereloadPort,
           middleware: function(connect, options, middlewares) {
             // Return array of whatever middlewares you want
             middlewares.unshift(header({ 'X-Webhook-Local' : true }));

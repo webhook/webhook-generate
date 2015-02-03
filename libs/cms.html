@@ -8,6 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="siteName" content="<%= siteName %>">
   <meta name="buildLive" content="true">
+  {% if cmsSocketPort %}
+  <meta name="socketPort" content="{{ cmsSocketPort }}">
+  {% endif %}
 
   <link rel="stylesheet" href="http://cms.webhook.com/{{ cmsVersion }}/assets/app.min.css">
 
