@@ -1195,6 +1195,13 @@ module.exports.generator = function (config, options, logger, fileParser) {
           }, self.reloadFiles);
       }, 1);
 
+      sock.on('close', function() {
+        websocket = null;
+      });
+
+      sock.on('error', function() {
+      })
+
       sock.on('text', function(message) {
         if(message.indexOf('scaffolding:') === 0)
         {
