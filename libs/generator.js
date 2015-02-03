@@ -11,7 +11,7 @@ var tinylr = require('tiny-lr');
 var _ = require('lodash');
 var wrench = require('wrench');
 var utils = require('./utils.js');
-var ws = require('ws').Server;
+var websocketServer = require('nodejs-websocket');
 var Zip   = require('adm-zip');
 var slug = require('uslug');
 var async = require('async');
@@ -1130,7 +1130,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
    */
   this.sendSockMessage = function(message) {
     if(websocket) {
-      websocket.send('message:' + JSON.stringify(message));
+      websocket.sendText('message:' + JSON.stringify(message));
     }
   };
 
@@ -1183,45 +1183,45 @@ module.exports.generator = function (config, options, logger, fileParser) {
    * Accepts messages for generating scaffolding and downloading preset themes.
    */
   this.webListener = function() {
-    var server = new ws({ host: '0.0.0.0', port: 6557 });
+    var server = new websocketServer.createServer(function(sock) {
 
-    server.on('connection', function(sock) {
       websocket = sock;
 
       var buildQueue = async.queue(function (task, callback) {
           self.buildBoth(function() {
-            sock.send('done');
-            callback();
+            sock.sendText('done', function() {
+              callback();
+            });
           }, self.reloadFiles);
       }, 1);
 
-      sock.on('message', function(message) {
+      sock.on('text', function(message) {
         if(message.indexOf('scaffolding:') === 0)
         {
           var name = message.replace('scaffolding:', '');
           self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
-            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
+            sock.sendText('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
           });
         } else if (message.indexOf('scaffolding_force:') === 0) {
           var name = message.replace('scaffolding_force:', '');
           self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
-            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
+            sock.sendText('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
           }, true);
         } else if (message.indexOf('check_scaffolding:') === 0) {
           var name = message.replace('check_scaffolding:', '');
           self.checkScaffoldingMD5(name, function(individualMD5, listMD5, oneOffMD5) {
-            sock.send('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
+            sock.sendText('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
           });
         } else if (message === 'reset_files') {
           resetGenerator(function(error) {
             if(error) {
-              sock.send('done:' + JSON.stringify({ err: 'Error while resetting files' }));
+              sock.sendText('done:' + JSON.stringify({ err: 'Error while resetting files' }));
             } else {
-              sock.send('done');
+              sock.sendText('done');
             }
           });
         } else if (message === 'supported_messages') {
-          sock.send('done:' + JSON.stringify([
+          sock.sendText('done:' + JSON.stringify([
             'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
             'push', 'build', 'preset', 'layouts', 'preset_localv2', 'generate_slug_v2'
           ]));
@@ -1250,7 +1250,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
               tmpSlug = type + '/' + tmpSlug;
             }
               
-            sock.send('done:' + JSON.stringify(tmpSlug));
+            sock.sendText('done:' + JSON.stringify(tmpSlug));
           });
         } else if (message === 'build') {
           buildQueue.push({}, function(err) {});
@@ -1258,31 +1258,31 @@ module.exports.generator = function (config, options, logger, fileParser) {
           var fileData = message.replace('preset_local:', '');
 
           if(!fileData) {
-            sock.send('done');
+            sock.sendText('done');
             return;
           }
 
           extractPresetLocal(fileData, function(data) {
             runNpm(function() {
-              sock.send('done:' + JSON.stringify(data));
+              sock.sendText('done:' + JSON.stringify(data));
             });
           });
         } else if (message.indexOf('preset:') === 0) {
           var url = message.replace('preset:', '');
           if(!url) {
-            sock.send('done');
+            sock.sendText('done');
             return;
           }
           downloadPreset(url, function(data) {
             runNpm(function() {
-              sock.send('done:' + JSON.stringify(data));
+              sock.sendText('done:' + JSON.stringify(data));
             });
           });
         } else {
-          sock.send('done');
+          sock.sendText('done');
         }
       });
-    });
+    }).listen(6557, '0.0.0.0');
   };
 
   /**
