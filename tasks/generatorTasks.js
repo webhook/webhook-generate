@@ -125,7 +125,7 @@ module.exports = function(grunt) {
     }
 
     checkVersion(function() {
-      generator.buildBoth(done, generator.reloadFiles);
+      generator.buildBoth(done);
     })
   });
 

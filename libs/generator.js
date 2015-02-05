@@ -946,12 +946,24 @@ module.exports.generator = function (config, options, logger, fileParser) {
       });
   };
 
+  var buildQueue = async.queue(function (task, callback) {
+      self.realBuildBoth(function() {
+        callback();
+      }, self.reloadFiles);
+  }, 1);
+
+  this.buildBoth = function(done) {
+    buildQueue.push({}, function(err) {
+      done();
+    });
+  };
+
   /**
    * Builds templates from both /pages and /templates to the build directory
    * @param  {Function}   done     Callback passed either a true value to indicate its done, or an error
    * @param  {Function}   cb       Callback called after finished, passed list of files changed and done function
    */
-  this.buildBoth = function(done, cb) {
+  this.realBuildBoth = function(done, cb) {
     // clean files
     self.cachedData = null;
     self.cleanFiles(null, function() {
@@ -1196,14 +1208,6 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
       websocket = sock;
 
-      var buildQueue = async.queue(function (task, callback) {
-          self.buildBoth(function() {
-            sock.sendText('done', function() {
-              callback();
-            });
-          }, self.reloadFiles);
-      }, 1);
-
       sock.on('close', function() {
         websocket = null;
       });
@@ -1269,7 +1273,9 @@ module.exports.generator = function (config, options, logger, fileParser) {
             sock.sendText('done:' + JSON.stringify(tmpSlug));
           });
         } else if (message === 'build') {
-          buildQueue.push({}, function(err) {});
+          buildQueue.push({}, function(err) { 
+            sock.sendText('done');
+          });
         } else if (message.indexOf('preset_local:') === 0) {
           var fileData = message.replace('preset_local:', '');
 
