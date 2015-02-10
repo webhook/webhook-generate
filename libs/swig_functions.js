@@ -185,6 +185,7 @@ module.exports.swigFunctions = function(swig) {
     item = adjustRelationshipFields(relationshipFields, item);
 
     item._type = type;
+    item._id = key;
 
     return item;
   };
