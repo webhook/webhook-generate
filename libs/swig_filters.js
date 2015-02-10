@@ -25,6 +25,7 @@ module.exports.init = function (swig) {
 
   var siteDns = '';
   var firebaseConf = {};
+  var typeInfo = {};
 
   var upper = function(input) {
     return input.toUpperCase();
@@ -240,6 +241,9 @@ module.exports.init = function (swig) {
     return input.endsWith(string);
   };
 
+  this.setTypeInfo = function(tInfo) {
+    typeInfo = tInfo;
+  }
   this.setSiteDns = function(dns) {
     siteDns = dns;
   }
@@ -405,11 +409,62 @@ module.exports.init = function (swig) {
     return '<p>' + joined + '</p>'
   };
 
+  var jsonFixer = function(key, value) {
+    if(!key) {
+      return value;
+    }
+
+    if(!value) {
+      return value;
+    }
+
+    if(!this._type) {
+      return value;
+    }
+
+    var info = typeInfo[this._type] || {};
+    var controls = info.controls || {};
+    var controlCandidates = _.where(controls, { name: key });
+
+    if(controlCandidates.length === 0) {
+      return value;
+    }
+
+    var control = controlCandidates[0];
+
+    if(control.controlType === 'relation') {
+      var str = '';
+      if(Array.isArray(value)) {
+        str = [];
+        value.forEach(function(val) {
+          if(val._id) {
+            str.push(val._type + ' ' + val._id);
+          } else {
+            str.push(val._type + ' ' + val._type);
+          }
+        })
+      } else {
+        if(val._id) {
+          str += value._type + ' ' + value._id;
+        } else {
+          str += value._type + ' ' + value._type;
+        }
+      }
+      return str;
+    }
+
+    return value;
+  }
+
+  var json = function(input) {
+    return JSON.stringify(input, jsonFixer);
+  }
+
   var jsonP = function(input, callbackName) {
     if(!callbackName) {
       callbackName = 'callback';
     }
-    return '/**/' + callbackName +  '(' + JSON.stringify(input) + ')';
+    return '/**/' + callbackName +  '(' + JSON.stringify(input, jsonFixer) + ')';
   };
 
   var pluralize = function(input, singular, suffix) {
@@ -445,6 +500,7 @@ module.exports.init = function (swig) {
   markdown.safe = true;
   linebreaks.safe = true;
   jsonP.safe = true;
+  json.safe = true;
 
   swig.setFilter('upper', upper);
   swig.setFilter('slice', slice);
@@ -466,4 +522,5 @@ module.exports.init = function (swig) {
   swig.setFilter('linebreaks', linebreaks);
   swig.setFilter('pluralize', pluralize);
   swig.setFilter('jsonp', jsonP);
+  swig.setFilter('json', json);
 };

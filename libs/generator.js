@@ -138,6 +138,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
       swigFunctions.setSettings(self.cachedData.settings);
       swigFilters.setSiteDns(self.cachedData.siteDns);
       swigFilters.setFirebaseConf(config.get('webhook'));
+      swigFilters.setTypeInfo(self.cachedData.typeInfo);
 
       callback(self.cachedData.data, self.cachedData.typeInfo);
       return;
@@ -183,6 +184,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
       swigFunctions.setData(data);
       swigFunctions.setTypeInfo(typeInfo);
       swigFunctions.setSettings(settings);
+      swigFilters.setTypeInfo(typeInfo);
 
       getDnsChild().once('value', function(snap) {
         var siteDns = snap.val() || config.get('webhook').siteName + '.webhook.org';
