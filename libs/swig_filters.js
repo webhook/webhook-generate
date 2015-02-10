@@ -444,7 +444,7 @@ module.exports.init = function (swig) {
           }
         })
       } else {
-        if(val._id) {
+        if(value._id) {
           str += value._type + ' ' + value._id;
         } else {
           str += value._type + ' ' + value._type;
