@@ -54,6 +54,11 @@ var wrap = function()
          'var window = null;' +
          'var process = null;' +
          'var eval = null;' +
+         'var require = null;' +
+         'var __filename = null;' +
+         'var __dirname = null;' +
+         'var modules = null;' +
+         'var exports = null;' +
          last;
 
   args.push(last);
