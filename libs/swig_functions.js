@@ -187,6 +187,27 @@ module.exports.swigFunctions = function(swig) {
     item._type = type;
     item._id = key;
 
+    if(!item.slug) {
+      var tmpSlug = generateSlug(item);
+      var prefix = '';
+
+      if(self.typeInfo[type] && self.typeInfo[type].customUrls && self.typeInfo[type].customUrls.listUrl) {
+        if(!(self.typeInfo[type].customUrls.listUrl === '#')) {
+          prefix = self.typeInfo[type].customUrls.listUrl + '/';
+        }
+      } else {
+        prefix = type + '/';
+      }
+
+      if(self.typeInfo[type] && self.typeInfo[type].customUrls && self.typeInfo[type].customUrls.individualUrl) {
+        prefix += utils.parseCustomUrl(self.typeInfo[type].customUrls.individualUrl, item) + '/';
+      }
+
+      prefix += tmpSlug;
+
+      item.slug = prefix;
+    }
+
     return item;
   };
 
