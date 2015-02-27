@@ -94,6 +94,8 @@ module.exports.generator = function (config, options, logger, fileParser) {
   this.versionString = null;
   this.cachedData = null;
 
+  this.childProcess = null;
+
   if(liveReloadPort === true)
   {
     liveReloadPort = 35729;
@@ -215,6 +217,14 @@ module.exports.generator = function (config, options, logger, fileParser) {
   };
 
   var searchEntryStream = null;
+
+  this.setChildProcess = function(child) {
+    self.childProcess = child;
+
+    child.on('message', function(message) {
+      self.sendSockMessage(message);
+    })
+  }
 
   this.openSearchEntryStream = function(callback) {
     if(config.get('webhook').noSearch === true) {
@@ -1246,8 +1256,12 @@ module.exports.generator = function (config, options, logger, fileParser) {
    * @param  {String}      message    Message to send
    */
   this.sendSockMessage = function(message) {
-    if(websocket) {
-      websocket.sendText('message:' + JSON.stringify(message));
+    if(process.send) {
+      process.send(message);
+    } else {
+      if(websocket) {
+        websocket.sendText('message:' + JSON.stringify(message));
+      }
     }
   };
 
@@ -1295,6 +1309,102 @@ module.exports.generator = function (config, options, logger, fileParser) {
     }
   };
 
+  var handleMessage = function(message) {
+    if(message.indexOf('scaffolding:') === 0)
+    {
+      var name = message.replace('scaffolding:', '');
+      self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
+        self.sendSockMessage('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
+      });
+    } else if (message.indexOf('scaffolding_force:') === 0) {
+      var name = message.replace('scaffolding_force:', '');
+      self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
+        self.sendSockMessage('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
+      }, true);
+    } else if (message.indexOf('check_scaffolding:') === 0) {
+      var name = message.replace('check_scaffolding:', '');
+      self.checkScaffoldingMD5(name, function(individualMD5, listMD5, oneOffMD5) {
+        self.sendSockMessage('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
+      });
+    } else if (message === 'reset_files') {
+      resetGenerator(function(error) {
+        if(error) {
+          self.sendSockMessage('done:' + JSON.stringify({ err: 'Error while resetting files' }));
+        } else {
+          self.sendSockMessage('done');
+        }
+      });
+    } else if (message === 'supported_messages') {
+      self.sendSockMessage('done:' + JSON.stringify([
+        'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
+        'push', 'build', 'preset', 'layouts', 'preset_localv2', 'generate_slug_v2'
+      ]));
+    } else if (message.indexOf('generate_slug_v2:') === 0) {
+      var obj = JSON.parse(message.replace('generate_slug_v2:', ''));
+      var type = obj.type;
+      var name = obj.name;
+      var date = obj.date;
+
+      getTypeData(type, function(typeInfo) {
+        var tmpSlug = '';
+        tmpSlug = slug(name).toLowerCase();
+
+        if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
+          tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl, date) + '/' + tmpSlug;
+        } 
+
+        if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.listUrl) {
+
+          if(typeInfo.customUrls.listUrl === '#') {
+            tmpSlug = tmpSlug;
+          } else {
+            tmpSlug = typeInfo.customUrls.listUrl + '/' + tmpSlug;
+          }
+        } else {
+          tmpSlug = type + '/' + tmpSlug;
+        }
+          
+        self.sendSockMessage('done:' + JSON.stringify(tmpSlug));
+      });
+    } else if (message === 'build') {
+      buildQueue.push({ type: 'all' }, function(err) { 
+        self.sendSockMessage('done');
+      });
+    } else if (message.indexOf('preset_local:') === 0) {
+      var fileData = message.replace('preset_local:', '');
+
+      if(!fileData) {
+        self.sendSockMessage('done');
+        return;
+      }
+
+      extractPresetLocal(fileData, function(data) {
+        runNpm(function() {
+          self.sendSockMessage('done:' + JSON.stringify(data));
+        });
+      });
+    } else if (message.indexOf('preset:') === 0) {
+      var url = message.replace('preset:', '');
+      if(!url) {
+        self.sendSockMessage('done');
+        return;
+      }
+      downloadPreset(url, function(data) {
+        runNpm(function() {
+          self.sendSockMessage('done:' + JSON.stringify(data));
+        });
+      });
+    } else {
+      self.sendSockMessage('done');
+    }
+  };
+
+  if(process.send) {
+    process.on('message', function(message) {
+      handleMessage(message);
+    });
+  }
+
   /**
    * Starts a websocket listener on 0.0.0.0 (for people who want to run wh serv over a network)
    * Accepts messages for generating scaffolding and downloading preset themes.
@@ -1309,95 +1419,14 @@ module.exports.generator = function (config, options, logger, fileParser) {
       });
 
       sock.on('error', function() {
+
       })
 
       sock.on('text', function(message) {
-        if(message.indexOf('scaffolding:') === 0)
-        {
-          var name = message.replace('scaffolding:', '');
-          self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
-            sock.sendText('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
-          });
-        } else if (message.indexOf('scaffolding_force:') === 0) {
-          var name = message.replace('scaffolding_force:', '');
-          self.makeScaffolding(name, function(individualMD5, listMD5, oneOffMD5) {
-            sock.sendText('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
-          }, true);
-        } else if (message.indexOf('check_scaffolding:') === 0) {
-          var name = message.replace('check_scaffolding:', '');
-          self.checkScaffoldingMD5(name, function(individualMD5, listMD5, oneOffMD5) {
-            sock.sendText('done:' + JSON.stringify({ individualMD5: individualMD5, listMD5: listMD5, oneOffMD5: oneOffMD5 }));
-          });
-        } else if (message === 'reset_files') {
-          resetGenerator(function(error) {
-            if(error) {
-              sock.sendText('done:' + JSON.stringify({ err: 'Error while resetting files' }));
-            } else {
-              sock.sendText('done');
-            }
-          });
-        } else if (message === 'supported_messages') {
-          sock.sendText('done:' + JSON.stringify([
-            'scaffolding', 'scaffolding_force', 'check_scaffolding', 'reset_files', 'supported_messages',
-            'push', 'build', 'preset', 'layouts', 'preset_localv2', 'generate_slug_v2'
-          ]));
-        } else if (message.indexOf('generate_slug_v2:') === 0) {
-          var obj = JSON.parse(message.replace('generate_slug_v2:', ''));
-          var type = obj.type;
-          var name = obj.name;
-          var date = obj.date;
-
-          getTypeData(type, function(typeInfo) {
-            var tmpSlug = '';
-            tmpSlug = slug(name).toLowerCase();
-
-            if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.individualUrl) {
-              tmpSlug = utils.parseCustomUrl(typeInfo.customUrls.individualUrl, date) + '/' + tmpSlug;
-            } 
-
-            if(typeInfo && typeInfo.customUrls && typeInfo.customUrls.listUrl) {
-
-              if(typeInfo.customUrls.listUrl === '#') {
-                tmpSlug = tmpSlug;
-              } else {
-                tmpSlug = typeInfo.customUrls.listUrl + '/' + tmpSlug;
-              }
-            } else {
-              tmpSlug = type + '/' + tmpSlug;
-            }
-              
-            sock.sendText('done:' + JSON.stringify(tmpSlug));
-          });
-        } else if (message === 'build') {
-          buildQueue.push({ type: 'all' }, function(err) { 
-            sock.sendText('done');
-          });
-        } else if (message.indexOf('preset_local:') === 0) {
-          var fileData = message.replace('preset_local:', '');
-
-          if(!fileData) {
-            sock.sendText('done');
-            return;
-          }
-
-          extractPresetLocal(fileData, function(data) {
-            runNpm(function() {
-              sock.sendText('done:' + JSON.stringify(data));
-            });
-          });
-        } else if (message.indexOf('preset:') === 0) {
-          var url = message.replace('preset:', '');
-          if(!url) {
-            sock.sendText('done');
-            return;
-          }
-          downloadPreset(url, function(data) {
-            runNpm(function() {
-              sock.sendText('done:' + JSON.stringify(data));
-            });
-          });
+        if(self.childProcess) {
+          self.childProcess.send(message);
         } else {
-          sock.sendText('done');
+          handleMessage(message);
         }
       });
     }).listen(cmsSocketPort, '0.0.0.0');

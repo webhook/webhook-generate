@@ -81,14 +81,14 @@ module.exports = function(grunt) {
       }
     },
 
-    concurrent: {
+   /* concurrent: {
       options: {
         logConcurrentOutput: true
       },
       "wh-concurrent": {
         tasks: ["watch", "webListener-open"]
       }
-    },
+    },*/
 
     // Compile static assets into .whdist/static
     // Copy pages/html files into .whdist/pages and .whdist/html

@@ -2,6 +2,7 @@
 var curVersion = 'v53';
 
 var request = require('request');
+var fork = require('child_process').fork;
 
 module.exports = function(grunt) {
 
@@ -101,6 +102,20 @@ module.exports = function(grunt) {
       }
       grunt.log.writeln('\n' + result.stdout);
     });
+
+    var child = grunt.util.spawn({
+      grunt: true,
+      args: ['watch'].concat(grunt.option.flags()),
+      opts: { stdio: [ process.stdin, process.stdout, process.stderr, 'ipc'] }
+    }, function (err, result, code) {
+      if (err || code > 0) {
+        // Try using grunt.warn instead of process.exit
+        process.exit(0);
+      }
+    });
+
+    generator.setChildProcess(child);
+
   });
 
   grunt.registerTask('clean', 'Clean build files', function() {
@@ -181,7 +196,8 @@ module.exports = function(grunt) {
     grunt.task.run('configureProxies:wh-server')
     grunt.task.run('connect:wh-server');
     grunt.task.run('build');
-    grunt.task.run('concurrent:wh-concurrent');
+    grunt.task.run('webListener-open');
+    grunt.task.run('watch');
   });
 
 };
