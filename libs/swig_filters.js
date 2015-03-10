@@ -107,6 +107,72 @@ module.exports.init = function (swig) {
     return out;
   };
 
+  var googleImageSize = function(image, width, height, crop) {
+
+    var source = image.resize_url;
+
+    if(width) {
+      source += '=w' + width;
+    }
+
+    if(width && height) {
+      source += '-h' + height;
+    } else if (height) {
+      source += '=h' + height;
+    }
+
+    if(source.indexOf('http://') === 0) {
+      source = source.replace('http://', 'https://');
+    }
+
+    if(crop) {
+      source += '-c';
+    }
+
+    return source;
+  }
+
+  var resize = function(image, width, height) {
+    if(!image) {
+      return '';
+    }
+
+    if(typeof image === 'object' && image.resize_url) {
+      if(!height && !width) {
+        return image.url;
+      }
+
+      if(!image.resize_url) {
+        return image.url;
+      }
+
+      return googleImageSize(image, width, height);
+    } else {
+      console.log('A non image object appears to have been passed to |resize. This is not supported.'.red );
+      return image;
+    }
+  }
+
+  var crop = function(image, height, width) {
+    if(!image) {
+      return '';
+    }
+
+    if(typeof image === 'object' && image.resize_url) {
+      if(!height && !width) {
+        return image.url;
+      }
+
+      if(!image.resize_url) {
+        return image.url;
+      }
+
+      return googleImageSize(image, width, height, true);
+    } else {
+      console.log('A non image object appears to have been passed to |crop. This is not supported.'.red);
+      return image;
+    }
+  }
 
   var imageSize = function(input, size, deprecatedHeight, deprecatedGrow) {
 
@@ -507,7 +573,7 @@ module.exports.init = function (swig) {
   swig.setFilter('truncate', truncate);
   swig.setFilter('sort', sort);
   swig.setFilter('startsWith', startsWith);
-  swig.setFilter('endsWith', endsWith)
+  swig.setFilter('endsWith', endsWith);
   swig.setFilter('reverse', reverse);
   swig.setFilter('imageSize', imageSize);
   swig.setFilter('imageCrop', imageCrop);
@@ -523,4 +589,6 @@ module.exports.init = function (swig) {
   swig.setFilter('pluralize', pluralize);
   swig.setFilter('jsonp', jsonP);
   swig.setFilter('json', json);
+  swig.setFilter('resize', resize);
+  swig.setFilter('crop', crop);
 };
