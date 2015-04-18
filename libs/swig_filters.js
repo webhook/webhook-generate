@@ -114,9 +114,9 @@ module.exports.init = function (swig) {
     if(width === 'auto' && height === 'auto') {
       return image.resize_url;
     } else if(width === 'auto' && height) {
-      source += '=h' + height;
+      source += '=w0-h' + height;
     } else if(width && height === 'auto') {
-      source += '=w' + width;
+      source += '=w' + width + '-h0';
     } else if(width && height) {
       source += '=w' + width + '-h' +height;
     } else if(width && !height) {
