@@ -1,5 +1,5 @@
 
-var curVersion = 'v54';
+var curVersion = 'v55';
 
 var request = require('request');
 
