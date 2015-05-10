@@ -518,7 +518,7 @@ module.exports.init = function (swig) {
     var re = /(<img.*)?alt=(['"](.*?)\|(.*?)['"])(.*>)/;
     var result = "";
     input.split('\n').forEach(function(e,i) {
-      result += e.replace(re,"$1 alt=\"$3\" class=\"$4\">");
+      result += e.replace(re,"$1alt=\"$3\" class=\"$4\"$5");
     });
     return result;
   }
