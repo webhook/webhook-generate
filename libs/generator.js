@@ -647,7 +647,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
             filename = 'index';
           }
 
-          if(filename.indexOf('.raw') === (filename.length - 4) && extension === '.html') {
+          if(filename.indexOf('.raw') !== -1 && filename.indexOf('.raw') === (filename.length - 4) && extension === '.html') {
             filename = filename.slice(0, filename.length - 4);
           }
 
