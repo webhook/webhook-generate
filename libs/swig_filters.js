@@ -511,6 +511,18 @@ module.exports.init = function (swig) {
     return suffix;
   }
 
+  // Down and dirty hack for image classes
+  // ![Real Alt Text|class1 class2 class3](src) -> alt="Real Alt Text" class="class1 class2 class3"
+  // 
+  var imgAltClass = function (input) {
+    var re = /(<img.*)?alt=(['"](.*?)\|(.*?)['"])(.*>)/;
+    var result = "";
+    input.split('\n').forEach(function(e,i) {
+      result += e.replace(re,"$1alt=\"$3\" class=\"$4\"$5");
+    });
+    return result;
+  }
+
   markdown.safe = true;
   linebreaks.safe = true;
   jsonP.safe = true;
@@ -537,4 +549,5 @@ module.exports.init = function (swig) {
   swig.setFilter('pluralize', pluralize);
   swig.setFilter('jsonp', jsonP);
   swig.setFilter('json', json);
+  swig.setFilter('imgAltClass',imgAltClass);
 };
