@@ -1583,6 +1583,7 @@ module.exports.generator = function (config, options, logger, fileParser) {
 
   this.enableProduction = function() {
     productionFlag = true;
+    swig.setDefaults({ cache: 'memory' });
   }
 
   return this;
