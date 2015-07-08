@@ -375,6 +375,54 @@ module.exports.init = function (swig) {
     return filtered;
   }
 
+  var relationshipHas = function(input, relationshipName, property) {
+    var filtered = [];
+    var args =  [].slice.apply(arguments);
+    var filters = args.slice(3);
+
+    input.forEach(function(item) {
+      var relationship = item[relationshipName];
+
+      if (relationship) {
+        if(Array.isArray(relationship)) {
+          var include = false;
+
+          relationship.forEach(function(subItem) {
+            if(filters.length === 0 && subItem && subItem[property]) {
+              include = true;
+            }
+
+            if(filters.length > 0) {
+              filters.forEach(function(filter) {
+                if(subItem && subItem[property] === filter) {
+                  include = true;
+                }
+              })
+            }
+          });
+
+          if(include) {
+            filtered.push(item);
+          }
+        } else {
+          if(filters.length === 0 && relationship && relationship[property]) {
+            filtered.push(item);
+          }
+
+          if(filters.length > 0) {
+            filters.forEach(function(filter) {
+              if(subItem && subItem[property] === filter) {
+                filtered.push(item);
+              }
+            })
+          }
+        }
+      }
+    })
+
+    return filtered;
+  }
+
   var exclude = function(input, property) {
     var filtered = [];
 
@@ -542,6 +590,7 @@ module.exports.init = function (swig) {
   swig.setFilter('markdown', markdown);
   swig.setFilter('date', date);
   swig.setFilter('where', where);
+  swig.setFilter('relationshipHas', relationshipHas);
   swig.setFilter('exclude', exclude);
   swig.setFilter('duration', duration);
   swig.setFilter('abs', abs);
