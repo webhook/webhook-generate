@@ -132,7 +132,38 @@ module.exports.init = function (swig) {
     }
 
     return source;
-  }
+  };
+
+  var justinImageSize = function(image, width, height, crop) {
+
+    var source = image.resize_url,
+        parts = source.split('.'),
+        ext = parts.length > 1 ? ('.' + parts.pop()) : '';
+
+    source = parts.join('.');
+
+    if(width === 'auto' && height === 'auto') {
+      return source + '-0x0' + ext;
+    } else if(width === 'auto' && height) {
+      source += '-0x' + height;
+    } else if(width && height === 'auto') {
+      source += '-' + width + 'x0';
+    } else if(width && height) {
+      source += '-' + width + 'x' + height;
+    } else if(width && !height) {
+      source += '-' + width + 'x' + width;
+    }
+
+    if(crop) {
+      source += '-c';
+    } else {
+      source += '-a';
+    }
+
+    source += ext;
+
+    return source;
+  };
 
   var imageSize = function(input, size, deprecatedHeight, deprecatedGrow) {
 
@@ -150,6 +181,10 @@ module.exports.init = function (swig) {
 
       if(!input.resize_url) {
         return input.url;
+      }
+
+      if (input.resize_url.indexOf('http://static-cdn.jtvnw.net') === 0) {
+        return justinImageSize(input, size, deprecatedHeight);
       }
 
       return googleImageSize(input, size, deprecatedHeight);
@@ -199,6 +234,10 @@ module.exports.init = function (swig) {
 
       if(!size) {
         return input.url;
+      }
+
+      if (input.resize_url.indexOf('http://static-cdn.jtvnw.net') === 0) {
+        return justinImageSize(input, size, deprecatedHeight, true);
       }
 
       return googleImageSize(input, size, deprecatedHeight, true);      
