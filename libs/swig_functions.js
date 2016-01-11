@@ -475,6 +475,10 @@ module.exports.swigFunctions = function(swig) {
     return self.maxPage;
   };
 
+  var range = function(args) {
+    return _.range.apply(this, arguments);
+  };
+
   var getPageUrl = function(pageNum) {
     if(pageNum == 1) {
       return self.paginationBaseUrl;
@@ -628,6 +632,7 @@ module.exports.swigFunctions = function(swig) {
       getCurPage: getCurPage,
       getMaxPage: getMaxPage,
       getPageUrl: getPageUrl,
+      range: range,
       url: url,
       getCurrentUrl: getCurrentUrl,
       getSetting: getSetting,
