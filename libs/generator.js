@@ -636,13 +636,14 @@ module.exports.generator = function (config, options, logger, fileParser) {
             return true;
           }
 
+          var forceBuild = false;
           var newFile = file.replace('pages', './.build');
 
           var dir = path.dirname(newFile);
           var filename = path.basename(newFile, path.extname(file));
           var extension = path.extname(file);
 
-          if(path.extname(file) === '.html' && filename !== 'index' && path.basename(newFile) !== '404.html' && file.indexOf('.raw.html') === -1) {
+          if(extension === '.html' && filename !== 'index' && path.basename(newFile) !== '404.html' && file.indexOf('.raw.html') === -1 && extension !== 'tpl') {
             dir = dir + '/' + filename;
             filename = 'index';
           }
@@ -651,9 +652,15 @@ module.exports.generator = function (config, options, logger, fileParser) {
             filename = filename.slice(0, filename.length - 4);
           }
 
-          newFile = dir + '/' + filename + path.extname(file);
+          if(extension === '.tpl') {
+            extension = filename.substr(filename.length - 5, filename.length - 1);
+            filename = filename.slice(0, filename.length - 5);
+            forceBuild = true;
+          }
 
-          if(extension === '.html' || extension === '.xml' || extension === '.rss' || extension === '.xhtml' || extension === '.atom' || extension === '.txt') { 
+          newFile = dir + '/' + filename + extension;
+
+          if(forceBuild || extension === '.html' || extension === '.xml' || extension === '.rss' || extension === '.xhtml' || extension === '.atom' || extension === '.txt') { 
             writeTemplate(file, newFile);
           } else {
             mkdirp.sync(path.dirname(newFile));
