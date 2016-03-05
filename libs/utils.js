@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var moment = require('moment');
+var slug = require('uslug');
 
 /**
  * Extends source dictionaries into the target dictionary
@@ -86,6 +87,10 @@ module.exports.each = function(obj, cb) {
 // #d - Day leading zero
 // #j - Day, no leading zero
 // #T - The typename (e.g. articles)
+//
+// Support field names in the url
+// :[field_name] - Value of that field
+//
 module.exports.parseCustomUrl = function(url, object) {
   var publishDate = object.publish_date ? object.publish_date : object;
 
@@ -115,7 +120,17 @@ module.exports.parseCustomUrl = function(url, object) {
     }
   }
 
+  function replaceByProp(match, prop) {
+    if(object.hasOwnProperty(prop)){
+      return slug(object[prop]);
+    } else {
+      return '';
+    }
+  }
+
   url = url.replace(/#(\w)/g, replacer);
+
+  url = url.replace(/:(\w+)/g, replaceByProp);
 
   return url;
 }
