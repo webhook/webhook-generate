@@ -4,8 +4,8 @@
   {% for image in <%- value %> %}
     <li>
       {# You can get the raw image url by accessing image.url #}
-      <img src="{{ image|imageSize(200,200) }}">
+      <img src="{{ image|imageSize(200, 200) }}">
       <div>{{ image.caption }}</div>
     </li>
-  {% endfor%}
+  {% endfor %}
 </ul>
